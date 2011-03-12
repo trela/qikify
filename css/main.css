@@ -9,11 +9,30 @@ body {
 	overflow:hidden;
 }
 
+h1 { margin: 10px; }
+
+#login { 
+	margin: 200px auto;
+	padding: 0 auto;
+	width: 300px;
+}
+#loginLabel { clear:both; display: block; margin-bottom: 10px; }
+#loginText {
+  width: 100px;
+  text-align: left;
+  background-color: #444;
+  padding: 6px;
+  color: #fff;
+  float: left;
+}
+#loginButton { margin-left: 10px; float: left;} 
+
 #container { 
 	width: 960px;
 	margin: 0 auto;
 	padding: 0 auto;
-	text-align: center; 
+	text-align: center;
+	background: #050505; 
 }
 #chats {
   width: 100%;
@@ -32,10 +51,14 @@ body {
   bottom: 0px;
 }
 #im {
-  width: 100%;
+  width: 500px;
   text-align: left;
   background-color: #444;
-  padding: 10px;
-  margin-bottom: -50px;
+  padding: 6px;
   color: #fff;
+  float:left;
 }
+
+#submitButton {  margin-left: 10px; float: left; }
+
+.information { color: #00ff00;}

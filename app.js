@@ -69,6 +69,7 @@ var socket  = io.listen(app, {transports:['websocket', 'xhr-polling']}),
 
 socket.on('connection', function(client) {
   client.on('message', function(data) {
+	// Initial connection
     if ((/^(USERNAME:).*$/ig).test(data)) {
       var parts = data.split(":");
       var username = parts[1];
@@ -107,7 +108,9 @@ socket.on('connection', function(client) {
     if (buffer.length > MAXBUF) {
       buffer.shift();
     }
-    client.broadcast(data);
+	
+	console.log(data);
+    client.broadcast(json({'username':client.username, 'message':data}));
   });
 
   client.on('disconnect', function() {
