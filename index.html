@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html manifest="app.manifest">
+<head>
+  <title>Chat</title>
+  <link rel="stylesheet" type="text/css" href="css/main.css" />
+	<script src="javascripts/socket.io.js" type="text/javascript" charset="utf-8"></script>
+	<script>io.setPath('/');</script>
+	<script type="text/javascript">
+		var socket;
+		var applicationDidLoad = function() {
+		  if ('undefined'===typeof(io)) {
+		    throw new Error("Application failed to load: Socket.IO not found");
+		  }    
+		  socket = new io.Socket("localhost", {port:9202});
+		  socket.on('message', didReceiveData);
+		  socket.connect();
+
+		  var username = prompt("Enter a username: ");
+		  if (username && username != "") {
+		    socket.send("USERNAME:"+username);
+		  }
+		};
+
+		var didReceiveData = function(data) {
+		  if ("string"===typeof(data)) {
+		    data = JSON.parse(data);
+		  }
+		  return renderChatData(data);
+		};
+
+		var sendData = function() {
+		  var doc = document,
+		      elt = doc.getElementById('im'),
+		      msg = elt.value;
+		  if (msg) {
+		    socket.send(msg);
+		    renderChatData({message:msg});
+		    elt.value = "";
+		  }
+		  elt.focus();
+		};
+
+		var renderChatData = function(data) {
+		  var doc     = document,
+		      chatBox = doc.getElementById('chats');
+
+		  var renderMessage = function(message) {
+		    var chatMsg = message.message,
+		        chatUsr = (message.username || message.user),
+		        chatElt = doc.createElement('li');
+		    chatElt.setAttribute('class', 'chat');
+
+		    if (chatUsr) {
+		      chatElt.setAttribute('class', 'chat remote');
+		      var usrElt = doc.createElement('span');
+		      usrElt.setAttribute('class', 'user');
+		      usrElt.innerHTML = chatUsr + ": ";
+		      chatElt.appendChild(usrElt);
+		    }
+		    var msgElt = doc.createElement('span');
+		    msgElt.setAttribute('class', 'message');
+		    msgElt.innerHTML = chatMsg;
+		    chatElt.appendChild(msgElt);
+		    return chatElt;
+		  };
+
+		  if (data && data.message) {        
+		    chatBox.appendChild(renderMessage(data));
+		  } else if (data && data.messages) {
+		    var fragment = doc.createDocumentFragment(),
+		        messages = data.messages,
+		        count    = messages.length,
+		        i = -1;
+		    while (count > ++i) {
+		      var message = messages[i];
+		      fragment.appendChild(renderMessage(message));
+		    }
+		    chatBox.appendChild(fragment);        
+		  } else if (data && data.announcement) {
+		    var chatInfo = data.announcement,
+		        infoElt  = doc.createElement('li');
+		    infoElt.setAttribute('class', 'information');
+		    infoElt.innerHTML = chatInfo;
+		    chatBox.appendChild(infoElt);
+		  } else if (data && data.userlist && data.userlist.length) {
+		    var userlist = data.userlist,
+		        infoElt  = doc.createElement('li');
+		    infoElt.setAttribute('class', 'information');
+		    infoElt.innerHTML = "Users: " + userlist.join(", ");
+		    chatBox.appendChild(infoElt);
+		  }
+		  chatBox.scrollTop = chatBox.scrollHeight;
+		};
+</script>
+
+</head>
+<body onload="applicationDidLoad();">
+  	<div id="container">
+    	<ul id="chats">
+    	</ul>
+    	<form id="imchat" onsubmit="sendData(); return false;">
+      	<input type="text" id="im" value="">
+    	</form>
+  	</div>
+</body>
+</html>
