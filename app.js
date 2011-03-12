@@ -61,43 +61,39 @@ var app = http.createServer(function(request, response) {
 });
 
 
-
-var socket = io.listen(app, {transports:['websocket', 'xhr-polling']}),
-  buffer = [],
-  MAXBUF = 1024,
-  json = JSON.stringify;
-
 var clients = [];
-clients.usernames = function(client) {
-  return client.username;
-}
+var socket  = io.listen(app, {transports:['websocket', 'xhr-polling']}),
+  	buffer  = [],
+  	MAXBUF  = 1024,
+  	json 	= JSON.stringify;
 
 socket.on('connection', function(client) {
-
   client.on('message', function(data) {
     if ((/^(USERNAME:).*$/ig).test(data)) {
       var parts = data.split(":");
       var username = parts[1];
 
+	  // ensure non-blank username.
       if (!username || username == '') {
         client.send(json({announcement:"You must specify a username. Please reload the app."}));
         return;
       }
 
-      var usernames = clients.map(clients.usernames);
+	  // ensure unique username.
+      var usernames = clients.map( function(client) { return client.username; } );
       if (usernames.indexOf(username) >= 0) {
         client.send(json({announcement:"Username in use"}));
         return;
       }
 
       client.username = username;
-
       client.broadcast(json({announcement:client.username+' joined'}));
       console.log(client.sessionId + " = " + client.username);
       client.send(json({messages:buffer}));
       client.send(json({userlist:usernames}));
       client.send(json({announcement:"Connected! Hello, " + username + "!"}));
-
+	  client.send(json({announcement:"all your base are belong to us."}));
+	
       clients.push(client);
       return;
     } 
@@ -107,12 +103,11 @@ socket.on('connection', function(client) {
       return;
     }
 
-    var message = {'user':client.sessionId, 'username':client.username, 'message':data};
-    buffer.push(message);
+    buffer.push({'user':client.sessionId, 'username':client.username, 'message':data});
     if (buffer.length > MAXBUF) {
       buffer.shift();
     }
-    client.broadcast(json(message));
+    client.broadcast(data);
   });
 
   client.on('disconnect', function() {
@@ -127,7 +122,6 @@ socket.on('connection', function(client) {
 });
 
 
-// Only listen on $ node app.js
 
 if (!module.parent) {
   app.listen(9202);
