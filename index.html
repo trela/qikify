@@ -1,30 +1,40 @@
+<!--
+ *
+ * Attribution: heavily modified version of socket-chat, on github at:
+ *  			https://github.com/arunjitsingh/socket-chat
+ *
+-->
 <!DOCTYPE html>
 <html manifest="app.manifest">
 <head>
   	<title>Chat</title>
   	<link rel="stylesheet" type="text/css" href="css/main.css" />
-	<script src="javascripts/socket.io.js" type="text/javascript" charset="utf-8"></script>
-	
-	<link type="text/css" href="css/Aristo/jquery-ui-1.8.7.custom.css" rel="stylesheet" />	
+	<link rel="stylesheet" type="text/css" href="css/Aristo/jquery-ui-1.8.7.custom.css" />
+	<script type="text/javascript" src="javascripts/socket.io.js"></script>	
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script> 
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js"></script>
-	
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.7/jquery-ui.min.js"></script>
 	<script type="text/javascript">
 		io.setPath('/');
 		if ('undefined'===typeof(io)) { throw new Error("Application failed to load: Socket.IO not found"); }
 	  	var socket = new io.Socket("localhost", {port:9202});
-	
+
 		$(document).ready(function() {
+			// Hide chat interface until after login.
 			$("div#container").hide();
 			$("#loginButton, #submitButton").button();
 
+			// Login form submit calls init() to start the chat interface.
 			$("#loginButton").click(function() { return init(); });
 			$("#loginForm").submit( function() { return init(); });
 			
+			// Submit button / enter keypress submit the chat message.
 			$("#submitButton").click(function() { return pushMsg(); });
 			$('#imchat').submit(     function() { return pushMsg(); });
 		});
 		
+		// This function grabs the username from the login box and sends a login
+		// request message to the server. It also associates the pullMsg() handler
+		// function with the websocket so that messages will be handled there.
 		var init = function() {
 			var username = $("#loginText").val();
 			$("#login").fadeOut(function() { 
@@ -37,6 +47,7 @@
 			return false;
 		};
 		
+		// This function pushes a message to the server from the chat box.
 		var pushMsg = function() {
 			var msg = $('#im').val();
 		  	if (msg) {
@@ -82,7 +93,6 @@
 			return false;
 		};
 	</script>
-
 </head>
 <body>
 	<h1>KuppDev Chat</h1>

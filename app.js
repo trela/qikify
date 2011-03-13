@@ -1,4 +1,10 @@
-//require.paths.unshift(__dirname + '/lib');
+/*
+ *
+ * Attribution: adapted from socket-chat, on github at:
+ *  			https://github.com/arunjitsingh/socket-chat
+ *
+ */
+
 
 var io = require('socket.io'),
   http = require('http');
