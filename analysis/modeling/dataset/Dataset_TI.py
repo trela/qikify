@@ -66,7 +66,7 @@ class Dataset_TI(Dataset):
 		self.subsetRows(indRows)
 		self.computePF(specs)
 		return ind
-		
+
 	# Identify outliers. If "all" parameter is set, do so on the basis of *both* spec & ORBiT
 	# measurements. Otherwise, only use ORBiT measurements to ID outliers.
 	def idOutliers(self, all, ind):

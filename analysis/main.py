@@ -45,16 +45,10 @@ if __name__ == "__main__":
 	specs.genCriticalRegion()
 	
 	baseData  = Dataset_TI(filename = dataFiles[0])
-	#baseData.initSubsetIndices(specs)
 	baseData.printSummary()
+
 	
-	
-	## ============= LSFS will happen here ============= ##
-	#baseData.subsetCols(dotdict({'oData': array([82, 96, 42, 100, 108, 107, 68, 118, 92, 9])}))
-	#baseData.printSummary()
-	
-	
-	'''
+'''
 	## ============= Run KDE ============= ##
 	kde  	 	   = KDE.KDE(baseData, a = 0, specs = specs)
 	S	     	   = kde.run(nGood = 10, 
@@ -72,6 +66,4 @@ if __name__ == "__main__":
 
 	plotSample(synData.sData, baseData.sData, 4,5)
 '''
-
-
 

@@ -20,7 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 '''
-
+from numpy import *
 import matplotlib.pyplot as plt
 
 # 2D Scatterplot of synthetic & actual data.
@@ -62,3 +62,15 @@ def pair(data, labels=None):
 			else:
 				ax.scatter(data[:,i], data[:,j])
 	return fig
+	
+def uniqueValuesHistogram(baseData):
+	fig, ax = plt.subplots(1)
+	uniqueCounts = array([ len(unique(baseData.data[:,i])) for i in xrange(size(baseData.data,1))])
+	ax.hist(uniqueCounts, 100, facecolor='green', alpha=0.5)
+	fig.savefig('/Users/nathankupp/Desktop/histAll.png')
+		
+	fig, ax = plt.subplots(1)
+	uniqueCounts = uniqueCounts[uniqueCounts < 250]
+	ax.hist(uniqueCounts, 50, facecolor='green', alpha=0.5)
+	fig.savefig('/Users/nathankupp/Desktop/histZoom.png')
+	
