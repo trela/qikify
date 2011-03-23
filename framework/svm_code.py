@@ -23,10 +23,10 @@ THE SOFTWARE.
 
 # First pass integration of SVM code
 def runSVM():
-	dataTrain 	  = Dataset('/Users/nathankupp/Desktop/svm/xTrain.csv', hasHeader = False)
-	dataTrain.gnd = Dataset('/Users/nathankupp/Desktop/svm/yTrain.csv', hasHeader = False).data
-	dataTest 	  = Dataset('/Users/nathankupp/Desktop/svm/xTest.csv',  hasHeader = False)
-	dataTest.gnd  = Dataset('/Users/nathankupp/Desktop/svm/yTest.csv',  hasHeader = False).data
+	dataTrain 	  = Dataset('~/Desktop/svm/xTrain.csv', hasHeader = False)
+	dataTrain.gnd = Dataset('~/Desktop/svm/yTrain.csv', hasHeader = False).data
+	dataTest 	  = Dataset('~/Desktop/svm/xTest.csv',  hasHeader = False)
+	dataTest.gnd  = Dataset('~/Desktop/svm/yTest.csv',  hasHeader = False).data
 
 	dataTrain.printSummary()
 	dataTest.printSummary()

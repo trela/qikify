@@ -25,9 +25,8 @@ import sys, os, random
 from numpy import *
 from scipy.special import gamma
 
-sys.path.append( os.path.join( os.getcwd(), '..'))
-from ..helpers.general import *
-from ..dataset.Specs import Specs
+from helpers.general import *
+from models.Specs import Specs
 from slicesample import * 
 
 class KDE:
@@ -105,6 +104,9 @@ class KDE:
 		j = random.randint(self.n)
 		e = slicesample(zeros(self.d), 1, self.K_e)
 		s = self.datan[j,:] + self.h * self.lambdas[j] * e
+		
+		# Use mirroring technique to deal with boundary conditions.
+		# Perhaps we should consider applying boundary kernels here...
 		for k in xrange(self.d):
 			if (s[k] < self.bounds[0,k]):
 				s[k] = self.bounds[0,k]+abs(self.bounds[0,k]-s[k])

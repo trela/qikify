@@ -27,11 +27,11 @@ from scikits.learn.metrics import classification_report
 from scikits.learn.metrics import confusion_matrix
 from scikits.learn.svm import SVC
 
-from modeling.dataset.Specs import *
-from modeling.dataset.Dataset_TI import *
-from modeling.helpers.general import *
-from modeling.helpers.plots import *
-from modeling.kde import KDE
+from models.Specs import *
+from models.Dataset_TI import *
+from helpers.general import *
+from helpers.plots import *
+from controllers.kde import KDE
 
 
 	

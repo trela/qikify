@@ -22,10 +22,8 @@ THE SOFTWARE.
 '''
 
 import sys, os, csv
-sys.path.append( os.path.join( os.getcwd(), '..'))
-
 from numpy import *
-from ..helpers.general import *
+from helpers.general import *
 
 class Specs:
 	specs = {}

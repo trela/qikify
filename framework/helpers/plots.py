@@ -65,7 +65,7 @@ def pair(data, labels=None):
 	
 def uniqueValuesHistogram(baseData):
 	fig, ax = plt.subplots(1)
-	uniqueCounts = array([ len(unique(baseData.data[:,i])) for i in xrange(size(baseData.data,1))])
+	uniqueCounts = array([ len(unique(baseData.oData[:,i])) for i in xrange(size(baseData.oData,1))])
 	ax.hist(uniqueCounts, 100, facecolor='green', alpha=0.5)
 	fig.savefig('/Users/nathankupp/Desktop/histAll.png')
 		
