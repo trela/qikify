@@ -21,6 +21,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 '''
 
+from scikits.learn.grid_search import GridSearchCV
+from scikits.learn.metrics import classification_report
+from scikits.learn.metrics import confusion_matrix
+from scikits.learn.svm import SVC
+
+
 # First pass integration of SVM code
 def runSVM():
 	dataTrain 	  = Dataset('~/Desktop/svm/xTrain.csv', hasHeader = False)

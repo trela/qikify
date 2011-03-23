@@ -32,7 +32,7 @@ from models.Dataset_TI import *
 from helpers.general import *
 from helpers.plots import *
 from controllers.kde import KDE
-
+from controllers.lsfs import LSFS
 
 	
 if __name__ == "__main__":
@@ -47,6 +47,8 @@ if __name__ == "__main__":
 	baseData  = Dataset_TI(filename = dataFiles[0])
 	baseData.printSummary()
 
+	lsfs = LSFS.LSFS()
+	lsfs.run()
 	
 '''
 	## ============= Run KDE ============= ##

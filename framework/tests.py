@@ -21,17 +21,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 '''
 
-import csv, os, glob, numpy, sys, ConfigParser
-from scikits.learn.grid_search import GridSearchCV
-from scikits.learn.metrics import classification_report
-from scikits.learn.metrics import confusion_matrix
-from scikits.learn.svm import SVC
+import csv, os, glob, sys, ConfigParser
 import matplotlib.pyplot as plt
 
-from modeling.dataset import Dataset, Dataset_TI, Specs
-from modeling.helpers import *
-from modeling.kde import KDE, plotSample, slicesample
-
+from numpy import *
+from helpers import *
+from controllers.kde import KDE, slicesample
+from controllers.lsfs import LSFS
 
 # Test KDE.
 def testKDE():
@@ -64,11 +60,32 @@ def testSliceSample():
 	fig.savefig('/Users/nathankupp/Desktop/Figure1.png')
 	return x
 
-
-
+# Test LSFS code
+def testConstructW():
+	lsfs = LSFS.LSFS()
+	
+	# Test case simple
+	X = ones((4,4)) + diag(range(1,5))
+	gnd = array([-1,1,-1,1])
+	lsfs.constructW(X, gnd, bLDA = 1)
+	#print lsfs.W
+	
+	# Test case complex
+	X = random.random((10,10))
+	gnd = 2 * (random.randint(0,2,10) - 0.5)
+	lsfs.constructW(X,gnd, bLDA = 1)
+	#print lsfs.W
+	
+	# Turn off bLDA
+	X = ones((4,4)) + diag(range(1,5))
+	gnd = array([-1,1,-1,1])
+	lsfs.constructW(X, gnd)
+	print lsfs.W
+	
 if __name__ == "__main__":
-	testKDE()
+	#testKDE()
 	#x = testSliceSample()
+	testConstructW()
 	
 	
 	

@@ -62,4 +62,25 @@ def scale(data, scaleDict = None, reverse = False):
 		return (data - scaleDict.mean) / scaleDict.std
 
 
+# Set the diagonal of a matrix to all zeros
+def zeroMatrixDiagonal(X):
+	return X - diag(diag(X))
+
+# Returns a matrix which is the elementwise maximum of two matrices X and Y
+mmax = vectorize(lambda x,y: max(x,y), otypes = [float32])
+
+
+# Set a submatrix to values in D. That is:
+#  		[0, 0, 0]
+#	X = [0, 0, 0]  D = [1 2] ind = [0 1]
+#  		[0, 0, 0]	   [1 2]
+# Gives:
+#
+#  		[1, 2, 0]
+#	X = [1, 2, 0]
+#  		[0, 0, 0]
+def setSubMat(X, D, ind):
+	for i, row in enumerate(ind):
+		X[row,ind] = D[i,:]
+
 
