@@ -24,11 +24,12 @@ THE SOFTWARE.
 import matplotlib.pyplot as plt
 
 # 2D Scatterplot of synthetic & actual data.
-def plotSample(sData,bData, d1, d2):
+def plotSample(sData,bData, d1, d2, outFile = None):
 	fig, ax = plt.subplots(1)
 	ax.scatter(sData[:,d1],sData[:,d2], alpha=0.5, c='r')
 	ax.scatter(bData[:,d1],bData[:,d2], alpha=0.5, c='g')
-	fig.savefig('/Users/nathankupp/Desktop/Figure1.png')
+	if outFile is not None:
+		fig.savefig(outFile)
 	plt.show()
 
 

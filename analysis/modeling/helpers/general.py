@@ -25,15 +25,11 @@ import csv
 from numpy import * 
 import matplotlib.pyplot as plt
 
-# Compare data to lsl, usl and return +1/-1 label vector
-def compareToSpecs(data, lsl, usl):
-	result = ones(size(data))
-	if ~isnan(lsl):
-		result = (data >= lsl)
-	if ~isnan(usl):
-		result = logical_and(result, data <= usl)
-	return bool2symmetric(result)
-	
+
+# Changes True/False data to +1/-1 symmetric.
+def bool2symmetric(data):
+	return array((data - 0.5) * 2.0, dtype = int)
+
 	
 # Write mat to filename as a csv.
 def csvWriteMatrix(filename, mat):
@@ -49,16 +45,21 @@ class dotdict(dict):
     __setattr__= dict.__setitem__
     __delattr__= dict.__delitem__
 
+# Extracts a subset of a dictionary.
+def extract(keys, d):
+    return dict((k, d[k]) for k in keys if k in d)
 
-# Changes True/False data to +1/-1 symmetric.
-def bool2symmetric(data):
-	return array((data - 0.5) * 2.0, dtype = int)
-	
-	
+
+# Facilitates standardizing data by subtracting the mean and dividing by
+# the standard deviation. Set reverse to True to perform the inverse 
+# operation.
 def scale(data, scaleDict = None, reverse = False):
 	if reverse:
-		return (data.copy() * scaleDict.std) + scaleDict.mean
+		return (data * scaleDict.std) + scaleDict.mean
 	else:
 		if scaleDict is None:
 			scaleDict = dotdict({'mean': data.mean(axis = 0), 'std': data.std( axis = 0)})
-		return (data.copy() - scaleDict.mean) / scaleDict.std
+		return (data - scaleDict.mean) / scaleDict.std
+
+
+

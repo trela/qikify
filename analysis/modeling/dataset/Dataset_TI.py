@@ -25,22 +25,29 @@ from Dataset import *
 
 class Dataset_TI(Dataset):
 	
-	def __init__(self, filename = None):
+	# Constructor is either based on reading a file or passed in data.
+	def __init__(self, filename = None, oNames = None, sNames = None, oData  = None, sData = None):
 		if filename is not None:
 			# Read dataset column names
 			fileh 	  	= open(filename, 'rU')
 			specReader 	= csv.reader(fileh)
 			self.names  =  array(specReader.next())
 			fileh.close()
-		
+
 			# Read dataset
 			self.data   = loadtxt(filename, delimiter=',', skiprows=1)
-			self.sData  = self.data[:,739:];
-			self.sNames = self.names[ 739:];
-			self.oData  = self.data[:,0:739];
-			self.oNames = self.names[ 0:739];
-		
+			self.sData  = self.data[:,739:]
+			self.sNames = self.names[ 739:]
+			self.oData  = self.data[:,0:739]
+			self.oNames = self.names[ 0:739]
+			
+		else:
+			self.sData  = sData
+			self.sNames = sNames
+			self.oData  = oData
+			self.oNames = oNames
 
+			
 	# Run on first dataset, baseData, to:
 	# 1. Create logical column index vector which retains only features with more than 100 unique values.
 	# 2. Compute pass/fail for all devices.
@@ -71,18 +78,21 @@ class Dataset_TI(Dataset):
  	def computePF(self, specs, ind = None):
 		n, p       = size(self.sData,0), size(self.sData,1)
 		self.pfMat = ones((n,p))
-		for j in range(0,p):
+		for j in xrange(p):
 			lsl, usl = specs[self.sNames[j]]
 			if type(ind) is dict and ~(ind.sData[j]):
 				continue
 			else:
-				self.pfMat[:,j]  = compareToSpecs(self.sData[:,j], lsl, usl)
+				self.pfMat[:,j]  = specs.compareToSpecs(self.sData[:,j], lsl, usl)
 		self.gnd = bool2symmetric(sum(self.pfMat, 1) == p)
+		return self
 
 
 
 
 	# ===============================================================
+	def allData(self):
+		return hstack((self.oData, self.sData))
 
 	def subsetCols(self, ind):
 		if 'sData' in ind.keys():

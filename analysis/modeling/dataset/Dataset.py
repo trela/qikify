@@ -38,12 +38,15 @@ class Dataset:
 		
 		# Read dataset data
 		self.data  = loadtxt(filename, delimiter=',', skiprows=1)
-
 		
 	def __getitem__(self, name):
 		return self.data[:,self.names.index(name)]
 
-	# ===============================================================
+
+	def allData(self):
+		return self.data
+
+		
 	def printSummary(self):
 		print '====================================='
 		print ' Dataset\t# Rows\t# Cols'

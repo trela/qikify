@@ -27,7 +27,8 @@ from scikits.learn.metrics import classification_report
 from scikits.learn.metrics import confusion_matrix
 from scikits.learn.svm import SVC
 
-from modeling.dataset import Dataset, Dataset_TI, Specs
+from modeling.dataset.Specs import *
+from modeling.dataset.Dataset_TI import *
 from modeling.helpers.general import *
 from modeling.helpers.plots import *
 from modeling.kde import KDE
@@ -35,32 +36,42 @@ from modeling.kde import KDE
 
 	
 if __name__ == "__main__":
+	## ============= Init & Load Data, Specs ============= ##
 	config = ConfigParser.RawConfigParser()
 	config.read('settings.conf')
 	
 	dataFiles = glob.glob(config.get('Settings', 'dataFiles'))
-	specs     = Specs.Specs(config.get('Settings', 'specFile'))
+	specs     = Specs(config.get('Settings', 'specFile'))
+	specs.genCriticalRegion()
 	
-	baseData  = Dataset_TI.Dataset_TI(dataFiles[0])
-	baseData.initSubsetIndices(specs)
+	baseData  = Dataset_TI(filename = dataFiles[0])
+	#baseData.initSubsetIndices(specs)
 	baseData.printSummary()
 	
-	# LSFS will happen here
-	baseData.subsetCols(dotdict({'oData': array([82, 96, 42, 100, 108, 107, 68, 118, 92, 9])}))
-	baseData.printSummary()
-
-	# Run KDE
+	
+	## ============= LSFS will happen here ============= ##
+	#baseData.subsetCols(dotdict({'oData': array([82, 96, 42, 100, 108, 107, 68, 118, 92, 9])}))
+	#baseData.printSummary()
+	
+	
+	'''
+	## ============= Run KDE ============= ##
+	kde  	 	   = KDE.KDE(baseData, a = 0, specs = specs)
+	S	     	   = kde.run(nGood = 10, 
+							 nCritical = 10, 
+							 nFail = 100, 
+							 inner = vstack([ specs.inner[name] for name in baseData.sNames ]),
+							 outer = vstack([ specs.outer[name] for name in baseData.sNames ]))	
+	
 	# Create native data structure from KDE results
-	kde  	 	   = KDE.KDE(hstack((baseData.oData, baseData.sData)))
-	S	     	   = kde.run(2000)	
-	synData 	   = Dataset_TI.Dataset_TI()
-	synData.oNames = baseData.oNames
-	synData.sNames = baseData.sNames
-	synData.oData  = S[:,0:size(baseData.oData,1)]
-	synData.sData  = S[:,  size(baseData.oData,1):]
+	synData = Dataset_TI(oNames = baseData.oNames, 
+						 sNames = baseData.sNames, 
+						 oData  = S[:,0:size(baseData.oData,1)],
+						 sData  = S[:,  size(baseData.oData,1):])
 	synData.computePF(specs)
-	plotSample(synData.sData, baseData.sData, 4,5)
 
+	plotSample(synData.sData, baseData.sData, 4,5)
+'''
 
 
 

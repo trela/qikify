@@ -21,29 +21,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 '''
 
-import csv
+import sys, os, csv
+sys.path.append( os.path.join( os.getcwd(), '..'))
 
+from numpy import *
+from ..helpers.general import *
 
 class Specs:
 	specs = {}
 	names = []
 	
+	# Read in specs from `filename` and create {specname: [lsl,usl]} dictionary.
 	def __init__(self, filename):
-	    """This class retrieves specification limits from the file 
-	    filename. Note that it expects the following format for each column: 
-        
-	             Col. 1            Col. 2                        
-	       [ Test_Name     ]     [ Test_Name     ]                 
-	       [ LSL           ]     [ LSL           ]     ...         
-	       [ USL           ]     [ USL           ]                 
-
-	    Args:
-	    filename: The name of the CSV-formatted spec limit file.    
-    
-	    Returns:
-	    Creates the dictionary { test_ID: [LSL, USL], ... } 
-	    """
-    
 	    fileh 	  	= open(filename, 'rU')
 	    specReader 	= csv.reader(fileh)
 	    self.names 	= specReader.next()
@@ -51,16 +40,40 @@ class Specs:
 	    USL   		= specReader.next()
 
 	    for i, limit in enumerate(zip(LSL, USL)):
-			# Use this lambda function because float() fails on empty string, i.e. the 
-			# non-existent spec limit.
+			# Use this lambda function because float() fails on empty/non-existent spec limit.
 	    	lsl, usl = map(lambda x: float(x) if x else float('nan'), limit)
-	        self.specs[self.names[i]] = [lsl, usl]
-        
+	        self.specs[self.names[i]] = array([lsl, usl])
 	    fileh.close()
 
-    
+	# Compare data to lsl, usl and return +1/-1 label vector
+	def compareToSpecs(self, data, lsl, usl):
+		result = ones(size(data))
+		if isfinite(lsl):
+			result = logical_and(result, data >= lsl)
+		if isfinite(usl):
+			result = logical_and(result, data <= usl)
+		return bool2symmetric(result)
+
 	def __getitem__(self, key):
 		return self.specs[key]
     
-    
-    
+
+    # =============== Partitioned Sampling Methods =============== 
+	# Takes specification boundary and generates two boundaries to define 'critical' device set.
+	def genCriticalRegion(self, delta = 1.0):
+		self.inner = self.outer = {}
+		for (k, v) in self.specs.items():
+			lsl, usl = v
+			if (isnan(lsl) and isnan(usl)):
+				continue
+			elif isnan(lsl):
+				self.inner[k] = array([-inf, 5.0/6.0 * usl])
+				self.outer[k] = array([-inf, 7.0/6.0 * usl])
+			elif isnan(usl):
+				self.inner[k] = array([5.0/6.0 * lsl, inf])
+				self.outer[k] = array([7.0/6.0 * lsl, inf])
+			else:
+				smean = mean([lsl, usl])
+				self.inner[k] = array([smean + 5.0/6.0 * lsl, smean + 5.0/6.0 * usl])
+				self.outer[k] = array([smean + 7.0/6.0 * lsl, smean + 7.0/6.0 * usl])
+

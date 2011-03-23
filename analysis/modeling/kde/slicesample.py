@@ -4,20 +4,16 @@
 Loosely based on slicesample() from MATLAB.
  
 '''
-
 from numpy import *
 
-
-def slicesample(initial, nsamples, pdf, width = 10, maxiter = 200):
-	dim = size(initial)
+def slicesample(x0, nsamples, pdf, width = 10, maxiter = 200):
+	dim = size(x0)
 	rnd = zeros((nsamples,dim))
-
 	e   = random.exponential(1,nsamples) # needed for the vertical position of the slice.
 	RW  = random.rand(nsamples,dim) # factors of randomizing the width
 	RD  = random.rand(nsamples,dim) # uniformly draw the point within the slice
-	x0  = initial
 	
-	for i in range(nsamples):
+	for i in xrange(nsamples):
 		# A vertical level is drawn uniformly from (0,f(x0)) and used to define
 		# the horizontal "slice".
 		z = logpdf(x0, pdf) - e[i]
@@ -44,26 +40,22 @@ def slicesample(initial, nsamples, pdf, width = 10, maxiter = 200):
 
 	    # A new point is found by picking uniformly from the interval [xl, xr].
 		xp = RD[i,:]*(xr-xl) + xl
-		
+	
 	    # shrink the interval (or hyper-rectangle) if a point outside the
 	    # density is drawn.
 		iteration = 0
 		while outside(xp,z, pdf) and iteration < maxiter:
 			rshrink = (xp > x0)
-			xr[rshrink] = xp[rshrink]
 			lshrink = ~rshrink
+			xr[rshrink] = xp[rshrink]
 			xl[lshrink] = xp[lshrink]
 			xp = (random.rand(1,dim) * (xr-xl))[0] + xl # draw again
 			iteration += 1
-			
-		x0 = xp # update the current value 
-		rnd[i,:] = x0
-		
+		rnd[i,:] = x0 = xp # update the current value 
 	return (rnd[0,:] if nsamples == 1 else rnd)
 
-
 def logpdf(x, pdf):
-	fx 		= pdf(x)
+	fx = pdf(x)
 	return log(fx) if fx > 0 else -inf
 
 def inside(x,th, pdf):
