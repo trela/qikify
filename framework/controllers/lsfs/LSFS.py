@@ -70,15 +70,15 @@ class LSFS:
 	def euDist(self, A,B = None, bSqrt = True):	
 		if B is None:
 			nSamples = size(A,0)
-			aa, ab = sum(A*A,1), dot(A,A.transpose())
-			D = tile(aa,(nSamples,1)).transpose() + tile(aa,(nSamples,1)) - 2*ab
+			aa, ab = sum(A*A,1), dot(A,A.T)
+			D = tile(aa,(nSamples,1)).T + tile(aa,(nSamples,1)) - 2*ab
 			if bSqrt:
 				D = sqrt(D)
-			return abs(zeroMatrixDiagonal(mmax(D,D.transpose())))
+			return abs(zeroMatrixDiagonal(mmax(D,D.T)))
 		else:
 			nSamplesA, nSamplesB = size(A,0), size(B,0)
-			aa, bb, ab = sum(A*A,1), sum(B*B,1), dot(A,B.transpose())
-			D = tile(aa,(nSamplesB,1)).transpose() + tile(bb,(nSamplesA,1)) - 2*ab
+			aa, bb, ab = sum(A*A,1), sum(B*B,1), dot(A,B.T)
+			D = tile(aa,(nSamplesB,1)).T + tile(bb,(nSamplesA,1)) - 2*ab
 			if bSqrt:
 				D = sqrt(D)
 			return abs(D)
