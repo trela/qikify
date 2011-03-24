@@ -60,7 +60,7 @@ if __name__ == "__main__":
 							 nFail = 100, 
 							 inner = vstack([ specs.inner[name] for name in baseData.sNames ]),
 							 outer = vstack([ specs.outer[name] for name in baseData.sNames ]))	
-	
+
 	# Create native data structure from KDE results
 	synData = DatasetTI(oNames = baseData.oNames, 
 						 sNames = baseData.sNames, 

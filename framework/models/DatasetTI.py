@@ -28,9 +28,9 @@ class DatasetTI(Dataset):
 	# Constructor is either based on reading a file or passed in data.
 	def __init__(self, filename = None, hasHeader = True, oNames = None, sNames = None, oData  = None, sData = None):
 		if filename is not None:
-			# Call Dataset.__init__() which creates self.datasets and self.datasets.raw.
+			# Call parent class Dataset.__init__() which creates self.datasets and self.datasets.raw.
 			super(DatasetTI, self).__init__(filename, hasHeader)
-	
+			
 			# Create child datasets
 			self.datasets.sData  = self.datasets.raw.subsetCols(slice(739,1107), 'Specification test data.')
 			self.datasets.oData  = self.datasets.raw.subsetCols(slice(0,739), 'ORBiT test data.')
@@ -46,23 +46,15 @@ class DatasetTI(Dataset):
 					   		   'oData': apply_along_axis(lambda x: len(unique(x)) > 100, 0, self.datasets.oData.data)})
 
 		# Identify all outliers with signatures outside +/- 3 * (spec distance).
-		self.identifyOutliers(specs, ind, k_l = 3, k_u = 3)
+		self.identifyOutliers(specs, ind, dataset = 'sData', k_l = 3, k_u = 3)
 		
 		# Identify specification performances which now always pass.
 		self.computePF(specs, ind, dataset = 'sData')
 		alwaysPassing = (sum(self.datasets.sData.pfMat[self.indOutliers,:],0) / sum(self.indOutliers) == 1)
 		ind.sData  = logical_and(ind.sData, ~alwaysPassing)
 		
-		self.subsetCols(ind)
-		self.subsetRows({'sData': self.indOutliers, 'oData': self.indOutliers})
-		
+		self.subsetCols(ind).subsetRows({'sData': self.indOutliers, 'oData': self.indOutliers})
 		return ind
-
-
-
-	# ===============================================================
-	def identifyOutliers(self, specs, ind, k_l, k_u):
-		self.computePF(specs, ind, dataset = 'sData', outlierFilter = True, k_l = k_l, k_u = k_u)
 
 
 
