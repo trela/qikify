@@ -66,6 +66,7 @@ def scale(data, scaleDict = None, reverse = False):
 def zeroMatrixDiagonal(X):
 	return X - diag(diag(X))
 
+
 # Returns a matrix which is the elementwise maximum of two matrices X and Y
 mmax = vectorize(lambda x,y: max(x,y), otypes = [float32])
 

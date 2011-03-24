@@ -60,7 +60,7 @@ def testSliceSample():
 	fig.savefig('/Users/nathankupp/Desktop/Figure1.png')
 	return x
 
-# Test LSFS code
+# Test LSFS constructW function
 def testConstructW():
 	lsfs = LSFS.LSFS()
 	
@@ -80,13 +80,22 @@ def testConstructW():
 	X = ones((4,4)) + diag(range(1,5))
 	gnd = array([-1,1,-1,1])
 	lsfs.constructW(X, gnd)
-	print lsfs.W
+	#print lsfs.W
 	
+	
+def testLSFS():
+	lsfs = LSFS.LSFS()
+	
+	X = ones((4,4)) + diag(range(1,5))
+	gnd = array([-1,1,-1,1])
+	lsfs.run(X, gnd)
+
+
 if __name__ == "__main__":
 	#testKDE()
 	#x = testSliceSample()
-	testConstructW()
-	
+	#testConstructW()
+	testLSFS()
 	
 	
 	

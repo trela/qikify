@@ -24,17 +24,25 @@ THE SOFTWARE.
 import sys, os, random, time
 from numpy import *
 from scipy.sparse import lil_matrix
+from scipy.sparse import coo_matrix
 
 from helpers.general import *
 
 # Laplacian score feature selection
 class LSFS:
-	def run(self, X, gnd, numRetained = 10):
-		self.constructW(X, gnd, bLDA = 1)
-		#self.LaplacianScores = LaplacianScore(A, W)
-		#[~, index] = sort(-LaplacianScores)
-		#self.features = index[0:numRetained]
-
+	def run(self, X, gnd):
+		self.constructW(X, gnd)
+		nSmp	= size(X,0)
+		D 		= sum(self.W,1)
+		z	 	= dot(D.T,X) * dot(D.T,X) / sum(diag(D))
+		D 		= coo_matrix((D,(range(nSmp),range(nSmp))), shape=(nSmp,nSmp))
+		DPrime 	= array(sum(multiply(dot(X.T,D.todense()).T, X),1).T - z)[0]
+		LPrime 	= array(sum(multiply(dot(X.T,self.W).T, X).T, 1) - z)
+		DPrime[DPrime < 1e-12] = 10000
+		
+		self.Scores = (LPrime/DPrime).T
+		self.Ranking = argsort(self.Scores)
+		
 
 	# Construct the W matrix used in LSFS
 	def constructW(self, fea, gnd, k = 0, t = 1, bLDA = 0, bSelfConnected = 1):
@@ -46,19 +54,16 @@ class LSFS:
 			for i in xrange(len(label)):
 				ind = (gnd==label[i])
 				G[ind,ind] = 1.0/sum(ind)
-			self.W = lil_matrix(G)
+			self.W = G
 		else:
 			for i in xrange(len(label)):
 				ind = nonzero(gnd==label[i])[0]
 				D = self.euDist(fea[ind,:], bSqrt = 0)
 				D = exp(-D/(2*t**2))
-				print D, G, G[ind,ind]
 				setSubMat(G, D, ind)
-				#G[ind,ind] = D
-
 			if not bSelfConnected:
 				G = zeroMatrixDiagonal(G)
-			self.W = lil_matrix(mmax(G,G))
+			self.W = mmax(G,G)
 
 
 	# Euclidean Distance matrix
