@@ -22,36 +22,105 @@ THE SOFTWARE.
 '''
 
 import sys, os, csv
+import helpers.general as helpers
 from numpy import *
-from helpers.general import * 
 
-class Dataset: 
+class DataStruct:
+	def __init__(self, names = None, data = None, desc = None, pfMat = None, gnd = None):
+		self.names = names
+		self.data  = data
+		self.desc  = desc
+		self.pfMat = pfMat
+		self.gnd   = gnd
+
+	def subsetCols(self, cols, desc = None):
+		description = self.desc if desc is None else desc
+		pfMat       = self.pfMat[:,cols] if (hasattr(self, 'pfMat') and self.pfMat is not None) else None
+		gnd 		= self.gnd if (hasattr(self, 'gnd') and self.gnd is not None) else None
+		return DataStruct(self.names[cols], self.data[:,cols], description, pfMat, gnd)
+
+	def subsetRows(self, rows):
+		description = self.desc
+		pfMat 		= self.pfMat[rows,:] if (hasattr(self, 'pfMat') and self.pfMat is not None) else None
+		gnd 		= self.gnd[rows] if (hasattr(self, 'gnd') and self.gnd is not None) else None
+		return DataStruct(self.names, self.data[rows,:], self.desc, pfMat, gnd)
+
+class Dataset(object): 
 	def __init__(self, filename, hasHeader = True):
+		self.datasets = helpers.dotdict()
+		
 		# Read dataset column names
 		if ( hasHeader ):
 			fileh 	  	= open(filename, 'rU')
-			specReader 	= csv.reader(fileh)
-			self.names  =  specReader.next()
+			dataReader 	= csv.reader(fileh)
+			names  		= array(dataReader.next())
 			fileh.close()
 		
-		# Read dataset data
-		self.data  = loadtxt(filename, delimiter=',', skiprows=1)
-		
-	def __getitem__(self, name):
-		return self.data[:,self.names.index(name)]
-
+		# Read raw dataset data
+		self.datasets.raw = DataStruct(names = names,
+								   	   data  = loadtxt(filename, delimiter=',', skiprows=1),
+								       desc  = 'Raw dataset from input file.')
 
 	def allData(self):
-		return self.data
+		return self.datasets.raw.data
 
+	
+	# Multipurpose compute pass/fail function. If outlierFilter is False, this function takes
+	# the specification performance data, compares each column to spec lsl/usl, and saves
+	# pass/fail information for individial specs (pfMat) and the global pass/fail (gnd).
+	def computePF(self, specs, ind = None, dataset = 'raw', outlierFilter = False, k_l = 3, k_u = 3):
+		if dataset not in self.datasets.keys():
+			raise KeyError('Not a valid dataset.')
+			
+		pfData = self.datasets[dataset]
+		n, p   = size(pfData.data,0), size(pfData.data,1)
+		pfMat  = ones((n,p))
+		mu 	   = mean(pfData.data,0)
 		
-	def printSummary(self):
-		print '====================================='
-		print ' Dataset\t# Rows\t# Cols'
-		print '====================================='
-		print 'All data\t' + str(size(self.data,0)) + '\t' + str(size(self.data,1))
+		for j in xrange(p):
+			if type(ind) is dict and ~(ind[dataset][j]):
+				continue
+			else:
+				lsl, usl = specs[pfData.names[j]]
+				if outlierFilter:
+					lsl = mu[j] - k_l * abs(mu[j] - lsl)
+					usl = mu[j] + k_u * abs(mu[j] - usl)
+					#For debug only: print str(round(lsl,2)) + " < " + str(round(mu[j],2)) + " < " + str(round(usl,2)) + "\t\t", str(round(lslNew,2)) + " < " + str(round(mu[j],2)) + " < " + str(round(uslNew,2))
+				pfMat[:,j]  = specs.compareToSpecs(pfData.data[:,j], lsl, usl)
+
+		# If we are filtering outliers, return a logical index describing outlier observations.
+		# Otherwise, we are computing pass/fail and want to save pfMat and gnd.
+		if outlierFilter:
+			self.indOutliers = (sum(pfMat, 1) == p)
+		else:
+			self.datasets[dataset].pfMat = pfMat
+			self.datasets[dataset].gnd   = helpers.bool2symmetric(sum(pfMat, 1) == p)
+		return self
+
+
+
+	def subsetCols(self, ind):
+		for dataset in ind.keys():
+			if dataset not in self.datasets.keys():
+				raise KeyError(dataset + ' is not a valid dataset.')
+			self.datasets[dataset] = self.datasets[dataset].subsetCols(ind[dataset])
+		return self
 		
-		if hasattr(self, 'gnd'):
-			print '====================================='
-			print 'Pass\t' + str(sum(self.gnd == 1))
-			print 'Fail\t' + str(sum(self.gnd == -1))
+	def subsetRows(self, ind):
+		for dataset in ind.keys():
+			if dataset not in self.datasets.keys():
+				raise KeyError(dataset + ' is not a valid dataset.')
+			self.datasets[dataset] = self.datasets[dataset].subsetRows(ind[dataset])
+		return self
+
+	def printSummary(self):	
+		print helpers.bcolors.OKGREEN
+		print '==============================================='
+		print 'Dataset                         #Rows #Cols'
+		print '===============================================' + helpers.bcolors.ENDC
+		for dataset in self.datasets.values():
+			print '%-30s  %4d  %4d' % (dataset.desc, size(dataset.data,0), size(dataset.data,1))
+			if hasattr(dataset, 'gnd') and dataset.gnd is not None:
+				print 'Pass\t' + str(sum(dataset.gnd == 1))
+				print 'Fail\t' + str(sum(dataset.gnd == -1))
+

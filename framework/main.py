@@ -28,13 +28,13 @@ from scikits.learn.metrics import confusion_matrix
 from scikits.learn.svm import SVC
 
 from models.Specs import *
-from models.Dataset_TI import *
+from models.DatasetTI import *
 from helpers.general import *
 from helpers.plots import *
 from controllers.kde import KDE
 from controllers.lsfs import LSFS
 
-	
+
 if __name__ == "__main__":
 	## ============= Init & Load Data, Specs ============= ##
 	config = ConfigParser.RawConfigParser()
@@ -44,13 +44,15 @@ if __name__ == "__main__":
 	specs     = Specs(config.get('Settings', 'specFile'))
 	specs.genCriticalRegion()
 	
-	baseData  = Dataset_TI(filename = dataFiles[0])
+	baseData  = DatasetTI(filename = dataFiles[0])
+	baseData.printSummary()
+	ind = baseData.genSubsetIndices(specs)
 	baseData.printSummary()
 
+'''
 	## ============= Run LSFS ============= ##
 	lsfs = LSFS.LSFS()
 	lsfs.run()
-	
 	## ============= Run KDE ============= ##
 	kde  	 	   = KDE.KDE(baseData, a = 0, specs = specs)
 	S	     	   = kde.run(nGood = 10, 
@@ -60,12 +62,13 @@ if __name__ == "__main__":
 							 outer = vstack([ specs.outer[name] for name in baseData.sNames ]))	
 	
 	# Create native data structure from KDE results
-	synData = Dataset_TI(oNames = baseData.oNames, 
+	synData = DatasetTI(oNames = baseData.oNames, 
 						 sNames = baseData.sNames, 
 						 oData  = S[:,0:size(baseData.oData,1)],
 						 sData  = S[:,  size(baseData.oData,1):])
 	synData.computePF(specs)
 
 	plotSample(synData.sData, baseData.sData, 4,5)
+	'''
 
 

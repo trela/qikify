@@ -1,0 +1,68 @@
+#!/usr/bin/python
+'''
+Copyright (c) 2011 Nathan Kupp, Yale University.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+'''
+
+from Dataset import * 
+
+class DatasetTI(Dataset):
+	
+	# Constructor is either based on reading a file or passed in data.
+	def __init__(self, filename = None, hasHeader = True, oNames = None, sNames = None, oData  = None, sData = None):
+		if filename is not None:
+			# Call Dataset.__init__() which creates self.datasets and self.datasets.raw.
+			super(DatasetTI, self).__init__(filename, hasHeader)
+	
+			# Create child datasets
+			self.datasets.sData  = self.datasets.raw.subsetCols(slice(739,1107), 'Specification test data.')
+			self.datasets.oData  = self.datasets.raw.subsetCols(slice(0,739), 'ORBiT test data.')
+		else:
+			self.datasets.sData  = DataStruct(sNames, sData, 'Specification test data.')
+			self.datasets.oData  = DataStruct(oNames, oData, 'ORBiT test data.')
+
+
+	# Run on first dataset, baseData.
+	def genSubsetIndices(self, specs):
+		# We will remove all parameters with less than 100 unique values.
+		ind = helpers.dotdict({'sData': apply_along_axis(lambda x: len(unique(x)) > 100, 0, self.datasets.sData.data),
+					   		   'oData': apply_along_axis(lambda x: len(unique(x)) > 100, 0, self.datasets.oData.data)})
+
+		# Identify all outliers with signatures outside +/- 3 * (spec distance).
+		self.identifyOutliers(specs, ind, k_l = 3, k_u = 3)
+		
+		# Identify specification performances which now always pass.
+		self.computePF(specs, ind, dataset = 'sData')
+		alwaysPassing = (sum(self.datasets.sData.pfMat[self.indOutliers,:],0) / sum(self.indOutliers) == 1)
+		ind.sData  = logical_and(ind.sData, ~alwaysPassing)
+		
+		self.subsetCols(ind)
+		self.subsetRows({'sData': self.indOutliers, 'oData': self.indOutliers})
+		
+		return ind
+
+
+
+	# ===============================================================
+	def identifyOutliers(self, specs, ind, k_l, k_u):
+		self.computePF(specs, ind, dataset = 'sData', outlierFilter = True, k_l = k_l, k_u = k_u)
+
+
+

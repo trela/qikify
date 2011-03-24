@@ -56,6 +56,7 @@ class Specs:
 		return self.specs[key]
     
 
+		
     # =============== Partitioned Sampling Methods =============== 
 	# Takes specification boundary and generates two boundaries to define 'critical' device set.
 	def genCriticalRegion(self, delta = 1.0):
