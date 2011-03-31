@@ -20,8 +20,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 '''
-
+import csv
 from numpy import *
+import helpers.general as helpers
 
 class DataStruct:
 	def __init__(self, names = None, data = None, desc = None, pfMat = None, gnd = None):
@@ -42,3 +43,25 @@ class DataStruct:
 		pfMat 		= self.pfMat[rows,:] if (hasattr(self, 'pfMat') and self.pfMat is not None) else None
 		gnd 		= self.gnd[rows] if (hasattr(self, 'gnd') and self.gnd is not None) else None
 		return DataStruct(self.names, self.data[rows,:], self.desc, pfMat, gnd)
+
+
+	# Save datasets to files.
+	def writeCSV(self, filename):	
+		if hasattr(self, 'gnd') and self.gnd is not None:
+			dataset = hstack((self.data, self.pfMat, self.gnd.reshape(len(self.gnd),1)))
+			names = hstack((self.names, self.names, 'gnd'))
+		else:
+			dataset = self.data
+			names = self.names
+			
+		fileh 	  	= open(filename, 'w')
+		dataWriter 	= csv.writer(fileh)
+		dataWriter.writerow(names)
+		for row in dataset:
+			dataWriter.writerow(row)
+		fileh.close()
+		print helpers.bcolors.OKGREEN
+		print 'Saved dataset to ' + filename + ' successfully.' + helpers.bcolors.ENDC
+
+
+

@@ -25,23 +25,25 @@ import sys, os, csv
 from numpy import *
 from helpers.general import *
 
-class Specs:
-	specs = {}
-	names = []
-	
+class Specs:	
 	# Read in specs from `filename` and create {specname: [lsl,usl]} dictionary.
-	def __init__(self, filename):
-	    fileh 	  	= open(filename, 'rU')
-	    specReader 	= csv.reader(fileh)
-	    self.names 	= specReader.next()
-	    LSL   		= specReader.next()
-	    USL   		= specReader.next()
+	def __init__(self, filename = None, names = [], specs = {}):
+		self.names = names
+		self.specs = specs
+			
+		if filename is not None:
+		    fileh 	  	= open(filename, 'rU')
+		    specReader 	= csv.reader(fileh)
+		    self.names 	= specReader.next()
+		    LSL   		= specReader.next()
+		    USL   		= specReader.next()
 
-	    for i, limit in enumerate(zip(LSL, USL)):
-			# Use this lambda function because float() fails on empty/non-existent spec limit.
-	    	lsl, usl = map(lambda x: float(x) if x else float('nan'), limit)
-	        self.specs[self.names[i]] = array([lsl, usl])
-	    fileh.close()
+		    for i, limit in enumerate(zip(LSL, USL)):
+				# Use this lambda function because float() fails on empty/non-existent spec limit.
+		    	lsl, usl = map(lambda x: float(x) if x else float('nan'), limit)
+		        self.specs[self.names[i]] = array([lsl, usl])
+		    fileh.close()
+
 
 	# Compare data to lsl, usl and return +1/-1 label vector
 	def compareToSpecs(self, data, lsl, usl):

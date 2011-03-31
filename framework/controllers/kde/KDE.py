@@ -30,18 +30,20 @@ from models.Specs import Specs
 from slicesample import * 
 
 class KDE:
-	def __init__(self, baseData, a = 0, specs = None, bounds = None):
-		
-		data     = baseData.allData()
+
+	# Primary execution point. Run either standard KDE or class-membership based KDE. If 
+	# any of the class-membership based KDE arguments are set, it will be run instead of 
+	# standard KDE.
+	def run(self, data, a = 0, specs = None, bounds = None, nSamples = 0, nGood = 0, nCritical = 0, nFail = 0, inner = None, outer = None):
 		self.n 	 = size(data,0)
 		self.d 	 = size(data,1)
 		self.b 	 = 0.8			# Default bandwidth scaling factor
-		
+
 		# Select bandwidth for Epanechnikov kernel (Rule of Thumb, see Silverman, p.86)
 		self.c_d = 2.0* pow( pi, (self.d/2.0) ) / ( self.d * gamma(self.d/2) )
 		self.h   = self.compute_h(self.n, self.d, self.c_d, self.b)
 		self.setBandwithFactors(a)
-		
+
 		# Normalize data
 		self.scaleFactors 	= dotdict({'mean': data.mean(axis = 0), 'std': data.std(axis = 0)})
 		self.datan 			= scale(data, self.scaleFactors)
@@ -53,11 +55,6 @@ class KDE:
 		if specs is not None:
 			self.specs = specs
 
-	# Primary execution point. Run either standard KDE or class-membership based KDE. If 
-	# any of the class-membership based KDE arguments are set, it will be run instead of 
-	# standard KDE.
-	def run(self, nSamples = 0,
-				  nGood = 0, nCritical = 0, nFail = 0, inner = None, outer = None):
 		
 		# Generate nGood, nCritical, nFail samples.
 		if sum((nGood, nCritical, nFail)) > 0:
@@ -84,6 +81,9 @@ class KDE:
 		Sg, Sc, Sf = zeros((nGood, self.d)), zeros((nCritical, self.d)), zeros((nFail, self.d))
 		
 		ng = nc = nf = 0
+		
+		import pdb; pdb.set_trace()
+		
 		while (ng+nc+nf < nGood + nCritical + nFail):
 			sample = scale(self.genSample(), self.scaleFactors, reverse = True)
 			if self.isGood(sample) and ng < nGood:

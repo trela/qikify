@@ -71,22 +71,6 @@ def zeroMatrixDiagonal(X):
 mmax = vectorize(lambda x,y: max(x,y), otypes = [float32])
 
 
-# Set a submatrix to values in D. That is:
-#  		[0, 0, 0]
-#	X = [0, 0, 0]  D = [1 2] ind = [0 1]
-#  		[0, 0, 0]	   [1 2]
-# Gives:
-#
-#  		[1, 2, 0]
-#	X = [1, 2, 0]
-#  		[0, 0, 0]
-def setSubMat(X, D, ind):
-	for i, row in enumerate(ind):
-		X[row,ind] = D[i,:]
-
-
-
-
 # Colors for printing to terminal
 class bcolors:
     HEADER = '\033[95m'

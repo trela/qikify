@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 '''
 
-import sys, os, random, time
+import matplotlib.pyplot as plt
 from numpy import *
 from scipy.sparse import lil_matrix
 from scipy.sparse import coo_matrix
@@ -30,51 +30,63 @@ from helpers.general import *
 
 # Laplacian score feature selection
 class LSFS:
-	def run(self, X, gnd):
-		self.constructW(X, gnd)
+			
+	# Run LSFS. Arguments are `dataset`, a DataStruct object, and gnd, a pass/fail vector of the same size.
+	# Based on paper equation:
+	#
+	# \sum_{ij} (f_r^i - f_r^j) * S_{ij}
+	# ----------------------------------
+	#              sigma_2
+	#
+	def run(self, dataset, gnd):
+		X = dataset.data
+		if not (size(X,0) == len(gnd)): raise Exception( "Data and gnd do not have matching sizes" )
+		
+		self.constructW(scale(X), gnd, t = size(X,1), bLDA = False)
+		
 		nSmp	= size(X,0)
 		D 		= sum(self.W,1)
-		z	 	= dot(D.T,X) * dot(D.T,X) / sum(diag(D))
+		z	 	= dot(D,X) * dot(D,X) / sum(diag(D))
 		D 		= coo_matrix((D,(range(nSmp),range(nSmp))), shape=(nSmp,nSmp))
-		DPrime 	= array(sum(multiply(dot(X.T,D.todense()).T, X),1).T - z)[0]
+		DPrime 	= array(sum(multiply(dot(X.T,D.todense()).T, X),0) - z)[0]
 		LPrime 	= array(sum(multiply(dot(X.T,self.W).T, X).T, 1) - z)
 		DPrime[DPrime < 1e-12] = 10000
 		
 		self.Scores = (LPrime/DPrime).T
-		self.Ranking = argsort(self.Scores)
-		
+		self.Ranking = argsort(-self.Scores)
+
 
 	# Construct the W matrix used in LSFS
 	def constructW(self, fea, gnd, k = 0, t = 1, bLDA = 0, bSelfConnected = 1):
 		label 	 = unique(gnd)
 		nSamples = len(gnd)
 		G 		 = zeros((nSamples,nSamples))
-		
 		if bLDA:
 			for i in xrange(len(label)):
 				ind = (gnd==label[i])
-				G[ind,ind] = 1.0/sum(ind)
+				G[ix_(ind,ind)] = 1.0/sum(ind)
 			self.W = G
 		else:
 			for i in xrange(len(label)):
 				ind = nonzero(gnd==label[i])[0]
-				D = self.euDist(fea[ind,:], bSqrt = 0)
-				D = exp(-D/(2*t**2))
-				setSubMat(G, D, ind)
+				D = self.euDist(fea[ind,:], bSqrt = False)
+				D = exp(-D/t, dtype=float64)
+				self.setSubMat(G, D, ind)
 			if not bSelfConnected:
 				G = zeroMatrixDiagonal(G)
-			self.W = mmax(G,G)
-
+			self.W = self.genMaxMatrix(G)
 
 	# Euclidean Distance matrix
-	def euDist(self, A,B = None, bSqrt = True):	
+	def euDist(self, A,B = None, bSqrt = True):
 		if B is None:
 			nSamples = size(A,0)
-			aa, ab = sum(A*A,1), dot(A,A.T)
-			D = tile(aa,(nSamples,1)).T + tile(aa,(nSamples,1)) - 2*ab
+			aa_tiled = tile(sum(A*A,1),(nSamples,1))
+			D = aa_tiled.T + aa_tiled
+			D -= 2*dot(A,A.T)
+			aa_tiled = nan # let python retake this memory before continuing
 			if bSqrt:
 				D = sqrt(D)
-			return abs(zeroMatrixDiagonal(mmax(D,D.T)))
+			return abs(zeroMatrixDiagonal(self.genMaxMatrix(D)))
 		else:
 			nSamplesA, nSamplesB = size(A,0), size(B,0)
 			aa, bb, ab = sum(A*A,1), sum(B*B,1), dot(A,B.T)
@@ -83,3 +95,28 @@ class LSFS:
 				D = sqrt(D)
 			return abs(D)
 
+
+	# Set a submatrix to values in D. That is:
+	#  		[0, 0, 0]
+	#	X = [0, 0, 0]  D = [1 2] ind = [0 1]
+	#  		[0, 0, 0]	   [1 2]
+	# Gives:
+	#
+	#  		[1, 2, 0]
+	#	X = [1, 2, 0]
+	#  		[0, 0, 0]
+	def setSubMat(self, X, D, ind):
+		for i, row in enumerate(ind):
+			X[row,ind] = D[i,:]
+
+	# Takes a square matrix A and computes max(A, A')
+	def genMaxMatrix(self, A):
+		for i in range(size(A,0)):
+			for j in range(size(A,1)):
+				A[i,j] = max(A[i,j], A[j,i])
+		return A
+
+	def plotScores(self, filename):
+		plt.plot(self.Scores[self.Ranking])
+		plt.savefig(filename, dpi = 150, format='png')	
+	

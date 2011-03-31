@@ -35,40 +35,67 @@ from controllers.kde import KDE
 from controllers.lsfs import LSFS
 
 
-if __name__ == "__main__":
-	## ============= Init & Load Data, Specs ============= ##
-	config = ConfigParser.RawConfigParser()
-	config.read('settings.conf')
-	
-	dataFiles = glob.glob(config.get('Settings', 'dataFiles'))
-	specs     = Specs(config.get('Settings', 'specFile'))
-	specs.genCriticalRegion()
-	
-	baseData  = DatasetTI(filename = dataFiles[0])
-	baseData.printSummary()
-	ind = baseData.genSubsetIndices(specs)
-	baseData.printSummary()
+# We first consider the spec which fails most frequently
+def findMostFailingSpecPerf(baseData):
+	passingRates = (1.0 * sum(baseData.datasets.sData.pfMat == 1,0)) / size(baseData.datasets.sData.pfMat,0) 
+	gnd = baseData.datasets.sData.pfMat[:,argmin(passingRates)]
+	print 'Retained only specification test ' + helpers.bcolors.FAIL + '#' + str(argmin(passingRates)) + helpers.bcolors.ENDC
+	print 'Pass: ' + helpers.bcolors.OKGREEN + str(sum(gnd == 1)) + helpers.bcolors.ENDC, 
+	print ' Fail: ' + helpers.bcolors.FAIL + str(sum(gnd == -1)) + helpers.bcolors.ENDC
+	return argmin(passingRates)
 
-'''
-	## ============= Run LSFS ============= ##
-	lsfs = LSFS.LSFS()
-	lsfs.run()
-	## ============= Run KDE ============= ##
-	kde  	 	   = KDE.KDE(baseData, a = 0, specs = specs)
-	S	     	   = kde.run(nGood = 10, 
-							 nCritical = 10, 
-							 nFail = 100, 
+
+def runKDE(baseData):
+	pass
+	'''
+	kdeSpecs = Specs()
+	
+	kde  	 	   = KDE.KDE()
+	S	     	   = kde.run(bbb, 
+							 a = 0, 
+							 specs = specs, 
+							 nGood = 10,
+							 nCritical = 10,
+							 nFail = 100,
 							 inner = vstack([ specs.inner[name] for name in baseData.sNames ]),
-							 outer = vstack([ specs.outer[name] for name in baseData.sNames ]))	
-
+							 outer = vstack([ specs.outer[name] for name in baseData.sNames ]))
+	
 	# Create native data structure from KDE results
 	synData = DatasetTI(oNames = baseData.oNames, 
 						 sNames = baseData.sNames, 
 						 oData  = S[:,0:size(baseData.oData,1)],
 						 sData  = S[:,  size(baseData.oData,1):])
 	synData.computePF(specs)
-
 	plotSample(synData.sData, baseData.sData, 4,5)
 	'''
+
+if __name__ == "__main__":
+	## ============= Init, load specs ============= ##
+	config = ConfigParser.RawConfigParser()
+	config.read('settings.conf')
+	dataFiles = glob.glob(config.get('Settings', 'dataFiles'))
+	specs     = Specs(config.get('Settings', 'specFile'))
+	specs.genCriticalRegion()
+	
+	# Load the first wafer and subset rows/cols.
+	baseData  = DatasetTI(filename = dataFiles[0])
+	baseData.printSummary()
+	ind = baseData.genSubsetIndices(specs)
+	baseData.printSummary()
+
+	## ============= Run LSFS ============= ##
+	specIndex = findMostFailingSpecPerf(baseData)
+	lsfs = LSFS.LSFS()
+	lsfs.run(baseData.datasets.oData, baseData.datasets.sData.pfMat[:,specIndex])
+	lsfs.plotScores(config.get('Settings', 'lsfsPlot'))
+	
+	
+	## ============= Run KDE ============= ##
+	runKDE(baseData)
+
+
+
+
+
 
 
