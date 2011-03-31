@@ -53,8 +53,8 @@ class LSFS:
 		DPrime[DPrime < 1e-12] = 10000
 		
 		self.Scores = (LPrime/DPrime).T
-		self.Ranking = argsort(-self.Scores)
-
+		self.Ranking = argsort(self.Scores)
+		return self
 
 	# Construct the W matrix used in LSFS
 	def constructW(self, fea, gnd, k = 0, t = 1, bLDA = 0, bSelfConnected = 1):
@@ -119,4 +119,5 @@ class LSFS:
 	def plotScores(self, filename):
 		plt.plot(self.Scores[self.Ranking])
 		plt.savefig(filename, dpi = 150, format='png')	
-	
+		plt.close()
+		return self

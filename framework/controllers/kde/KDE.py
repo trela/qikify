@@ -34,35 +34,30 @@ class KDE:
 	# Primary execution point. Run either standard KDE or class-membership based KDE. If 
 	# any of the class-membership based KDE arguments are set, it will be run instead of 
 	# standard KDE.
-	def run(self, data, a = 0, specs = None, bounds = None, nSamples = 0, nGood = 0, nCritical = 0, nFail = 0, inner = None, outer = None):
-		self.n 	 = size(data,0)
-		self.d 	 = size(data,1)
-		self.b 	 = 0.8			# Default bandwidth scaling factor
+	def run(self, dataset, specs = None, nSamples = 0, counts = None, a = 0, bounds = None):
+		self.dataset = dataset
+		self.specs   = specs
+		self.n 	     = size(dataset.data,0)
+		self.d 	     = size(dataset.data,1)
+		self.b 	     = 0.8			# Default bandwidth scaling factor
 
 		# Select bandwidth for Epanechnikov kernel (Rule of Thumb, see Silverman, p.86)
-		self.c_d = 2.0* pow( pi, (self.d/2.0) ) / ( self.d * gamma(self.d/2) )
-		self.h   = self.compute_h(self.n, self.d, self.c_d, self.b)
+		self.c_d     = 2.0* pow( pi, (self.d/2.0) ) / ( self.d * gamma(self.d/2) )
+		self.h       = self.compute_h(self.n, self.d, self.c_d, self.b)
 		self.setBandwithFactors(a)
 
 		# Normalize data
-		self.scaleFactors 	= dotdict({'mean': data.mean(axis = 0), 'std': data.std(axis = 0)})
-		self.datan 			= scale(data, self.scaleFactors)
+		self.scaleFactors 	= dotdict({'mean': dataset.data.mean(axis = 0), 'std': dataset.data.std(axis = 0)})
+		self.datan 			= scale(dataset.data, self.scaleFactors)
 		if bounds is None:
-			self.bounds 	= scale(array([data.min(axis=0), data.max(axis=0)]), self.scaleFactors)
+			self.bounds 	= scale(array([dataset.data.min(axis=0), dataset.data.max(axis=0)]), self.scaleFactors)
 		else:
 			self.bounds 	= scale(bounds, self.scaleFactors)
 
-		if specs is not None:
-			self.specs = specs
-
-		
-		# Generate nGood, nCritical, nFail samples.
-		if sum((nGood, nCritical, nFail)) > 0:
-			self.inner = inner
-			self.outer = outer
-			return self.genPartitionedSamples(nGood, nCritical, nFail)
-			
+		# Generate nGood, nCritical, nFail samples.	
 		# Otherwise, just generate nSamples without caring about device good/critical/bad membership.
+		if sum(counts.values()) > 0:
+			return self.genPartitionedSamples(counts)
 		else:
 			return self.genSamples(nSamples)
 
@@ -76,27 +71,22 @@ class KDE:
 		return scale(Sn, self.scaleFactors, reverse = True)
 		
 	# Generates Ngc critical devices, Ng good devices, Nf failing devices.
-	def genPartitionedSamples(self, nGood, nCritical, nFail):
+	def genPartitionedSamples(self, counts):
 		# Initialize arrays for speed
-		Sg, Sc, Sf = zeros((nGood, self.d)), zeros((nCritical, self.d)), zeros((nFail, self.d))
-		
-		ng = nc = nf = 0
-		
-		import pdb; pdb.set_trace()
-		
-		while (ng+nc+nf < nGood + nCritical + nFail):
+		Sg, Sc, Sf = zeros((counts.nGood, self.d)), zeros((counts.nCritical, self.d)), zeros((counts.nFail, self.d))
+		ng, nc, nf = 0, 0, 0
+		while ( ng+nc+nf < sum(counts.values()) ):
 			sample = scale(self.genSample(), self.scaleFactors, reverse = True)
-			if self.isGood(sample) and ng < nGood:
-				ng += 1
+			if self.isGood(sample) and ng < counts.nGood:
 				Sg[ng,:] = sample
-			if self.isFailing(sample) and nf < nFail:
-				nf += 1
+				ng += 1
+			if self.isFailing(sample) and nf < counts.nFail:
 				Sf[nf,:] = sample
-			if self.isCritical(sample) and nc < nCritical:
-				nc += 1
+				nf += 1
+			if self.isCritical(sample) and nc < counts.nCritical:
 				Sc[nc,:] = sample
-		
-		return vstack((Sgc,Sg,Sf))
+				nc += 1	
+		return vstack((Sc,Sg,Sf))
 
 
 	# Generate a single device sample, use algorithm in Silverman, p. 143
@@ -139,16 +129,20 @@ class KDE:
 
 	# =============== Partitioned Sampling Methods =============== 
 	def isGood(self, sample):
-		for val, [lsl,usl] in zip(sample[10:], self.inner.tolist()):
-			if self.specs.compareToSpecs(val,lsl,usl) == -1:
-				return False
+		for i, name in enumerate(self.dataset.names):
+			if name in self.specs.inner.keys():
+				lsl, usl = self.specs.inner[name]
+				if self.specs.compareToSpecs(sample[i],lsl,usl) == -1:
+					return False
 		return True
 
 	def isCritical(self, sample):
-		return ~((self.isGood(sample) == 1) or (self.isFailing(sample) == 1))
+		return not (self.isGood(sample) == 1 or self.isFailing(sample) == 1)
 
 	def isFailing(self, sample):
-		for val, [lsl,usl] in zip(sample[10:], self.outer.tolist()):
-			if self.specs.compareToSpecs(val,lsl,usl) == -1:
-				return True
+		for i, name in enumerate(self.dataset.names):
+			if name in self.specs.outer.keys():
+				lsl, usl = self.specs.outer[name]
+				if self.specs.compareToSpecs(sample[i],lsl,usl) == -1:
+					return True
 		return False

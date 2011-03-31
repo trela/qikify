@@ -32,8 +32,8 @@ class DatasetTI(Dataset):
 			super(DatasetTI, self).__init__(filename, hasHeader)
 			
 			# Create child datasets
-			self.datasets.sData  = self.datasets.raw.subsetCols(slice(739,1107), 'Specification test data.')
-			self.datasets.oData  = self.datasets.raw.subsetCols(slice(0,739), 'ORBiT test data.')
+			self.datasets.sData  = self.datasets.raw.subsetCols(range(739,1106), 'Specification test data.')
+			self.datasets.oData  = self.datasets.raw.subsetCols(range(0,739), 'ORBiT test data.')
 		else:
 			self.datasets.sData  = DataStruct(sNames, sData, 'Specification test data.')
 			self.datasets.oData  = DataStruct(oNames, oData, 'ORBiT test data.')

@@ -33,10 +33,14 @@ class DataStruct:
 		self.gnd   = gnd
 
 	def subsetCols(self, cols, desc = None):
+		# Numpy won't hstack if data is un-reshaped column vector. So, we reshape if data is column vector.
+		# A hack, but not sure how to do this any better at the moment.
+		data 		= array([self.data[:,cols]]).T if (size(nonzero(cols)) == 1) else self.data[:,cols]
+		
 		description = self.desc if desc is None else desc
 		pfMat       = self.pfMat[:,cols] if (hasattr(self, 'pfMat') and self.pfMat is not None) else None
 		gnd 		= self.gnd if (hasattr(self, 'gnd') and self.gnd is not None) else None
-		return DataStruct(self.names[cols], self.data[:,cols], description, pfMat, gnd)
+		return DataStruct(self.names[cols], data, description, pfMat, gnd)
 
 	def subsetRows(self, rows):
 		description = self.desc
@@ -44,6 +48,11 @@ class DataStruct:
 		gnd 		= self.gnd[rows] if (hasattr(self, 'gnd') and self.gnd is not None) else None
 		return DataStruct(self.names, self.data[rows,:], self.desc, pfMat, gnd)
 
+	# Joins the base datastruct with a secondary datastruct (by column)
+	def join(self, Secondary, desc = None):
+		return DataStruct(names = hstack((self.names, Secondary.names)),
+						  data  = hstack((self.data,  Secondary.data)),
+						  desc  = desc)
 
 	# Save datasets to files.
 	def writeCSV(self, filename):	

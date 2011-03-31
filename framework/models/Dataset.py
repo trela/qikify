@@ -24,14 +24,14 @@ THE SOFTWARE.
 import sys, os, csv
 from numpy import *
 
-import helpers.general as helpers
+from helpers.general import *
 from DataStruct import *
 
 class Dataset(object): 
 	def __init__(self, filename, hasHeader = True):
 		## This is the primary dataset storage dictionary! All datasets will be pushed
 		## onto this dictionary.
-		self.datasets = helpers.dotdict()
+		self.datasets = dotdict()
 		
 		# Read dataset column names
 		if ( hasHeader ):
@@ -73,8 +73,8 @@ class Dataset(object):
 			else:
 				lsl, usl = specs[pfData.names[j]]
 				if outlierFilter:
-					lsl = mu[j] - k_l * abs(mu[j] - lsl)
-					usl = mu[j] + k_u * abs(mu[j] - usl)
+					lsl = mu[j] - k_l * abs(mu[j] - lsl) if not isnan(lsl) else nan
+					usl = mu[j] + k_u * abs(mu[j] - usl) if not isnan(usl) else nan
 				pfMat[:,j]  = specs.compareToSpecs(pfData.data[:,j], lsl, usl)
 
 		# If we are filtering outliers, return a logical index describing outlier observations.
@@ -83,7 +83,7 @@ class Dataset(object):
 			self.indOutliers = (sum(pfMat, 1) == p)
 		else:
 			self.datasets[dataset].pfMat = pfMat
-			self.datasets[dataset].gnd   = helpers.bool2symmetric(sum(pfMat, 1) == p)
+			self.datasets[dataset].gnd   = bool2symmetric(sum(pfMat, 1) == p)
 		return self
 
 		
@@ -109,15 +109,15 @@ class Dataset(object):
 
 	# Print a summary of the dataset.
 	def printSummary(self):	
-		print helpers.bcolors.OKGREEN
+		print GREEN
 		print '==============================================='
 		print 'Dataset                         #Rows #Cols'
-		print '===============================================' + helpers.bcolors.ENDC
+		print '===============================================' + ENDCOLOR
 		for dataset in self.datasets.values():
 			print '%-30s  %4d  %4d' % (dataset.desc, size(dataset.data,0), size(dataset.data,1))
 			if hasattr(dataset, 'gnd') and dataset.gnd is not None:
-				print 'Pass: ' + helpers.bcolors.OKGREEN + str(sum(dataset.gnd == 1)) + helpers.bcolors.ENDC, 
-				print ' Fail: ' + helpers.bcolors.FAIL + str(sum(dataset.gnd == -1)) + helpers.bcolors.ENDC
+				print 'Pass: ' + GREEN + str(sum(dataset.gnd == 1)) + ENDCOLOR, 
+				print ' Fail: ' + RED + str(sum(dataset.gnd == -1)) + ENDCOLOR
 		print ''
 		return self
 

@@ -59,21 +59,16 @@ class Specs:
     
 	
     # =============== Partitioned Sampling Methods =============== 
-	# Takes specification boundary and generates two boundaries to define 'critical' device set.
-	def genCriticalRegion(self, delta = 1.0):
-		self.inner = self.outer = {}
-		for (k, v) in self.specs.items():
-			lsl, usl = v
-			if (isnan(lsl) and isnan(usl)):
-				continue
-			elif isnan(lsl):
-				self.inner[k] = array([-inf, 5.0/6.0 * usl])
-				self.outer[k] = array([-inf, 7.0/6.0 * usl])
-			elif isnan(usl):
-				self.inner[k] = array([5.0/6.0 * lsl, inf])
-				self.outer[k] = array([7.0/6.0 * lsl, inf])
-			else:
-				smean = mean([lsl, usl])
-				self.inner[k] = array([smean + 5.0/6.0 * lsl, smean + 5.0/6.0 * usl])
-				self.outer[k] = array([smean + 7.0/6.0 * lsl, smean + 7.0/6.0 * usl])
+	# Takes specification boundary and generates two boundaries to define 'critical' device region.
+	def genCriticalRegion(self, refData, k_i = 5.0/6, k_o = 7.0/6):
+		self.inner, self.outer = {}, {}
+		for i, name in enumerate(refData.names):
+			lsl, usl = self.specs[name]
+			
+			# If either the lsl or usl is NaN, we use reference data to grow/shrink. Otherwise, use mean of lsl & usl.
+			mu = mean(refData.data,0) if isnan(lsl + usl) else mean([lsl, usl])
+			
+			self.inner[name] = array([mu - k_i * abs(mu-lsl), mu + k_i * abs(mu-usl)])
+			self.outer[name] = array([mu - k_o * abs(mu-lsl), mu + k_o * abs(mu-usl)])
+
 

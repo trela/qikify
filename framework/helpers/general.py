@@ -45,6 +45,7 @@ class dotdict(dict):
     __setattr__= dict.__setitem__
     __delattr__= dict.__delitem__
 
+
 # Extracts a subset of a dictionary.
 def extract(keys, d):
     return dict((k, d[k]) for k in keys if k in d)
@@ -72,18 +73,9 @@ mmax = vectorize(lambda x,y: max(x,y), otypes = [float32])
 
 
 # Colors for printing to terminal
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-
-    def disable(self):
-        self.HEADER = ''
-        self.OKBLUE = ''
-        self.OKGREEN = ''
-        self.WARNING = ''
-        self.FAIL = ''
-        self.ENDC = ''
+HEADER = '\033[95m'
+BLUE = '\033[94m'
+GREEN = '\033[92m'
+WARNING = '\033[93m'
+RED = '\033[91m'
+ENDCOLOR = '\033[0m'

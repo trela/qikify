@@ -35,66 +35,44 @@ from controllers.kde import KDE
 from controllers.lsfs import LSFS
 
 
-# We first consider the spec which fails most frequently
-def findMostFailingSpecPerf(baseData):
-	passingRates = (1.0 * sum(baseData.datasets.sData.pfMat == 1,0)) / size(baseData.datasets.sData.pfMat,0) 
-	gnd = baseData.datasets.sData.pfMat[:,argmin(passingRates)]
-	print 'Retained only specification test ' + helpers.bcolors.FAIL + '#' + str(argmin(passingRates)) + helpers.bcolors.ENDC
-	print 'Pass: ' + helpers.bcolors.OKGREEN + str(sum(gnd == 1)) + helpers.bcolors.ENDC, 
-	print ' Fail: ' + helpers.bcolors.FAIL + str(sum(gnd == -1)) + helpers.bcolors.ENDC
-	return argmin(passingRates)
-
-
-def runKDE(baseData):
-	pass
-	'''
-	kdeSpecs = Specs()
-	
-	kde  	 	   = KDE.KDE()
-	S	     	   = kde.run(bbb, 
-							 a = 0, 
-							 specs = specs, 
-							 nGood = 10,
-							 nCritical = 10,
-							 nFail = 100,
-							 inner = vstack([ specs.inner[name] for name in baseData.sNames ]),
-							 outer = vstack([ specs.outer[name] for name in baseData.sNames ]))
-	
-	# Create native data structure from KDE results
-	synData = DatasetTI(oNames = baseData.oNames, 
-						 sNames = baseData.sNames, 
-						 oData  = S[:,0:size(baseData.oData,1)],
-						 sData  = S[:,  size(baseData.oData,1):])
-	synData.computePF(specs)
-	plotSample(synData.sData, baseData.sData, 4,5)
-	'''
+THRESH_LSFS = 0.02
+KDE_A 		= 0			# For KDE, bandwidth
+K_INNER		= 5.0/6		# For KDE, defines critical region
+K_OUTER 	= 6.0/6		# For KDE, defines critical region
 
 if __name__ == "__main__":
 	## ============= Init, load specs ============= ##
-	config = ConfigParser.RawConfigParser()
+	config 	  = ConfigParser.ConfigParser()
 	config.read('settings.conf')
 	dataFiles = glob.glob(config.get('Settings', 'dataFiles'))
 	specs     = Specs(config.get('Settings', 'specFile'))
-	specs.genCriticalRegion()
-	
+		
 	# Load the first wafer and subset rows/cols.
 	baseData  = DatasetTI(filename = dataFiles[0])
 	baseData.printSummary()
-	ind = baseData.genSubsetIndices(specs)
+	ind 	  = baseData.genSubsetIndices(specs)
 	baseData.printSummary()
 
+	# Create pair of boundaries defining critical region of specification test space
+	specs.genCriticalRegion(baseData.datasets.sData, k_i = K_INNER, k_o = K_OUTER)
+
+
 	## ============= Run LSFS ============= ##
-	specIndex = findMostFailingSpecPerf(baseData)
-	lsfs = LSFS.LSFS()
-	lsfs.run(baseData.datasets.oData, baseData.datasets.sData.pfMat[:,specIndex])
-	lsfs.plotScores(config.get('Settings', 'lsfsPlot'))
-	
+	passing   = (1.0 * sum(baseData.datasets.sData.pfMat == 1,0)) / size(baseData.datasets.sData.pfMat,0) 
+	specIndex = argmin(passing)
+	print 'Retained only specification test ' + RED + '#' + str(specIndex + 1) + ENDCOLOR,
+	print ' Pass: ' + GREEN + str(sum(baseData.datasets.sData.pfMat[:,specIndex] == 1)) + ENDCOLOR, 
+	print ' Fail: ' + RED + str(sum(baseData.datasets.sData.pfMat[:,specIndex] == -1)) + ENDCOLOR
+	lsfs 	  = LSFS.LSFS()
+	lsfs.run(baseData.datasets.oData, baseData.datasets.sData.pfMat[:,specIndex]).plotScores(config.get('Settings', 'lsfsPlot'))
+	baseData.datasets.oDataSubset = baseData.datasets.oData.subsetCols(lsfs.Scores < THRESH_LSFS, 'ORBiT subset using LSFS.')
+	print 'Laplacian score feature selection complete. Retained ',
+	print GREEN + str(sum(lsfs.Scores < THRESH_LSFS)) + ENDCOLOR + ' ORBiT parameters.'
 	
 	## ============= Run KDE ============= ##
-	runKDE(baseData)
-
-
-
+	kdeData   = baseData.datasets.oDataSubset.join(baseData.datasets.sData.subsetCols(specIndex), 'KDE: ORBiT subset & spec data.')	
+	kde       = KDE.KDE()
+	synthetic = kde.run(kdeData, specs, a = KDE_A, counts = dotdict({'nGood': 100, 'nCritical': 100, 'nFail': 100}))
 
 
 
