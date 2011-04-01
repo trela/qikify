@@ -28,22 +28,23 @@ from helpers.general import *
 from DataStruct import *
 
 class Dataset(object): 
-	def __init__(self, filename, hasHeader = True):
+	def __init__(self, filename = None, hasHeader = True):
 		## This is the primary dataset storage dictionary! All datasets will be pushed
 		## onto this dictionary.
 		self.datasets = dotdict()
 		
-		# Read dataset column names
-		if ( hasHeader ):
-			fileh 	  	= open(filename, 'rU')
-			dataReader 	= csv.reader(fileh)
-			names  		= array(dataReader.next())
-			fileh.close()
+		if filename is not None:
+			# Read dataset column names
+			if ( hasHeader ):
+				fileh 	  	= open(filename, 'rU')
+				dataReader 	= csv.reader(fileh)
+				names  		= array(dataReader.next())
+				fileh.close()
 		
-		# Read raw dataset data
-		self.datasets.raw = DataStruct(names = names,
-								   	   data  = loadtxt(filename, delimiter=',', skiprows=1),
-								       desc  = 'Raw dataset from input file.')
+			# Read raw dataset data
+			self.datasets.raw = DataStruct(names = names,
+									   	   data  = loadtxt(filename, delimiter=',', skiprows=1),
+									       desc  = 'Raw dataset from input file.')
 
 
 
@@ -63,7 +64,7 @@ class Dataset(object):
 		pfData = self.datasets[dataset]
 		n, p   = size(pfData.data,0), size(pfData.data,1)
 		pfMat  = ones((n,p))
-		mu 	   = mean(pfData.data,0)
+		mu 	   = mean(pfData.data,0) if p > 1 else mean(pfData.data,0)[0]
 		
 		# Iterate over columns in pfData
 		for j in xrange(p):
@@ -71,7 +72,7 @@ class Dataset(object):
 			if type(ind) is dict and ~(ind[dataset][j]):
 				continue
 			else:
-				lsl, usl = specs[pfData.names[j]]
+				lsl, usl = specs[pfData.names[j]] if p > 1 else specs[pfData.names]
 				if outlierFilter:
 					lsl = mu[j] - k_l * abs(mu[j] - lsl) if not isnan(lsl) else nan
 					usl = mu[j] + k_u * abs(mu[j] - usl) if not isnan(usl) else nan
@@ -114,10 +115,7 @@ class Dataset(object):
 		print 'Dataset                         #Rows #Cols'
 		print '===============================================' + ENDCOLOR
 		for dataset in self.datasets.values():
-			print '%-30s  %4d  %4d' % (dataset.desc, size(dataset.data,0), size(dataset.data,1))
-			if hasattr(dataset, 'gnd') and dataset.gnd is not None:
-				print 'Pass: ' + GREEN + str(sum(dataset.gnd == 1)) + ENDCOLOR, 
-				print ' Fail: ' + RED + str(sum(dataset.gnd == -1)) + ENDCOLOR
+			dataset.printSummary()
 		print ''
 		return self
 

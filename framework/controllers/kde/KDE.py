@@ -75,6 +75,8 @@ class KDE:
 		# Initialize arrays for speed
 		Sg, Sc, Sf = zeros((counts.nGood, self.d)), zeros((counts.nCritical, self.d)), zeros((counts.nFail, self.d))
 		ng, nc, nf = 0, 0, 0
+		
+		thresh = 0.2
 		while ( ng+nc+nf < sum(counts.values()) ):
 			sample = scale(self.genSample(), self.scaleFactors, reverse = True)
 			if self.isGood(sample) and ng < counts.nGood:
@@ -86,6 +88,10 @@ class KDE:
 			if self.isCritical(sample) and nc < counts.nCritical:
 				Sc[nc,:] = sample
 				nc += 1	
+			if (1.0*(ng+nc+nf)/sum(counts.values())) > thresh:
+				print 'Synthetic data generation ' + str(thresh * 100) + '% complete.'
+				thresh += 0.2
+		print 'Synthetic data generation complete.'
 		return vstack((Sc,Sg,Sf))
 
 

@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 '''
 
-from Dataset import * 
+from Dataset import *
 
 class DatasetTI(Dataset):
 	
@@ -35,6 +35,9 @@ class DatasetTI(Dataset):
 			self.datasets.sData  = self.datasets.raw.subsetCols(range(739,1106), 'Specification test data.')
 			self.datasets.oData  = self.datasets.raw.subsetCols(range(0,739), 'ORBiT test data.')
 		else:
+			# Call parent class Dataset.__init__() which creates self.datasets.
+			super(DatasetTI, self).__init__()
+			
 			self.datasets.sData  = DataStruct(sNames, sData, 'Specification test data.')
 			self.datasets.oData  = DataStruct(oNames, oData, 'ORBiT test data.')
 
@@ -42,8 +45,8 @@ class DatasetTI(Dataset):
 	# Run on first dataset, baseData.
 	def genSubsetIndices(self, specs):
 		# We will remove all parameters with less than 100 unique values.
-		ind = helpers.dotdict({'sData': apply_along_axis(lambda x: len(unique(x)) > 100, 0, self.datasets.sData.data),
-					   		   'oData': apply_along_axis(lambda x: len(unique(x)) > 100, 0, self.datasets.oData.data)})
+		ind = dotdict({'sData': apply_along_axis(lambda x: len(unique(x)) > 100, 0, self.datasets.sData.data),
+					   'oData': apply_along_axis(lambda x: len(unique(x)) > 100, 0, self.datasets.oData.data)})
 
 		# Identify all outliers with signatures outside +/- 3 * (spec distance).
 		self.identifyOutliers(specs, ind, dataset = 'sData', k_l = 3, k_u = 3)

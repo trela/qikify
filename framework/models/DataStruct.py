@@ -22,7 +22,7 @@ THE SOFTWARE.
 '''
 import csv
 from numpy import *
-import helpers.general as helpers
+from helpers.general import *
 
 class DataStruct:
 	def __init__(self, names = None, data = None, desc = None, pfMat = None, gnd = None):
@@ -62,15 +62,21 @@ class DataStruct:
 		else:
 			dataset = self.data
 			names = self.names
-			
+
 		fileh 	  	= open(filename, 'w')
 		dataWriter 	= csv.writer(fileh)
 		dataWriter.writerow(names)
 		for row in dataset:
 			dataWriter.writerow(row)
 		fileh.close()
-		print helpers.bcolors.OKGREEN
-		print 'Saved dataset to ' + filename + ' successfully.' + helpers.bcolors.ENDC
+		print GREEN + 'Saved dataset to ' + filename + ' successfully.' + ENDCOLOR
 
+	# Just print out a summary of the dataset (rows, cols, pass/fail info if available.)
+	def printSummary(self):
+		print '%-30s  %4d  %4d' % (self.desc, size(self.data,0), size(self.data,1))
+		if hasattr(self, 'gnd') and self.gnd is not None:
+			print 'Pass: ' + GREEN + str(sum(self.gnd == 1)) + ENDCOLOR, 
+			print ' Fail: ' + RED + str(sum(self.gnd == -1)) + ENDCOLOR
 
+		
 

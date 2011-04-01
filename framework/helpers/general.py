@@ -23,7 +23,14 @@ THE SOFTWARE.
 
 import csv
 from numpy import * 
-import matplotlib.pyplot as plt
+
+# Colors for printing to terminal
+HEADER = '\033[95m'
+BLUE = '\033[94m'
+GREEN = '\033[92m'
+WARNING = '\033[93m'
+RED = '\033[91m'
+ENDCOLOR = '\033[0m'
 
 
 # Changes True/False data to +1/-1 symmetric.
@@ -72,10 +79,3 @@ def zeroMatrixDiagonal(X):
 mmax = vectorize(lambda x,y: max(x,y), otypes = [float32])
 
 
-# Colors for printing to terminal
-HEADER = '\033[95m'
-BLUE = '\033[94m'
-GREEN = '\033[92m'
-WARNING = '\033[93m'
-RED = '\033[91m'
-ENDCOLOR = '\033[0m'
