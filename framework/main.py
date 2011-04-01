@@ -72,7 +72,16 @@ if __name__ == "__main__":
 	## ============= Run KDE ============= ##
 	kdeData   = baseData.datasets.oDataSubset.join(baseData.datasets.sData.subsetCols(specIndex), 'KDE: ORBiT subset & spec data.')	
 	kde       = KDE.KDE()
-	synthetic = kde.run(kdeData, specs, a = KDE_A, counts = dotdict({'nGood': 100, 'nCritical': 100, 'nFail': 100}))
+	synthetic = kde.run(kdeData, specs, a = KDE_A, counts = dotdict({'nGood': 1000, 'nCritical': 1000, 'nFail': 1000}))
+	synData   = DatasetTI()
+
+
+
+
+
+
+
+
 
 
 
