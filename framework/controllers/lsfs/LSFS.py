@@ -52,9 +52,16 @@ class LSFS:
 		LPrime 	= array(sum(multiply(dot(X.T,self.W).T, X).T, 1) - z)
 		DPrime[DPrime < 1e-12] = 10000
 		
-		self.Scores = (LPrime/DPrime).T
-		self.Ranking = argsort(self.Scores)
+		self.Scores    = (LPrime/DPrime).T
+		self.Ranking   = argsort(self.Scores)
 		return self
+		
+	def subset(self, thresh):	
+		self.Subset    = self.Scores < thresh
+		self.nRetained = sum(self.Subset)
+		print 'LSFS retained', GREEN+str(self.nRetained)+ENDCOLOR, 'parameters.'
+		return self
+
 
 	# Construct the W matrix used in LSFS
 	def constructW(self, fea, gnd, k = 0, t = 1, bLDA = 0, bSelfConnected = 1):

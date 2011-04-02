@@ -29,8 +29,7 @@ from DataStruct import *
 
 class Dataset(object): 
 	def __init__(self, filename = None, hasHeader = True):
-		## This is the primary dataset storage dictionary! All datasets will be pushed
-		## onto this dictionary.
+		# This is the primary dataset storage dictionary! All datasets will be pushed onto this dictionary.
 		self.datasets = dotdict()
 		
 		if filename is not None:
@@ -40,14 +39,20 @@ class Dataset(object):
 				dataReader 	= csv.reader(fileh)
 				names  		= array(dataReader.next())
 				fileh.close()
-		
+				
 			# Read raw dataset data
 			self.datasets.raw = DataStruct(names = names,
 									   	   data  = loadtxt(filename, delimiter=',', skiprows=1),
 									       desc  = 'Raw dataset from input file.')
+			self.nrow  = size(self.datasets.raw.data,0) * 1.0
+			self.ncol  = size(self.datasets.raw.data,1) * 1.0
+			
+	def __getitem__(self, key):
+		return self.datasets[key]
+	def __setitem__(self, key, value):
+		self.datasets[key] = value
 
-
-
+		
 	# Identify outliers in the specified dataset using boundaries with margins determined by
 	# the k_l and k_u constants.
 	def identifyOutliers(self, specs, ind, dataset, k_l = 3, k_u = 3):

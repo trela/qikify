@@ -25,31 +25,27 @@ from scikits.learn.grid_search import GridSearchCV
 from scikits.learn.metrics import classification_report
 from scikits.learn.metrics import confusion_matrix
 from scikits.learn.svm import SVC
+
+from helpers.general import *
+
 class SVM:
 	def train(self, X, gnd, gridSearch = False):
 		self.gridSearch = gridSearch
 		if self.gridSearch:
 			paramGrid = { 'C': [1, 5, 10, 50, 100], 'gamma': [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.1] }
-			self.clf = GridSearchCV(SVC(kernel='rbf'), param_grid, fit_params={'class_weight': {1 : 1, -1 : 1}})
+			self.clf = GridSearchCV(SVC(kernel='rbf'), paramGrid, fit_params={'class_weight': {1 : 1, -1 : 1}})
 		else:
 			self.clf = SVC()
 		self.scaleDict = dotdict({'mean': X.mean(axis = 0), 'std': X.std(axis = 0)})
 		self.clf.fit(scale(X, self.scaleDict), gnd)
 	
-	def predict(self, X, gndTrue):
-		self.predicted = self.clf.predict(scale(X, self.scaleDict))
-		
-	def printSummary(self):
-		if self.gridSearch:
-			print "Best estimator found by grid search:" + self.clf.best_estimator
-		print classification_report(gndTrue, self.predicted)
-		print confusion_matrix(gndTrue, self.predicted)
+	def predict(self, X):
+		return self.clf.predict(scale(X, self.scaleDict))
 
-
-
-
-
-
+	def getTEYL(self, gnd, predicted):
+		te = sum(logical_and((gnd == -1), (predicted ==  1))) * 100.0 / len(gnd)
+		yl = sum(logical_and((gnd ==  1), (predicted == -1))) * 100.0 / len(gnd)
+		return [te, yl]
 
 
 

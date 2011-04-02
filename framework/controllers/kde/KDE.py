@@ -46,20 +46,15 @@ class KDE:
 		self.h       = self.compute_h(self.n, self.d, self.c_d, self.b)
 		self.setBandwithFactors(a)
 
-		# Normalize data
+		# Normalize data/bounds
 		self.scaleFactors 	= dotdict({'mean': dataset.data.mean(axis = 0), 'std': dataset.data.std(axis = 0)})
 		self.datan 			= scale(dataset.data, self.scaleFactors)
-		if bounds is None:
-			self.bounds 	= scale(array([dataset.data.min(axis=0), dataset.data.max(axis=0)]), self.scaleFactors)
-		else:
+		self.bounds 		= scale(array([dataset.data.min(axis=0), dataset.data.max(axis=0)]), self.scaleFactors)
+		if bounds is not None:
 			self.bounds 	= scale(bounds, self.scaleFactors)
 
-		# Generate nGood, nCritical, nFail samples.	
-		# Otherwise, just generate nSamples without caring about device good/critical/bad membership.
-		if sum(counts.values()) > 0:
-			return self.genPartitionedSamples(counts)
-		else:
-			return self.genSamples(nSamples)
+		# Generate samples
+		return self.genSamples(nSamples) if counts is None else self.genPartitionedSamples(counts)
 
 
 
@@ -68,6 +63,7 @@ class KDE:
 	# Default method of generating device samples
 	def genSamples(self, nSamples):
 		Sn = vstack([ self.genSample() for _ in xrange(nSamples) ])
+		#print 'Synthetic data generation complete.'
 		return scale(Sn, self.scaleFactors, reverse = True)
 		
 	# Generates Ngc critical devices, Ng good devices, Nf failing devices.
@@ -76,7 +72,7 @@ class KDE:
 		Sg, Sc, Sf = zeros((counts.nGood, self.d)), zeros((counts.nCritical, self.d)), zeros((counts.nFail, self.d))
 		ng, nc, nf = 0, 0, 0
 		
-		thresh = 0.2
+		#thresh = 0.2
 		while ( ng+nc+nf < sum(counts.values()) ):
 			sample = scale(self.genSample(), self.scaleFactors, reverse = True)
 			if self.isGood(sample) and ng < counts.nGood:
@@ -88,10 +84,10 @@ class KDE:
 			if self.isCritical(sample) and nc < counts.nCritical:
 				Sc[nc,:] = sample
 				nc += 1	
-			if (1.0*(ng+nc+nf)/sum(counts.values())) > thresh:
-				print 'Synthetic data generation ' + str(thresh * 100) + '% complete.'
-				thresh += 0.2
-		print 'Synthetic data generation complete.'
+			#if (1.0*(ng+nc+nf)/sum(counts.values())) > thresh:
+				#print 'Synthetic data generation ' + str(thresh * 100) + '% complete.'
+				#thresh += 0.2
+		#print 'Synthetic data generation complete.'
 		return vstack((Sc,Sg,Sf))
 
 

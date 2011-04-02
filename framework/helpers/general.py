@@ -33,6 +33,10 @@ RED = '\033[91m'
 ENDCOLOR = '\033[0m'
 
 
+def printPassFail(gnd):
+	print 'Pass: '  + GREEN + str(sum(gnd ==  1)) + ENDCOLOR, 
+	print ' Fail: ' + RED   + str(sum(gnd == -1)) + ENDCOLOR
+		
 # Changes True/False data to +1/-1 symmetric.
 def bool2symmetric(data):
 	return array((data - 0.5) * 2.0, dtype = int)

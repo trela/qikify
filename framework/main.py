@@ -21,92 +21,93 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 '''
 
-import csv, os, glob, numpy, sys, ConfigParser
-from scikits.learn.grid_search import GridSearchCV
-from scikits.learn.metrics import classification_report
-from scikits.learn.metrics import confusion_matrix
-from scikits.learn.svm import SVC
+from ConfigParser import ConfigParser
+from glob import glob
 
-from models.Specs import *
-from models.DatasetTI import *
 from helpers.general import *
 from helpers.plots import *
+from models.Specs import *
+from models.DatasetTI import *
 from controllers.kde import KDE
 from controllers.lsfs import LSFS
 from controllers.svm import SVM
 
+
 # Global parameters controlling the run
-THRESH_LSFS = 0.02
-KDE_A 		= 0			# For KDE, bandwidth
+THRESH_LSFS = 0.02		# Threshold determining how many features are retained by LSFS
 K_INNER		= 5.5/6		# For KDE, defines critical region
 K_OUTER 	= 6.5/6		# For KDE, defines critical region
+N_GOOD 		= 1000
+N_CRITICAL  = 200
+N_FAIL		= 200
 
 
 # Controller class instances
-config 	  	= ConfigParser.ConfigParser()
+config 	  	= ConfigParser(); config.read('settings.conf')
+specs     	= Specs(config.get('Settings', 'specFile')).genCriticalRegion(K_INNER, K_OUTER)
 lsfs 	  	= LSFS.LSFS()
 kde       	= KDE.KDE()
 svm 		= SVM.SVM()		
 
+# Results go here
+error    = zeros((len(dataFiles[1:len(dataFiles)]), 2))
+errorSyn = zeros((len(dataFiles[1:len(dataFiles)]), 2))
 
 
-
+def runAll(dataFiles, baseData, kdeData):
+	for i, dataFile in enumerate(dataFiles[1:len(dataFiles)]):
+		# Evaluate real data error metrics
+		dataset 	= DatasetTI(dataFile).clean(specs, ind)
+		predicted  	= svm.predict(dataset['oData'].subsetCols(lsfs.Subset).data)
+		error[i,:] 	= svm.getTEYL(dataset['sData'].pfMat[:,ind_s], predicted)
+		
+		# Evaluate synthetic data error metrics	
+		synthetic = kde.run(kdeData, nSamples = int(dataset.nrow))
+		synData   = DatasetTI(oNames = baseData['oData'].names, 
+							  sNames = baseData['sData'].names,
+							  oData = synthetic[:,0:lsfs.nRetained], 
+							  sData = array([synthetic[:,-1]]).T).computePF(specs, dataset = 'sData')
+		errorSyn[i,:] = svm.getTEYL(synData['sData'].gnd, svm.predict(synData['oData'].data))
+	
+		print dataFile[39:50], 
+		print 'TE:', str(round(error[i,0], 3)) + '%', 
+		print 'YL:', str(round(error[i,1], 3)) + '%',
+		print 'TE:', str(round(errorSyn[i,0], 3)) + '%',
+		print 'YL:', str(round(errorSyn[i,1], 3)) + '%'
+	
+	plotTEYL(error, errorSyn, '/Users/nathankupp/Desktop/Result ' + str(THRESH_LSFS) + ' - ' + str(N_GOOD) + ' - ' + str(N_CRITICAL) + ' - ' + str(N_FAIL) + '.png')
+	
+	
+	
 if __name__ == "__main__":
-	## ============= Init, load specs ============= ##
-	config.read('settings.conf')
-	dataFiles = glob.glob(config.get('Settings', 'dataFiles'))
-	specs     = Specs(config.get('Settings', 'specFile'))
-
-	# Load the first wafer and subset rows/cols.
-	baseData  = DatasetTI(filename = dataFiles[0])
+	dataFiles = glob(config.get('Settings', 'dataFiles'))
+	baseData  = DatasetTI(dataFiles[0])
 	baseData.printSummary()
 	ind 	  = baseData.genSubsetIndices(specs)
-	baseData.printSummary()
-
-	# Create pair of boundaries defining critical region of specification test space
-	specs.genCriticalRegion(baseData.datasets.sData, k_i = K_INNER, k_o = K_OUTER)
-
-
-	## ============= Run LSFS ============= ##
+	
 	# Identify the most-frequently failing specification test.
-	passing   = (1.0 * sum(baseData.datasets.sData.pfMat == 1,0)) / size(baseData.datasets.sData.pfMat,0) 
-	specIndex = argmin(passing)
-	
-	# Print summary of retained specification test.
-	print 'Retained only specification test ' + RED + '#' + str(specIndex + 1) + ENDCOLOR,
-	print ' Pass: ' + GREEN + str(sum(baseData.datasets.sData.pfMat[:,specIndex] == 1)) + ENDCOLOR, 
-	print ' Fail: ' + RED + str(sum(baseData.datasets.sData.pfMat[:,specIndex] == -1)) + ENDCOLOR
-	
 	# Run LSFS against the ORBiT data + the retained specification test.
-	lsfs.run(baseData.datasets.oData, baseData.datasets.sData.pfMat[:,specIndex])
-	lsfs.plotScores(config.get('Settings', 'lsfsPlot'))
+	ind_s     = argmin( sum(baseData['sData'].pfMat == 1,0) / baseData['sData'].nrow)
+	gnd  	  = baseData['sData'].pfMat[:,ind_s]
+	lsfs.run(baseData['oData'], gnd, plot = config.get('Settings', 'lsfsPlot'))
+	lsfs.subset(THRESH_LSFS)
+	baseData.subsetCols({'oData': lsfs.Subset, 'sData': ind_s})
 	
-	# Subset the ORBiT data based the Laplacian scores.
-	baseData.datasets.oDataSubset = baseData.datasets.oData.subsetCols(lsfs.Scores < THRESH_LSFS, 'ORBiT subset using LSFS.')
-	nRetained = sum(lsfs.Scores < THRESH_LSFS)
+	# KDE
+	kdeData   = baseData['oData'].join(baseData['sData'])	
+	synthetic = kde.run(kdeData, specs, counts = dotdict({'nGood': N_GOOD, 'nCritical': N_CRITICAL, 'nFail': N_FAIL}))
+	synData   = DatasetTI(oNames = baseData['oData'].names, 
+						  sNames = baseData['sData'].names,
+						  oData = synthetic[:,0:lsfs.nRetained], 
+						  sData = array([synthetic[:,-1]]).T).computePF(specs, dataset = 'sData')
+
+	# SVM
+	svm.train(synData['oData'].data, synData['sData'].gnd, gridSearch = True)
+	svm.getTEYL(gnd, svm.predict(baseData['oData'].data))
+
+	# Go through everything else and get TE/YL
+	runAll(dataFiles, baseData, kdeData)
 	
-	# Summarize the number of ORBiT parameters retained by LSFS.
-	print 'LSFS complete, retained ' + GREEN + str(nRetained) + ENDCOLOR + ' ORBiT parameters.'
-	
-	## ============= Run KDE ============= ##
-	# Base dataset for KDE is the retained ORBiT parameters + the single specification test we retained.
-	kdeData   = baseData.datasets.oDataSubset.join(baseData.datasets.sData.subsetCols(specIndex), 'KDE: ORBiT subset & spec data.')	
-	synthetic = kde.run(kdeData, specs, a = KDE_A, counts = dotdict({'nGood': 1000, 'nCritical': 1000, 'nFail': 1000}))
-	synData   = DatasetTI(oNames = baseData.datasets.oDataSubset.names, 
-						  sNames = baseData.datasets.sData.names[specIndex], 
-						  oData  = synthetic[:,0:nRetained], 
-						  sData  = array([synthetic[:,-1]]).T).computePF(specs, dataset = 'sData')
-
-	## ============= Train SVM ============= ##
-	svm.train(synData.datasets.oData.data, synData.datasets.sData.gnd)
-	svm.predict(baseData.datasets.oDataSubset.data, baseData.datasets.sData.pfMat[:,specIndex])
-	svm.printSummary()
-	
-
-
-
-
-
 
 
 

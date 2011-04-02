@@ -57,7 +57,17 @@ class DatasetTI(Dataset):
 		ind.sData  = logical_and(ind.sData, ~alwaysPassing)
 		
 		self.subsetCols(ind).subsetRows({'sData': self.indOutliers, 'oData': self.indOutliers})
+		self.printSummary()
 		return ind
+
+	# Run on every subsequent dataset.
+	def clean(self, specs, ind):
+		self.identifyOutliers(specs, ind, dataset = 'sData', k_l = 3, k_u = 3)
+		self.subsetCols(ind).subsetRows({'sData': self.indOutliers, 'oData': self.indOutliers})
+		self.computePF(specs, ind, dataset = 'sData')
+		return self
+		
+
 
 
 

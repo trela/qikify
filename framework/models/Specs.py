@@ -60,15 +60,12 @@ class Specs:
 	
     # =============== Partitioned Sampling Methods =============== 
 	# Takes specification boundary and generates two boundaries to define 'critical' device region.
-	def genCriticalRegion(self, refData, k_i = 5.0/6, k_o = 7.0/6):
+	def genCriticalRegion(self, k_i, k_o):
 		self.inner, self.outer = {}, {}
-		for i, name in enumerate(refData.names):
+		for name in self.specs.keys():
 			lsl, usl = self.specs[name]
-			
-			# If either the lsl or usl is NaN, we use reference data to grow/shrink. Otherwise, use mean of lsl & usl.
-			mu = mean(refData.data,0) if isnan(lsl + usl) else mean([lsl, usl])
-			
+			mu		 = mean([lsl, usl])
 			self.inner[name] = array([mu - k_i * abs(mu-lsl), mu + k_i * abs(mu-usl)])
 			self.outer[name] = array([mu - k_o * abs(mu-lsl), mu + k_o * abs(mu-usl)])
-
+		return self
 

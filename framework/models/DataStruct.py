@@ -31,7 +31,9 @@ class DataStruct:
 		self.desc  = desc
 		self.pfMat = pfMat
 		self.gnd   = gnd
-
+		self.nrow  = size(data,0) * 1.0
+		self.ncol  = size(data,1) * 1.0
+		
 	def subsetCols(self, cols, desc = None):
 		# Numpy won't hstack if data is un-reshaped column vector. So, we reshape if data is column vector.
 		# A hack, but not sure how to do this any better at the moment.
@@ -75,8 +77,7 @@ class DataStruct:
 	def printSummary(self):
 		print '%-30s  %4d  %4d' % (self.desc, size(self.data,0), size(self.data,1))
 		if hasattr(self, 'gnd') and self.gnd is not None:
-			print 'Pass: ' + GREEN + str(sum(self.gnd == 1)) + ENDCOLOR, 
-			print ' Fail: ' + RED + str(sum(self.gnd == -1)) + ENDCOLOR
+			printPassFail(self.gnd)
 
 		
 
