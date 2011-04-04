@@ -23,7 +23,44 @@ THE SOFTWARE.
 from numpy import *
 import matplotlib.pyplot as plt
 import matplotlib.font_manager
-from pylab import *
+from matplotlib.ticker import FuncFormatter
+import pylab
+
+def percentFormatter(x, pos=0):
+     return '%1.2f%%'%(x)
+
+def plotLSFSThresholds(thresholds, results, filename):
+	teMeans = []
+	ylMeans = []
+	teMins = []
+	ylMins = []
+	teMaxs = []
+	ylMaxs = []
+	for threshold in thresholds:
+		rowIndex = (results[:,0] == threshold)
+		teMeans.append(mean(results[rowIndex,1]))
+		ylMeans.append(mean(results[rowIndex,2]))
+		teMins.append(min(results[rowIndex,1]))
+		ylMins.append(min(results[rowIndex,2]))
+		teMaxs.append(max(results[rowIndex,1]))
+		ylMaxs.append(max(results[rowIndex,2]))
+	
+	prop = matplotlib.font_manager.FontProperties(size=10)
+	fig = pylab.figure()
+	ax = fig.add_subplot(111)
+	ax.plot(thresholds, teMeans,'k-')
+	ax.plot(thresholds, ylMeans,'k--')
+	ax.fill_between(thresholds, teMins, teMaxs, facecolor='red', alpha=0.75)
+	ax.fill_between(thresholds, ylMins, ylMaxs, facecolor='green', alpha=0.75)
+	leg = ax.legend((r"$T_E$", r"$Y_L$"), 'best', shadow=True, prop = prop)
+	ax.grid(True)
+	ax.set_title('Test Escapes and Yield Loss vs. LSFS Threshold')
+	plt.xlabel(r"$\tau_{L}$")
+	plt.ylabel("Error")
+	ax.yaxis.set_major_formatter(FuncFormatter(percentFormatter))
+	plt.savefig(filename, dpi = 150, format='pdf')	
+	plt.close()
+
 
 def plotTEYL(error, errorSyn, filename):
 	prop = matplotlib.font_manager.FontProperties(size=10)
@@ -47,7 +84,7 @@ def plotTEYL(error, errorSyn, filename):
 	leg = ax.legend((r"$Y_L$", r"$\hat{Y}_L$", r"$\bar{Y}_L$"), 'best', shadow=True, prop = prop)
 	ax.grid(True)
 	ax.set_title('Yield Loss')
-	plt.savefig(filename, dpi = 150, format='png')	
+	plt.savefig(filename, dpi = 150, format='pdf')	
 	plt.close()
 
 

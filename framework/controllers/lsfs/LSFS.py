@@ -60,7 +60,7 @@ class LSFS:
 		self.Subset    = self.Scores < thresh
 		self.nRetained = sum(self.Subset)
 		print 'LSFS retained', GREEN+str(self.nRetained)+ENDCOLOR, 'parameters.'
-		return self
+		return self.Subset
 
 
 	# Construct the W matrix used in LSFS
@@ -124,7 +124,10 @@ class LSFS:
 		return A
 
 	def plotScores(self, filename):
-		plt.plot(self.Scores[self.Ranking])
-		plt.savefig(filename, dpi = 150, format='png')	
+		plt.plot(self.Scores[self.Ranking], 'k-')
+		plt.grid(True)
+		plt.xlabel('Features Retained')
+		plt.ylabel('Laplacian Score')
+		plt.savefig(filename, dpi = 150, format='pdf')
 		plt.close()
 		return self

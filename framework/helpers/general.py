@@ -44,7 +44,7 @@ def bool2symmetric(data):
 	
 # Write mat to filename as a csv.
 def csvWriteMatrix(filename, mat):
-	out  = csv.writer(open('../data/' + filename, 'wb'))
+	out  = csv.writer(open(filename, 'wb'))
 	for row in mat:
 		out.writerow(row)
 		
