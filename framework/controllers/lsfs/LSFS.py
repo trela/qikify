@@ -38,8 +38,7 @@ class LSFS:
 	# ----------------------------------
 	#              sigma_2
 	#
-	def run(self, dataset, gnd):
-		X = dataset.data
+	def run(self, X, gnd):
 		if not (size(X,0) == len(gnd)): raise Exception( "Data and gnd do not have matching sizes" )
 		
 		self.constructW(scale(X), gnd, t = size(X,1), bLDA = False)

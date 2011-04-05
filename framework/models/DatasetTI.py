@@ -53,8 +53,8 @@ class DatasetTI(Dataset):
 		
 		# Identify specification performances which now always pass.
 		self.computePF(specs, ind, dataset = 'sData')
-		#alwaysPassing = (sum(self.datasets.sData.pfMat[self.indOutliers,:],0) / sum(self.indOutliers) == 1)
-		#ind.sData  = logical_and(ind.sData, ~alwaysPassing)
+		alwaysPassing = (sum(self.datasets.sData.pfMat[self.indOutliers,:],0) / sum(self.indOutliers) == 1)
+		ind.sData  = logical_and(ind.sData, ~alwaysPassing)
 		
 		self.subsetCols(ind).subsetRows({'sData': self.indOutliers, 'oData': self.indOutliers})
 		self.printSummary()

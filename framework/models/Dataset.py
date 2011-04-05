@@ -44,8 +44,8 @@ class Dataset(object):
 			self.datasets.raw = DataStruct(names = names,
 									   	   data  = loadtxt(filename, delimiter=',', skiprows=1),
 									       desc  = 'Raw dataset from input file.')
-			self.nrow  = size(self.datasets.raw.data,0) * 1.0
-			self.ncol  = size(self.datasets.raw.data,1) * 1.0
+			self.nrow  = size(self.datasets.raw.data,0)
+			self.ncol  = size(self.datasets.raw.data,1)
 			
 	def __getitem__(self, key):
 		return self.datasets[key]

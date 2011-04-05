@@ -31,14 +31,16 @@ class DataStruct:
 		self.desc  = desc
 		self.pfMat = pfMat
 		self.gnd   = gnd
-		self.nrow  = size(data,0) * 1.0
-		self.ncol  = size(data,1) * 1.0
+		self.nrow  = size(data,0)
+		self.ncol  = size(data) if (size(data,0) == size(data)) else size(data,1)
 		
 	def subsetCols(self, cols, desc = None):
 		# Numpy won't hstack if data is un-reshaped column vector. So, we reshape if data is column vector.
 		# A hack, but not sure how to do this any better at the moment.
-		data 		= array([self.data[:,cols]]).T if (size(nonzero(cols)) == 1) else self.data[:,cols]
-		
+		data 		= self.data[:,cols]
+		if size(data) == size(data,0):
+			data = array([self.data[:,cols]]).T
+			
 		description = self.desc if desc is None else desc
 		pfMat       = self.pfMat[:,cols] if (hasattr(self, 'pfMat') and self.pfMat is not None) else None
 		gnd 		= self.gnd if (hasattr(self, 'gnd') and self.gnd is not None) else None
