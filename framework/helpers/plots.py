@@ -89,26 +89,21 @@ def plotTEYL(error, errorSyn, filename):
 
 
 # 2D Scatterplot of synthetic & actual data.
-def plotSample(sData,bData, d1, d2, outFile = None):
+def plotSyntheticAndReal(sData, bData, d1, d2, filename):
 	fig, ax = plt.subplots(1)
 	ax.scatter(sData[:,d1],sData[:,d2], alpha=0.5, c='r')
 	ax.scatter(bData[:,d1],bData[:,d2], alpha=0.5, c='g')
-	if outFile is not None:
-		fig.savefig(outFile)
-	plt.show()
+	plt.savefig(filename, dpi = 150, format='pdf')	
+	plt.close()
 
 
-def plotHistograms():
-	plt.figure(1)
-	for i in range(8):
-		ax1 = plt.subplot(3,3,i, axisbg = 'w')
-		plt.hist(synData.sData[:,i], 20, alpha=0.5, color='r')
-		plt.hist(baseData.sData[:,i], 20, alpha=0.5, color='b')
-		plt.grid(True)
-		lowerLim = min(hstack((baseData.sData[:,i], synData.sData[:,i])))
-		upperLim = max(hstack((baseData.sData[:,i], synData.sData[:,i])))
-		plt.xlim([lowerLim, upperLim]) 
-	plt.show()	
+def plotHistogram(sData, bData, i, filename):
+	fig, ax = plt.subplots(1)
+	ax.hist(sData[:,i], 50, normed=True, alpha=0.5, color='r')
+	ax.hist(bData[:,i], 50, normed=True, alpha=0.5, color='g')
+	ax.grid(True)
+	plt.savefig(filename, dpi = 150, format='pdf')	
+	plt.close()	
 
 
 

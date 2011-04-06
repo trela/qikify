@@ -35,7 +35,8 @@ class KDE:
 	# any of the class-membership based KDE arguments are set, it will be run instead of 
 	# standard KDE.
 	def run(self, dataset, specs = None, nSamples = 0, counts = None, a = 0, bounds = None):
-		self.dataset = dataset
+		
+		
 		self.specs   = specs
 		self.n 	     = size(dataset.data,0)
 		self.d 	     = size(dataset.data,1)
@@ -54,11 +55,22 @@ class KDE:
 			self.bounds 	= scale(bounds, self.scaleFactors)
 
 		# Generate samples
-		return self.genSamples(nSamples) if counts is None else self.genPartitionedSamples(counts)
+		if counts is None:
+			return self.genSamples(nSamples)
+		else:
+			self.genSpecLimits(dataset, specs)
+			return self.genPartitionedSamples(counts)
 
 
+ 	# We convert spec lims to arrays so spec compare during device sample generation is fast.
+	def genSpecLimits(self, dataset, specs):
+		self.inner = zeros((2,dataset.ncol))
+		self.outer = zeros((2,dataset.ncol))
+		for i, name in enumerate(dataset.names):
+			self.inner[:,i] = self.specs.inner[name] if name in self.specs.inner.keys() else [-inf, inf]
+			self.outer[:,i] = self.specs.outer[name] if name in self.specs.outer.keys() else [-inf, inf]
 
-
+	
 	# =============== Private class methods =============== 
 	# Default method of generating device samples
 	def genSamples(self, nSamples):
@@ -85,7 +97,7 @@ class KDE:
 				Sc[nc,:] = sample
 				nc += 1	
 			if (1.0*(ng+nc+nf)/sum(counts.values())) > thresh:
-				print 'Synthetic data generation ' + str(thresh * 100) + '% complete.'
+				print 'Ng:' + str(ng) + '/' + str(counts.nGood) + ' Nc:' + str(nc) + '/' + str(counts.nCritical) + ' Nf:' + str(nf) + '/' + str(counts.nFail)
 				thresh += 0.2
 		print 'Synthetic data generation complete.'
 		return vstack((Sc,Sg,Sf))
@@ -131,20 +143,11 @@ class KDE:
 
 	# =============== Partitioned Sampling Methods =============== 
 	def isGood(self, sample):
-		for i, name in enumerate(self.dataset.names):
-			if name in self.specs.inner.keys():
-				lsl, usl = self.specs.inner[name]
-				if self.specs.compareToSpecs(sample[i],lsl,usl) == -1:
-					return False
-		return True
+		return all(sample > self.inner[0,:]) and all(sample < self.inner[1,:])
 
 	def isCritical(self, sample):
-		return not (self.isGood(sample) == 1 or self.isFailing(sample) == 1)
+		return not (self.isGood(sample) or self.isFailing(sample))
 
 	def isFailing(self, sample):
-		for i, name in enumerate(self.dataset.names):
-			if name in self.specs.outer.keys():
-				lsl, usl = self.specs.outer[name]
-				if self.specs.compareToSpecs(sample[i],lsl,usl) == -1:
-					return True
-		return False
+		return (any(sample < self.outer[0,:]) or any(sample > self.outer[1,:]))
+

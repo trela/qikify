@@ -76,7 +76,7 @@ class LSFS:
 			for i in xrange(len(label)):
 				ind = nonzero(gnd==label[i])[0]
 				D = self.euDist(fea[ind,:], bSqrt = False)
-				D = exp(-D/t, dtype=float64)
+				D = exp(-D/t)
 				self.setSubMat(G, D, ind)
 			if not bSelfConnected:
 				G = zeroMatrixDiagonal(G)
@@ -86,10 +86,9 @@ class LSFS:
 	def euDist(self, A,B = None, bSqrt = True):
 		if B is None:
 			nSamples = size(A,0)
-			aa_tiled = tile(sum(A*A,1),(nSamples,1))
-			D = aa_tiled.T + aa_tiled
+			D = tile(sum(A*A,1),(nSamples,1))
+			D = D.T + D
 			D -= 2*dot(A,A.T)
-			aa_tiled = nan # let python retake this memory before continuing
 			if bSqrt:
 				D = sqrt(D)
 			return abs(zeroMatrixDiagonal(self.genMaxMatrix(D)))
@@ -117,9 +116,8 @@ class LSFS:
 
 	# Takes a square matrix A and computes max(A, A')
 	def genMaxMatrix(self, A):
-		for i in range(size(A,0)):
-			for j in range(size(A,1)):
-				A[i,j] = max(A[i,j], A[j,i])
+		ind = (A.T - A) > 0
+		A[ind] = A.T[ind]
 		return A
 
 	def plotScores(self, filename):
