@@ -29,7 +29,7 @@ import pylab
 def percentFormatter(x, pos=0):
      return '%1.2f%%'%(x)
 
-def plotLSFSThresholds(thresholds, results, filename):
+def plotLSFSThresholds(results, filename, thresholds):
 	teMeans = []
 	ylMeans = []
 	teMins = []

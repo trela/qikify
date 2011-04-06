@@ -43,8 +43,8 @@ class SVM:
 		return self.clf.predict(scale(X, self.scaleDict))
 
 	def getTEYL(self, gnd, predicted):
-		te = sum(logical_and((gnd == -1), (predicted ==  1))) * 100.0 / len(gnd)
-		yl = sum(logical_and((gnd ==  1), (predicted == -1))) * 100.0 / len(gnd)
+		te = sum(logical_and((gnd < 0), (predicted > 0))) * 100.0 / len(gnd)
+		yl = sum(logical_and((gnd > 0), (predicted < 0))) * 100.0 / len(gnd)
 		return [te, yl]
 
 

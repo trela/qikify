@@ -37,9 +37,9 @@ from controllers.svm import SVM
 # Global parameters controlling the run
 K_INNER		= 5.5/6		# For KDE, defines critical region
 K_OUTER 	= 6.5/6		# For KDE, defines critical region
-N_GOOD 		= 1000
-N_CRITICAL  = 200
-N_FAIL		= 200
+N_GOOD 		= 2000
+N_CRITICAL  = 2000
+N_FAIL		= 2000
 
 
 # Controller class instances
@@ -82,16 +82,16 @@ if __name__ == "__main__":
 			
 			# Evaluate real data error metrics
 			dataset 		  = DatasetTI(dataFile).clean(specs, ind)
-			predicted  		  = svm.predict(dataset['oData'].subsetCols(lsfs.Subset).data)
+			predicted  		  = svm.predict(dataset['oData'].subsetCols(lsfs.subset(0.06)).data)
 			error[ind_s][j,:] = svm.getTEYL(dataset['sData'].pfMat[:,ind_s], predicted)
 
 			# Evaluate synthetic data error metrics	
 			synthetic = kde.run(kdeData, nSamples = int(dataset.nrow))
-			synData   = DatasetTI(oNames = baseData['oData'].names, 
-								  sNames = baseData['sData'].names,
+			synData   = DatasetTI(oNames = baseData['oDataSub'].names, 
+								  sNames = baseData['sData'].names[ind_s],
 								  oData = synthetic[:,0:lsfs.nRetained], 
 								  sData = array([synthetic[:,-1]]).T).computePF(specs, dataset = 'sData')
-			errorSyn[ind_s][j,:] = svm.getTEYL(synData['sData'].gnd, svm.predict(synData['oData'].data))
+			errorSyn[ind_s][j,:] = svm.getTEYL(synData['sData'].pfMat[:,ind_s], svm.predict(synData['oData'].data))
 
 			print dataFile[39:50],
 			print 'TE:', str(round(error[ind_s][j,0], 3)) + '%', 
