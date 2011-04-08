@@ -56,6 +56,11 @@ if __name__ == "__main__":
 	baseData  = DatasetTI(dataFiles[0]); baseData.printSummary()
 	ind 	  = baseData.genSubsetIndices(specs)
 	
+	for ind_s in xrange(baseData['sData'].ncol):
+		printPassFail(baseData['sData'].pfMat[:,ind_s])
+	
+
+	'''
 	# Results stored in these two arrays
 	error 	  = []	
 	errorSyn  = []
@@ -100,7 +105,7 @@ if __name__ == "__main__":
 			print 'YL:', str(round(errorSyn[ind_s][j,1], 3)) + '%'
 			
 		plotTEYL(error[ind_s], errorSyn[ind_s], config.get('Settings', 'resultDir') + 'Result  - ' + baseData['sData'].names[ind_s] + '.pdf')
-
+'''
 
 	
 	

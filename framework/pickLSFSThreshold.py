@@ -47,17 +47,27 @@ lsfs 	  	= LSFS.LSFS()
 kde       	= KDE.KDE()
 svm 		= SVM.SVM()
 
-
-def pickThreshold(ind_s, nCrossVals = 3):
+	
+# Run LSFS for a series of threshold values to determine best threshold.
+if __name__ == "__main__":
+	if len(sys.argv) == 2:
+		ind_s = int(sys.argv[1])
+	else:
+		sys.exit()
+	
 	dataFiles 	 = glob(config.get('Settings', 'dataFiles'))
 	baseData  	 = DatasetTI(dataFiles[0])
 	baseData.printSummary()
 	ind 	  	 = baseData.genSubsetIndices(specs)
+
+	thresholds   = [0.006, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10]
+	nCrossVals	 = 5
 	
-	thresholds   = [0.006, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.15, 0.2, 0.25]
 	
 	## Main run given ind_s
 	print ind_s, baseData['sData'].names[ind_s]
+	printPassFail(baseData['sData'].pfMat[:,ind_s])
+
 	lsfs.run(baseData['oData'].data, baseData['sData'].pfMat[:,ind_s])
 	baseData['sDataSub'] = baseData['sData'].subsetCols(ind_s)
 	
@@ -68,34 +78,22 @@ def pickThreshold(ind_s, nCrossVals = 3):
 		kdeData   			 = baseData['oDataSub'].join(baseData['sDataSub'])
 		
 		for j in xrange(nCrossVals):
-			# Generate training set using KDE	
+			# Generate training set using KDE
 			synthetic = kde.run(kdeData, specs, counts = dotdict({'nGood': N_GOOD, 'nCritical': N_CRITICAL, 'nFail': N_FAIL}))
 			synData   = DatasetTI(oNames = baseData['oDataSub'].names, 
 								  sNames = baseData['sDataSub'].names,
 								  oData = synthetic[:,0:lsfs.nRetained], 
 								  sData = array([synthetic[:,-1]]).T).computePF(specs, dataset = 'sData')
-			
+
 			svm.train(synData['oData'].data, synData['sData'].gnd, gridSearch = True)
 			results.append([threshold] + svm.getTEYL(baseData['sData'].pfMat[:,ind_s], svm.predict(baseData['oDataSub'].data)))
 			print str(j+1) + '/' + str(nCrossVals), results[-1]
 
 	resultsArray = array(results)
 	csvWriteMatrix(config.get('Settings', 'resultDir') + 'LSFSThresholdErrors - ' + baseData['sData'].names[ind_s] + '.csv', results)		
-	#plotLSFSThresholds(resultsArray, config.get('Settings', 'resultDir') + 'lsfsThresholds - ' + baseData['sData'].names[ind_s] + '.pdf', thresholds)
-	print 'Minimum TE at threshold=' + resultsArray[argmin(resultsArray[:,1]),0]
-	return results
-
-	
-# Run LSFS for a series of threshold values to determine best threshold.
-if __name__ == "__main__":
-	if len(sys.argv) == 2:
-		ind_s = int(sys.argv[1])
-	else:
-		sys.exit()
-	
-	results = pickThreshold(ind_s, nCrossVals = 1)
-	
-	
+	plotLSFSThresholds(resultsArray, config.get('Settings', 'resultDir') + 'lsfsThresholds - ' + baseData['sData'].names[ind_s] + '.pdf', thresholds)
+	print 'Minimum TE at threshold=' + resultsArray[argmin(resultsArray[:,1]),0]	
 
 
 
+loadtxt(config.get('Settings', 'resultDir') + 'LSFSThresholdErrors - FM_SNR2_108_R_N47DBM.csv', delimiter=',', skiprows=0)

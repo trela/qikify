@@ -35,14 +35,12 @@ class KDE:
 	# any of the class-membership based KDE arguments are set, it will be run instead of 
 	# standard KDE.
 	def run(self, dataset, specs = None, nSamples = 0, counts = None, a = 0, bounds = None):
-		
-		
-		self.specs   = specs
 		self.n 	     = size(dataset.data,0)
 		self.d 	     = size(dataset.data,1)
-		self.b 	     = 0.8			# Default bandwidth scaling factor
-
+		self.specs   = specs
+		
 		# Select bandwidth for Epanechnikov kernel (Rule of Thumb, see Silverman, p.86)
+		self.b 	     = 0.8			# Default bandwidth scaling factor
 		self.c_d     = 2.0* pow( pi, (self.d/2.0) ) / ( self.d * gamma(self.d/2) )
 		self.h       = self.compute_h(self.n, self.d, self.c_d, self.b)
 		self.setBandwithFactors(a)

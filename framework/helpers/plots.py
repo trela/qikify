@@ -30,6 +30,8 @@ def percentFormatter(x, pos=0):
      return '%1.2f%%'%(x)
 
 def plotLSFSThresholds(results, filename, thresholds):
+	results[:,1] *= 10000
+	results[:,2] *= 10000
 	teMeans = []
 	ylMeans = []
 	teMins = []
@@ -44,20 +46,31 @@ def plotLSFSThresholds(results, filename, thresholds):
 		ylMins.append(min(results[rowIndex,2]))
 		teMaxs.append(max(results[rowIndex,1]))
 		ylMaxs.append(max(results[rowIndex,2]))
-	
+	bestThresh = thresholds[argmin(teMeans)]
 	prop = matplotlib.font_manager.FontProperties(size=10)
 	fig = pylab.figure()
 	ax = fig.add_subplot(111)
+	
+	# Mean TE/YL
 	ax.plot(thresholds, teMeans,'k-')
 	ax.plot(thresholds, ylMeans,'k--')
-	ax.fill_between(thresholds, teMins, teMaxs, facecolor='red', alpha=0.75)
-	ax.fill_between(thresholds, ylMins, ylMaxs, facecolor='green', alpha=0.75)
+	
+	# Showing choice of threshold via TE
+	ax.plot([bestThresh, bestThresh], [0, min(teMeans)],'k-', alpha=1, linewidth=0.5, label='_nolegend_')
+	ax.plot([0, bestThresh], [min(teMeans), min(teMeans)],'k-', alpha=1, linewidth=0.5, label='_nolegend_')
+	ax.fill_between([0, bestThresh], [0,0], [min(teMeans), min(teMeans)], facecolor='black', alpha=0.2, label='_nolegend_')
+	
+	# Error range on TE/YL
+	ax.fill_between(thresholds, teMins, teMaxs, facecolor='red', alpha=0.5)
+	ax.fill_between(thresholds, ylMins, ylMaxs, facecolor='green', alpha=0.5)
+	
 	leg = ax.legend((r"$T_E$", r"$Y_L$"), 'best', shadow=True, prop = prop)
 	ax.grid(True)
-	ax.set_title('Test Escapes and Yield Loss vs. LSFS Threshold')
+	#ax.set_title('Test Escapes and Yield Loss vs. LSFS Threshold')
 	plt.xlabel(r"$\tau_{L}$")
-	plt.ylabel("Error")
-	ax.yaxis.set_major_formatter(FuncFormatter(percentFormatter))
+	plt.ylabel("Test Metric Values (PPM)")
+	#ax.yaxis.set_major_formatter(FuncFormatter(percentFormatter))
+	ax.set_xlim((min(thresholds),max(thresholds)))
 	plt.savefig(filename, dpi = 150, format='pdf')	
 	plt.close()
 

@@ -21,15 +21,22 @@
 		$(document).ready(function() {
 			// Hide chat interface until after login.
 			$("div#container").hide();
-			$("#loginButton, #submitButton").button();
+			$("#loginButton, #submitButton, #runtaskButton").button();
+			$("#loginForm :input:visible:enabled:first").focus();
 
 			// Login form submit calls init() to start the chat interface.
 			$("#loginButton").click(function() { return init(); });
 			$("#loginForm").submit( function() { return init(); });
-			
+
 			// Submit button / enter keypress submit the chat message.
-			$("#submitButton").click(function() { return pushMsg(); });
-			$('#imchat').submit(     function() { return pushMsg(); });
+			$("#submitButton").click(function() { 
+				pushMsg( $('#im').val() ); 
+				$('#im').val('');
+		  		$('#im').focus();
+			});
+			$('#imchat').submit(     function() { return pushMsg( $('#im').val() ); });
+			
+			$('#runtaskButton').click(function() { return runtask(); });
 		});
 		
 		// This function grabs the username from the login box and sends a login
@@ -47,15 +54,18 @@
 			return false;
 		};
 		
+		// This function sends a request to the server to run a task.
+		var runtask = function() {
+			socket.send("RUNTASK:");
+			return false;
+		};
+		
 		// This function pushes a message to the server from the chat box.
-		var pushMsg = function() {
-			var msg = $('#im').val();
+		var pushMsg = function(msg) {
 		  	if (msg) {
 				socket.send(msg);
 		    	renderMsg({message:msg});
 		  	}
-			$('#im').val('');
-		  	$('#im').focus();
 			return false;
 		};
 		
@@ -110,6 +120,9 @@
     	<form id="imchat">
       	<input type="text" id="im" value="" />	
 		<div id="submitButton">Submit</div>
+    	</form>
+    	<form id="runtask">
+		<div id="runtaskButton">Run Task</div>
     	</form>
   	</div>
 </body>

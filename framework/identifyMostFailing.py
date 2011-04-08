@@ -34,6 +34,11 @@ from controllers.lsfs import LSFS
 from controllers.svm import SVM
 
 
+# Global parameters controlling the run
+K_INNER		= 5.5/6		# For KDE, defines critical region
+K_OUTER 	= 6.5/6		# For KDE, defines critical region
+
+
 # All this does is go through every data file and identify fail counts per performance.
 # Then, we can easily sum these up to get total fail counts per performance across all devices.
 if __name__ == "__main__":
@@ -64,3 +69,7 @@ if __name__ == "__main__":
 	# Save counts to a CSV file.
 	outData = [baseData['sData'].names.tolist(), sum(array(failCounts),0).tolist()]
 	csvWriteMatrix(config.get('Settings', 'resultDir') + 'Specification Test Fail Counts.csv', outData)
+
+	## Gives FM_SNR2_108_R_N47DBM most failing, ind_s = 12.
+	
+	
