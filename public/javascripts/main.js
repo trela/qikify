@@ -1,6 +1,5 @@
-io.setPath('/');
 if ('undefined'===typeof(io)) { throw new Error("Application failed to load: Socket.IO not found"); }
-var socket = new io.Socket("localhost", {port:9202});
+var socket = new io.Socket();
 
 $(document).ready(function() {
 	// Hide chat interface until after login.
@@ -31,8 +30,8 @@ var init = function() {
 		$("div#container").show();
 		$("#chats").scrollTop($("#chats")[0].scrollHeight); 
 	});
+    socket.connect();
   	socket.on('message', pullMsg);
-  	socket.connect();
 	socket.send("USERNAME:" + username);
 	return false;
 };
