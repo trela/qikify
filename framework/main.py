@@ -35,78 +35,61 @@ from controllers.svm import SVM
 
 
 # Global parameters controlling the run
-K_INNER		= 5.5/6		# For KDE, defines critical region
-K_OUTER 	= 6.5/6		# For KDE, defines critical region
-N_GOOD 		= 2000
-N_CRITICAL  = 2000
-N_FAIL		= 2000
-
+K_INNER     = 5.5/6        # For KDE, defines critical region
+K_OUTER     = 6.5/6        # For KDE, defines critical region
+KDE_COUNTS  = dotdict({'nGood': 3000, 'nCritical': 500, 'nFail': 500})
+T_L         = 0.01
+IND_S       = 32           # 'XTR_SN_IDS_X01'
+TRAIN_WAFER = 0
 
 # Controller class instances
-config 	  	= ConfigParser(); config.read('settings.conf')
-specs     	= Specs(config.get('Settings', 'specFile')).genCriticalRegion(K_INNER, K_OUTER)
-lsfs 	  	= LSFS.LSFS()
-kde       	= KDE.KDE()
-svm 		= SVM.SVM()
+config = ConfigParser(); config.read('settings.conf')
+specs  = Specs(config.get('Settings', 'specFile')).genCriticalRegion(K_INNER, K_OUTER)
+lsfs   = LSFS.LSFS()
+kde    = KDE.KDE()
+svm    = SVM.SVM()
 
+# Just spit out some information with each run
+def printRunInfo(dataFile, errorReal, errorSyn):
+    print dataFile[39:50],
+    print 'TE:', str(round(errorReal[0],3)) + '%', 'YL:', str(round(errorReal[1],3)) + '%',
+    print 'TE:', str(round(errorSyn[0], 3)) + '%', 'YL:', str(round(errorSyn[1], 3)) + '%'
 
 
 if __name__ == "__main__":
-	dataFiles = glob(config.get('Settings', 'dataFiles'))
-	baseData  = DatasetTI(dataFiles[0]); baseData.printSummary()
-	ind 	  = baseData.genSubsetIndices(specs)
-	
-	for ind_s in xrange(baseData['sData'].ncol):
-		printPassFail(baseData['sData'].pfMat[:,ind_s])
-	
-
-	'''
-	# Results stored in these two arrays
-	error 	  = []	
-	errorSyn  = []
-	
-	for ind_s in range(baseData.ncol):
-		# Run LSFS against the ORBiT data + the retained specification test.
-		lsfs.run(baseData['oData'].data, baseData['sData'].pfMat[:,ind_s])
-		lsfs.plotScores(config.get('Settings', 'resultDir') + 'lsfsScores - ' + baseData['sData'].names[ind_s] + '.pdf')
-		baseData['oDataSub'] = baseData['oData'].subsetCols(lsfs.subset(0.06))
-
-		# Construct synthetic dataset & train SVM.
-		kdeData   	= baseData['oDataSub'].join(baseData['sData'].subsetCols(ind_s))	
-		synthetic 	= kde.run(kdeData, specs, counts = dotdict({'nGood': N_GOOD, 'nCritical': N_CRITICAL, 'nFail': N_FAIL}))
-		synData   	= DatasetTI(oNames = baseData['oDataSub'].names, 
-							  	sNames = baseData['sData'].names[ind_s],
-							  	oData = synthetic[:,0:lsfs.nRetained], 
-							  	sData = array([synthetic[:,-1]]).T).computePF(specs, dataset = 'sData')
-		svm.train(synData['oData'].data, synData['sData'].gnd, gridSearch = True)
-
-		# Go through everything else and get TE/YL
-		error.append(zeros((len(dataFiles[1:]), 2)))
-		errorSyn.append(zeros((len(dataFiles[1:]), 2)))
-		for j, dataFile in enumerate(dataFiles[1:len(dataFiles)]):
-			
-			# Evaluate real data error metrics
-			dataset 		  = DatasetTI(dataFile).clean(specs, ind)
-			predicted  		  = svm.predict(dataset['oData'].subsetCols(lsfs.subset(0.06)).data)
-			error[ind_s][j,:] = svm.getTEYL(dataset['sData'].pfMat[:,ind_s], predicted)
-
-			# Evaluate synthetic data error metrics	
-			synthetic = kde.run(kdeData, nSamples = int(dataset.nrow))
-			synData   = DatasetTI(oNames = baseData['oDataSub'].names, 
-								  sNames = baseData['sData'].names[ind_s],
-								  oData = synthetic[:,0:lsfs.nRetained], 
-								  sData = array([synthetic[:,-1]]).T).computePF(specs, dataset = 'sData')
-			errorSyn[ind_s][j,:] = svm.getTEYL(synData['sData'].pfMat[:,ind_s], svm.predict(synData['oData'].data))
-
-			print dataFile[39:50],
-			print 'TE:', str(round(error[ind_s][j,0], 3)) + '%', 
-			print 'YL:', str(round(error[ind_s][j,1], 3)) + '%',
-			print 'TE:', str(round(errorSyn[ind_s][j,0], 3)) + '%',
-			print 'YL:', str(round(errorSyn[ind_s][j,1], 3)) + '%'
-			
-		plotTEYL(error[ind_s], errorSyn[ind_s], config.get('Settings', 'resultDir') + 'Result  - ' + baseData['sData'].names[ind_s] + '.pdf')
-'''
-
-	
-	
-	
+    dataFiles = glob(config.get('Settings', 'dataFiles'))
+    baseData  = DatasetTI(dataFiles[0]); baseData.printSummary()
+    ind       = baseData.genSubsetIndices(specs)
+    specName  = baseData['sData'].names[IND_S]; print 'Analyzing specification', specName
+    trainData = DatasetTI(dataFiles[TRAIN_WAFER]).clean(specs, ind)
+    
+    # Run LSFS against the ORBiT data + the retained specification test
+    lsfs.run(baseData['oData'].data, baseData['sData'].pfMat[:,IND_S]); lsfs.subset(T_L)
+    
+    # Construct synthetic dataset
+    kdeData   = trainData['oData'].subsetCols(lsfs.Subset).join(trainData['sData'].subsetCols(IND_S))
+    synthetic = kde.run(kdeData, specs, counts=KDE_COUNTS)    
+    synData   = DatasetTI(synData=synthetic, nRetained=lsfs.nRetained).computePF(specs, dataset='sData')
+    
+    # Train SVM
+    svm.train(synData['oData'].data, synData['sData'].gnd, gridSearch = True)
+    
+    # Go through everything else and get TE/YL
+    errorReal, errorSyn = [], []
+    for j, dataFile in enumerate(dataFiles[2:len(dataFiles)]):
+        
+        # Evaluate real data error metrics
+        nData      = DatasetTI(dataFile).clean(specs, ind)
+        predReal   = svm.predict(nData['oData'].subsetCols(lsfs.Subset).data)
+        TE_YL_Real = svm.getTEYL(nData['sData'].pfMat[:,IND_S], predReal)
+        errorReal.append(TE_YL_Real)
+        
+        # Evaluate synthetic data error metrics
+        sData     = DatasetTI(synData=kde.run(kdeData, nSamples=int(nData.nrow)), nRetained=lsfs.nRetained).computePF(specs, dataset='sData')
+        predSyn   = svm.predict(sData['oData'].data)
+        TE_YL_Syn = svm.getTEYL(sData['sData'].pfMat[:,0], predSyn)
+        errorSyn.append(TE_YL_Syn)
+        
+        printRunInfo(dataFile, errorReal[j], errorSyn[j])
+        
+    plotTEYL(array(errorReal), array(errorSyn), config.get('Settings', 'resultDir') + 'Result  - ' + specName + ' TrainWafer - ' + str(TRAIN_WAFER+1) + ' - T_L - ' + str(T_L) + ' .pdf')

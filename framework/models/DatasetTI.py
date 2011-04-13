@@ -26,10 +26,10 @@ from Dataset import *
 class DatasetTI(Dataset):
 	
 	# Constructor is either based on reading a file or passed in data.
-	def __init__(self, filename = None, hasHeader = True, oNames = None, sNames = None, oData  = None, sData = None):
+	def __init__(self, filename = None, synData = None, nRetained = None):
 		if filename is not None:
 			# Call parent class Dataset.__init__() which creates self.datasets and self.datasets.raw.
-			super(DatasetTI, self).__init__(filename, hasHeader)
+			super(DatasetTI, self).__init__(filename, hasHeader=True)
 			
 			# Create child datasets
 			self.datasets.sData  = self.datasets.raw.subsetCols(range(739,1106), 'Specification test data.')
@@ -38,8 +38,9 @@ class DatasetTI(Dataset):
 			# Call parent class Dataset.__init__() which creates self.datasets.
 			super(DatasetTI, self).__init__()
 			
-			self.datasets.sData  = DataStruct(sNames, sData, 'Specification test data.')
-			self.datasets.oData  = DataStruct(oNames, oData, 'ORBiT test data.')
+			# Create child datasets
+			self.datasets.sData  = synData.subsetCols(nRetained, 'Specification test data.')
+			self.datasets.oData  = synData.subsetCols(range(0,nRetained), 'ORBiT test data.')
 
 
 	# Run on first dataset, baseData.

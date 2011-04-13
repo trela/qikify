@@ -58,7 +58,7 @@ class LSFS:
 	def subset(self, thresh):	
 		self.Subset    = self.Scores < thresh
 		self.nRetained = sum(self.Subset)
-		print 'LSFS retained', GREEN+str(self.nRetained)+ENDCOLOR, 'parameters.'
+		print 'LSFS: retained', GREEN+str(self.nRetained)+ENDCOLOR, 'parameters.'
 		return self.Subset
 
 
@@ -81,7 +81,8 @@ class LSFS:
 			if not bSelfConnected:
 				G = zeroMatrixDiagonal(G)
 			self.W = self.genMaxMatrix(G)
-
+		print 'LSFS: Construction of W matrix complete.'
+		
 	# Euclidean Distance matrix
 	def euDist(self, A,B = None, bSqrt = True):
 		if B is None:

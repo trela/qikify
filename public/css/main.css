@@ -5,11 +5,12 @@ body {
 	background-color: #000; 
 	font-family:"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", sans-serif;
 	font-weight:100;
+	font-size: 13px;
 	color: #fff;
 	overflow:hidden;
 }
 
-h1 { margin: 10px; }
+#header h1 { font-size: 20px; margin: 10px; }
 
 #login { 
 	margin: 200px auto;

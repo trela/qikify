@@ -27,6 +27,8 @@ from scipy.special import gamma
 
 from helpers.general import *
 from models.Specs import Specs
+from models.DataStruct import DataStruct
+
 from slicesample import * 
 
 class KDE:
@@ -38,6 +40,7 @@ class KDE:
 		self.n 	     = size(dataset.data,0)
 		self.d 	     = size(dataset.data,1)
 		self.specs   = specs
+		self.names   = dataset.names
 		
 		# Select bandwidth for Epanechnikov kernel (Rule of Thumb, see Silverman, p.86)
 		self.b 	     = 0.8			# Default bandwidth scaling factor
@@ -74,7 +77,7 @@ class KDE:
 	def genSamples(self, nSamples):
 		Sn = vstack([ self.genSample() for _ in xrange(nSamples) ])
 		#print 'Synthetic data generation complete.'
-		return scale(Sn, self.scaleFactors, reverse = True)
+		return DataStruct(names = self.names, data = scale(Sn, self.scaleFactors, reverse = True))
 		
 	# Generates Ngc critical devices, Ng good devices, Nf failing devices.
 	def genPartitionedSamples(self, counts):
@@ -98,7 +101,7 @@ class KDE:
 				print 'Ng:' + str(ng) + '/' + str(counts.nGood) + ' Nc:' + str(nc) + '/' + str(counts.nCritical) + ' Nf:' + str(nf) + '/' + str(counts.nFail)
 				thresh += 0.2
 		print 'Synthetic data generation complete.'
-		return vstack((Sc,Sg,Sf))
+		return DataStruct(names = self.names, data = vstack((Sc,Sg,Sf)))
 
 
 	# Generate a single device sample, use algorithm in Silverman, p. 143
