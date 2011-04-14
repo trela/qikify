@@ -1,3 +1,5 @@
 settings.conf
+tests/
 *.pyc
 *.py
+!example.py

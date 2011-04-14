@@ -28,7 +28,7 @@ from helpers.general import *
 from DataStruct import *
 
 class Dataset(object): 
-    def __init__(self, filename = None, hasHeader = True):
+    def __init__(self, filename=None, hasHeader=True, dataset=None):
         # This is the primary dataset storage dictionary! All datasets will be pushed onto this dictionary.
         self.datasets = dotdict()
         
@@ -41,11 +41,19 @@ class Dataset(object):
                 fileh.close()
                 
             # Read raw dataset data
-            self.datasets.raw = DataStruct(names = names,
-                                              data  = loadtxt(filename, delimiter=',', skiprows=1),
-                                           desc  = 'Raw dataset from input file.')
+            self.datasets.raw = DataStruct(names=names,
+                                           data=loadtxt(filename, delimiter=',', skiprows=1),
+                                           desc='Raw dataset from input file.')
             self.nrow  = size(self.datasets.raw.data,0)
             self.ncol  = size(self.datasets.raw.data,1)
+
+        if data is not None:
+            self.datasets.raw = DataStruct(names=dataset.names,
+                                           data=dataset.data,
+                                           desc='Raw dataset from input file.')
+            self.nrow  = size(self.datasets.raw.data,0)
+            self.ncol  = size(self.datasets.raw.data,1)
+            
             
     def __getitem__(self, key):
         return self.datasets[key]

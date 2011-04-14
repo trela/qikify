@@ -1,0 +1,4 @@
+[Settings]
+specFile:  /path/to/specifications
+dataFiles: /path/to/data/files
+resultDir: /path/to/result/output/location
