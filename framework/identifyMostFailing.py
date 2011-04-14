@@ -35,41 +35,41 @@ from controllers.svm import SVM
 
 
 # Global parameters controlling the run
-K_INNER		= 5.5/6		# For KDE, defines critical region
-K_OUTER 	= 6.5/6		# For KDE, defines critical region
+K_INNER        = 5.5/6        # For KDE, defines critical region
+K_OUTER     = 6.5/6        # For KDE, defines critical region
 
 
 # All this does is go through every data file and identify fail counts per performance.
 # Then, we can easily sum these up to get total fail counts per performance across all devices.
 if __name__ == "__main__":
-	
-	# Controller class instances
-	config 	  	= ConfigParser(); config.read('settings.conf')
-	specs     	= Specs(config.get('Settings', 'specFile')).genCriticalRegion(K_INNER, K_OUTER)
-	lsfs 	  	= LSFS.LSFS()
-	kde       	= KDE.KDE()
-	svm 		= SVM.SVM()		
+    
+    # Controller class instances
+    config           = ConfigParser(); config.read('settings.conf')
+    specs         = Specs(config.get('Settings', 'specFile')).genCriticalRegion(K_INNER, K_OUTER)
+    lsfs           = LSFS.LSFS()
+    kde           = KDE.KDE()
+    svm         = SVM.SVM()        
 
-	# Read in first wafer, subset by removing discrete ORBiT tests / performances.
-	dataFiles = glob(config.get('Settings', 'dataFiles'))
-	baseData  = DatasetTI(dataFiles[0])
-	baseData.printSummary()
-	ind 	  = baseData.genSubsetIndices(specs)
-	
-	# Iterate over remaining data files and count up fails
-	totalDevices = baseData.nrow
-	failCounts = []
-	failCounts.append(sum(baseData['sData'].pfMat == -1,0).tolist())
-	for i, dataFile in enumerate(dataFiles[1:len(dataFiles)]):
-		dataset	= DatasetTI(dataFile).clean(specs, ind)
-		failCounts.append(sum(dataset['sData'].pfMat == -1,0).tolist())
-		totalDevices += dataset.nrow
-		print i, totalDevices
-	
-	# Save counts to a CSV file.
-	outData = [baseData['sData'].names.tolist(), sum(array(failCounts),0).tolist()]
-	csvWriteMatrix(config.get('Settings', 'resultDir') + 'Specification Test Fail Counts.csv', outData)
+    # Read in first wafer, subset by removing discrete ORBiT tests / performances.
+    dataFiles = glob(config.get('Settings', 'dataFiles'))
+    baseData  = DatasetTI(dataFiles[0])
+    baseData.printSummary()
+    ind       = baseData.genSubsetIndices(specs)
+    
+    # Iterate over remaining data files and count up fails
+    totalDevices = baseData.nrow
+    failCounts = []
+    failCounts.append(sum(baseData['sData'].pfMat == -1,0).tolist())
+    for i, dataFile in enumerate(dataFiles[1:len(dataFiles)]):
+        dataset    = DatasetTI(dataFile).clean(specs, ind)
+        failCounts.append(sum(dataset['sData'].pfMat == -1,0).tolist())
+        totalDevices += dataset.nrow
+        print i, totalDevices
+    
+    # Save counts to a CSV file.
+    outData = [baseData['sData'].names.tolist(), sum(array(failCounts),0).tolist()]
+    csvWriteMatrix(config.get('Settings', 'resultDir') + 'Specification Test Fail Counts.csv', outData)
 
-	## Gives FM_SNR2_108_R_N47DBM most failing, ind_s = 12.
-	
-	
+    ## Gives FM_SNR2_108_R_N47DBM most failing, ind_s = 12.
+    
+    

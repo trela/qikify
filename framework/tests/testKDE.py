@@ -36,29 +36,29 @@ from controllers.svm import SVM
 import cProfile
 
 # Global parameters controlling the run
-K_INNER		= 5.5/6		# For KDE, defines critical region
-K_OUTER 	= 6.5/6		# For KDE, defines critical region
-N_GOOD 		= 1000
+K_INNER        = 5.5/6        # For KDE, defines critical region
+K_OUTER     = 6.5/6        # For KDE, defines critical region
+N_GOOD         = 1000
 N_CRITICAL  = 200
-N_FAIL		= 200
+N_FAIL        = 200
 
 # Controller class instances
-config 	  	= ConfigParser(); config.read('settings.conf')
-specs     	= Specs(config.get('Settings', 'specFile')).genCriticalRegion(K_INNER, K_OUTER)
-lsfs 	  	= LSFS.LSFS()
-kde       	= KDE.KDE()
-svm 		= SVM.SVM()
+config           = ConfigParser(); config.read('settings.conf')
+specs         = Specs(config.get('Settings', 'specFile')).genCriticalRegion(K_INNER, K_OUTER)
+lsfs           = LSFS.LSFS()
+kde           = KDE.KDE()
+svm         = SVM.SVM()
 
 
-dataFiles 	 = glob(config.get('Settings', 'dataFiles'))
-baseData  	 = DatasetTI(dataFiles[0])
+dataFiles      = glob(config.get('Settings', 'dataFiles'))
+baseData       = DatasetTI(dataFiles[0])
 baseData.printSummary()
-ind 	  	 = baseData.genSubsetIndices(specs)
+ind            = baseData.genSubsetIndices(specs)
 
 baseData['sDataSub'] = baseData['sData'].subsetCols(0)
 baseData['oDataSub'] = baseData['oData'].subsetCols(slice(0,10))
-kdeData   			 = baseData['oDataSub'].join(baseData['sDataSub'])
-synthetic 			 = kde.run(kdeData, specs, counts = dotdict({'nGood': N_GOOD, 'nCritical': N_CRITICAL, 'nFail': N_FAIL}))
+kdeData                = baseData['oDataSub'].join(baseData['sDataSub'])
+synthetic              = kde.run(kdeData, specs, counts = dotdict({'nGood': N_GOOD, 'nCritical': N_CRITICAL, 'nFail': N_FAIL}))
 
 # Plot everything
 plotSyntheticAndReal(synthetic,kdeData.data, 0, 1, config.get('Settings', 'resultDir') + 'pairwisePlot0-1.pdf')

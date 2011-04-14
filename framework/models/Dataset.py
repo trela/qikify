@@ -28,99 +28,106 @@ from helpers.general import *
 from DataStruct import *
 
 class Dataset(object): 
-	def __init__(self, filename = None, hasHeader = True):
-		# This is the primary dataset storage dictionary! All datasets will be pushed onto this dictionary.
-		self.datasets = dotdict()
-		
-		if filename is not None:
-			# Read dataset column names
-			if ( hasHeader ):
-				fileh 	  	= open(filename, 'rU')
-				dataReader 	= csv.reader(fileh)
-				names  		= array(dataReader.next())
-				fileh.close()
-				
-			# Read raw dataset data
-			self.datasets.raw = DataStruct(names = names,
-									   	   data  = loadtxt(filename, delimiter=',', skiprows=1),
-									       desc  = 'Raw dataset from input file.')
-			self.nrow  = size(self.datasets.raw.data,0)
-			self.ncol  = size(self.datasets.raw.data,1)
-			
-	def __getitem__(self, key):
-		return self.datasets[key]
-	def __setitem__(self, key, value):
-		self.datasets[key] = value
+    def __init__(self, filename = None, hasHeader = True):
+        # This is the primary dataset storage dictionary! All datasets will be pushed onto this dictionary.
+        self.datasets = dotdict()
+        
+        if filename is not None:
+            # Read dataset column names
+            if ( hasHeader ):
+                fileh           = open(filename, 'rU')
+                dataReader     = csv.reader(fileh)
+                names          = array(dataReader.next())
+                fileh.close()
+                
+            # Read raw dataset data
+            self.datasets.raw = DataStruct(names = names,
+                                              data  = loadtxt(filename, delimiter=',', skiprows=1),
+                                           desc  = 'Raw dataset from input file.')
+            self.nrow  = size(self.datasets.raw.data,0)
+            self.ncol  = size(self.datasets.raw.data,1)
+            
+    def __getitem__(self, key):
+        return self.datasets[key]
+    def __setitem__(self, key, value):
+        self.datasets[key] = value
 
-		
-	# Identify outliers in the specified dataset using boundaries with margins determined by
-	# the k_l and k_u constants.
-	def identifyOutliers(self, specs, ind, dataset, k_l = 3, k_u = 3):
-		self.computePF(specs, ind, dataset, outlierFilter = True, k_l = k_l, k_u = k_u)
+        
+    # Identify outliers in the specified dataset using boundaries with margins determined by
+    # the k_l and k_u constants.
+    def identifyOutliers(self, specs, ind, dataset, k_l = 3, k_u = 3):
+        self.computePF(specs, ind, dataset, outlierFilter = True, k_l = k_l, k_u = k_u)
 
-	
-	# Multipurpose compute pass/fail function. If outlierFilter is False, this function takes
-	# the specification performance data, compares each column to spec lsl/usl, and saves
-	# pass/fail information for individial specs (pfMat) and the global pass/fail (gnd).
-	def computePF(self, specs, ind = None, dataset = 'raw', outlierFilter = False, k_l = None, k_u = None):
-		if dataset not in self.datasets.keys():
-			raise KeyError('Not a valid dataset.')
+    
+    # Multipurpose compute pass/fail function. If outlierFilter is False, this function takes
+    # the specification performance data, compares each column to spec lsl/usl, and saves
+    # pass/fail information for individial specs (pfMat) and the global pass/fail (gnd).
+    def computePF(self, specs, ind = None, dataset = 'raw', outlierFilter = False, k_l = None, k_u = None):
+        if dataset not in self.datasets.keys():
+            raise KeyError('Not a valid dataset.')
 
-		pfData = self.datasets[dataset]
-		n, p   = size(pfData.data,0), size(pfData.data,1)
-		pfMat  = ones((n,p))
-		mu 	   = mean(pfData.data,0) if p > 1 else mean(pfData.data,0)[0]
-		
-		# Iterate over columns in pfData
-		for j in xrange(p):
-			# Logical column indices permit skipping some columns
-			if type(ind) is dict and ~(ind[dataset][j]):
-				continue
-			else:
-				lsl, usl = specs[pfData.names[j]] if p > 1 else specs[pfData.names]
-				if outlierFilter:
-					lsl = mu[j] - k_l * abs(mu[j] - lsl) if not isnan(lsl) else nan
-					usl = mu[j] + k_u * abs(mu[j] - usl) if not isnan(usl) else nan
-				pfMat[:,j]  = specs.compareToSpecs(pfData.data[:,j], lsl, usl)
+        pfData = self.datasets[dataset]
+        n, p   = size(pfData.data,0), size(pfData.data,1)
+        pfMat  = ones((n,p))
+        mu        = mean(pfData.data,0) if p > 1 else mean(pfData.data,0)[0]
+        
+        # Iterate over columns in pfData
+        for j in xrange(p):
+            # Logical column indices permit skipping some columns
+            if type(ind) is dict and ~(ind[dataset][j]):
+                continue
+            else:
+                lsl, usl = specs[pfData.names[j]] if p > 1 else specs[pfData.names]
+                if outlierFilter:
+                    lsl = mu[j] - k_l * abs(mu[j] - lsl) if not isnan(lsl) else nan
+                    usl = mu[j] + k_u * abs(mu[j] - usl) if not isnan(usl) else nan
+                pfMat[:,j]  = specs.compareToSpecs(pfData.data[:,j], lsl, usl)
 
-		# If we are filtering outliers, return a logical index describing outlier observations.
-		# Otherwise, we are computing pass/fail and want to save pfMat and gnd.
-		if outlierFilter:
-			self.indOutliers = (sum(pfMat, 1) == p)
-		else:
-			self.datasets[dataset].pfMat = pfMat
-			self.datasets[dataset].gnd   = bool2symmetric(sum(pfMat, 1) == p)
-		return self
+        # If we are filtering outliers, return a logical index describing outlier observations.
+        # Otherwise, we are computing pass/fail and want to save pfMat and gnd.
+        if outlierFilter:
+            self.indOutliers = (sum(pfMat, 1) == p)
+        else:
+            self.datasets[dataset].pfMat = pfMat
+            self.datasets[dataset].gnd   = bool2symmetric(sum(pfMat, 1) == p)
+        return self
 
-		
-	# Subset the columns of the datasets identified in the ind dictionary.
-	# Argument:
-	#	ind = {'datasetName': columnIndices }
-	def subsetCols(self, ind, desc = None):
-		for dataset in ind.keys():
-			if dataset not in self.datasets.keys():
-				raise KeyError(dataset + ' is not a valid dataset.')
-			self.datasets[dataset] = self.datasets[dataset].subsetCols(ind[dataset], desc = desc)
-		return self
-		
-	# Subset the rows of the datasets identified in the ind dictionary.
-	# Argument:
-	#	ind = {'datasetName': rowIndices }
-	def subsetRows(self, ind):
-		for dataset in ind.keys():
-			if dataset not in self.datasets.keys():
-				raise KeyError(dataset + ' is not a valid dataset.')
-			self.datasets[dataset] = self.datasets[dataset].subsetRows(ind[dataset])
-		return self
+        
+    # Subset the columns of the datasets identified in the ind dictionary.
+    # Argument:
+    #    ind = {'datasetName': columnIndices }
+    def subsetCols(self, ind, desc = None):
+        for dataset in ind.keys():
+            if dataset not in self.datasets.keys():
+                raise KeyError(dataset + ' is not a valid dataset.')
+            self.datasets[dataset] = self.datasets[dataset].subsetCols(ind[dataset], desc = desc)
+        return self
+        
+    # Subset the rows of the datasets identified in the ind dictionary.
+    # Argument:
+    #    ind = {'datasetName': rowIndices }
+    def subsetRows(self, ind):
+        for dataset in ind.keys():
+            if dataset not in self.datasets.keys():
+                raise KeyError(dataset + ' is not a valid dataset.')
+            self.datasets[dataset] = self.datasets[dataset].subsetRows(ind[dataset])
+        return self
+        
+    # Join datasets
+    def joinRows(self, Secondary):
+        newData = self
+        for dataset in newData.datasets.keys():
+            newData[dataset] = newData[dataset].joinRows(Secondary[dataset])
+        return newData
 
-	# Print a summary of the dataset.
-	def printSummary(self):	
-		print GREEN
-		print '==============================================='
-		print 'Dataset                         #Rows #Cols'
-		print '===============================================' + ENDCOLOR
-		for dataset in self.datasets.values():
-			dataset.printSummary()
-		print ''
-		return self
+    # Print a summary of the dataset.
+    def printSummary(self):    
+        print GREEN
+        print '==============================================='
+        print 'Dataset                         #Rows #Cols'
+        print '===============================================' + ENDCOLOR
+        for dataset in self.datasets.values():
+            dataset.printSummary()
+        print ''
+        return self
 

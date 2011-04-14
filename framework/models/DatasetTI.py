@@ -24,49 +24,49 @@ THE SOFTWARE.
 from Dataset import *
 
 class DatasetTI(Dataset):
-	
-	# Constructor is either based on reading a file or passed in data.
-	def __init__(self, filename = None, synData = None, nRetained = None):
-		if filename is not None:
-			# Call parent class Dataset.__init__() which creates self.datasets and self.datasets.raw.
-			super(DatasetTI, self).__init__(filename, hasHeader=True)
-			
-			# Create child datasets
-			self.datasets.sData  = self.datasets.raw.subsetCols(range(739,1106), 'Specification test data.')
-			self.datasets.oData  = self.datasets.raw.subsetCols(range(0,739), 'ORBiT test data.')
-		else:
-			# Call parent class Dataset.__init__() which creates self.datasets.
-			super(DatasetTI, self).__init__()
-			
-			# Create child datasets
-			self.datasets.sData  = synData.subsetCols(nRetained, 'Specification test data.')
-			self.datasets.oData  = synData.subsetCols(range(0,nRetained), 'ORBiT test data.')
+    
+    # Constructor is either based on reading a file or passed in data.
+    def __init__(self, filename = None, synData = None, nRetained = None):
+        if filename is not None:
+            # Call parent class Dataset.__init__() which creates self.datasets and self.datasets.raw.
+            super(DatasetTI, self).__init__(filename, hasHeader=True)
+            
+            # Create child datasets
+            self.datasets.sData  = self.datasets.raw.subsetCols(range(739,1106), 'Specification test data.')
+            self.datasets.oData  = self.datasets.raw.subsetCols(range(0,739), 'ORBiT test data.')
+        else:
+            # Call parent class Dataset.__init__() which creates self.datasets.
+            super(DatasetTI, self).__init__()
+            
+            # Create child datasets
+            self.datasets.sData  = synData.subsetCols(nRetained, 'Specification test data.')
+            self.datasets.oData  = synData.subsetCols(range(0,nRetained), 'ORBiT test data.')
 
 
-	# Run on first dataset, baseData.
-	def genSubsetIndices(self, specs):
-		# We will remove all parameters with less than 100 unique values.
-		ind = dotdict({'sData': apply_along_axis(lambda x: len(unique(x)) > 100, 0, self.datasets.sData.data),
-					   'oData': apply_along_axis(lambda x: len(unique(x)) > 100, 0, self.datasets.oData.data)})
+    # Run on first dataset, baseData.
+    def genSubsetIndices(self, specs):
+        # We will remove all parameters with less than 100 unique values.
+        ind = dotdict({'sData': apply_along_axis(lambda x: len(unique(x)) > 100, 0, self.datasets.sData.data),
+                       'oData': apply_along_axis(lambda x: len(unique(x)) > 100, 0, self.datasets.oData.data)})
 
-		# Identify all outliers with signatures outside +/- 3 * (spec distance).
-		self.identifyOutliers(specs, ind, dataset = 'sData', k_l = 3, k_u = 3)
-		
-		# Identify specification performances which now always pass.
-		self.computePF(specs, ind, dataset = 'sData')
-		alwaysPassing = (sum(self.datasets.sData.pfMat[self.indOutliers,:],0) / sum(self.indOutliers) == 1)
-		ind.sData  = logical_and(ind.sData, ~alwaysPassing)
-		
-		self.subsetCols(ind).subsetRows({'sData': self.indOutliers, 'oData': self.indOutliers})
-		self.printSummary()
-		return ind
+        # Identify all outliers with signatures outside +/- 3 * (spec distance).
+        self.identifyOutliers(specs, ind, dataset = 'sData', k_l = 3, k_u = 3)
+        
+        # Identify specification performances which now always pass.
+        self.computePF(specs, ind, dataset = 'sData')
+        alwaysPassing = (sum(self.datasets.sData.pfMat[self.indOutliers,:],0) / sum(self.indOutliers) == 1)
+        ind.sData  = logical_and(ind.sData, ~alwaysPassing)
+        
+        self.subsetCols(ind).subsetRows({'sData': self.indOutliers, 'oData': self.indOutliers})
+        self.printSummary()
+        return ind
 
-	# Run on every subsequent dataset.
-	def clean(self, specs, ind):
-		self.subsetCols(ind)
-		self.computePF(specs, ind, dataset = 'sData')
-		return self
-		
+    # Run on every subsequent dataset.
+    def clean(self, specs, ind):
+        self.subsetCols(ind)
+        self.computePF(specs, ind, dataset = 'sData')
+        return self
+        
 
 
 

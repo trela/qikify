@@ -31,73 +31,73 @@ from controllers.lsfs import LSFS
 
 # Test KDE.
 def testKDE():
-	data    = random.multivariate_normal([0,0],[[1,0],[0,1]],1000)
-	kde 	= KDE.KDE(data, [[-10,-10],[10,10]])
-	synData = kde.run(1000)
-	plotSample.plotSample(synData, data, 0,1)
+    data    = random.multivariate_normal([0,0],[[1,0],[0,1]],1000)
+    kde     = KDE.KDE(data, [[-10,-10],[10,10]])
+    synData = kde.run(1000)
+    plotSample.plotSample(synData, data, 0,1)
 
 
 # Test the slicesample() function with a sample pdf 
 def testSliceSample():
-	# Some crazy distribution
-	#f = lambda x: exp(-x**2/2) * (1+(sin(3*x))**2) * (1+(cos(5*x)**2))
+    # Some crazy distribution
+    #f = lambda x: exp(-x**2/2) * (1+(sin(3*x))**2) * (1+(cos(5*x)**2))
 
-	# Standard normal
-	#f = lambda x: 1.0 / sqrt(2.0 * pi) * exp(-x**2 / 2 )
-	
-	# Bivariate normal
-	f = lambda x: 1.0 / sqrt(2.0 * pi) * exp(-dot(x,x)**2 / 2 )
-	
-	# Run slicesample
-	initial = array([0,0])
-	x = slicesample.slicesample(initial,100,f)
+    # Standard normal
+    #f = lambda x: 1.0 / sqrt(2.0 * pi) * exp(-x**2 / 2 )
+    
+    # Bivariate normal
+    f = lambda x: 1.0 / sqrt(2.0 * pi) * exp(-dot(x,x)**2 / 2 )
+    
+    # Run slicesample
+    initial = array([0,0])
+    x = slicesample.slicesample(initial,100,f)
 
-	fig, ax = plt.subplots(1)
-	if size(initial) == 1: # univariate distribution
-		ax.hist(x, 100)
-	else:
-		ax.scatter(x[:,0], x[:,1])
-	fig.savefig('/Users/nathankupp/Desktop/Figure1.png')
-	return x
+    fig, ax = plt.subplots(1)
+    if size(initial) == 1: # univariate distribution
+        ax.hist(x, 100)
+    else:
+        ax.scatter(x[:,0], x[:,1])
+    fig.savefig('/Users/nathankupp/Desktop/Figure1.png')
+    return x
 
 # Test LSFS constructW function
 def testConstructW():
-	lsfs = LSFS.LSFS()
-	
-	# Test case simple
-	X = ones((4,4)) + diag(range(1,5))
-	gnd = array([-1,1,-1,1])
-	lsfs.constructW(X, gnd, bLDA = 1)
-	#print lsfs.W
-	
-	# Test case complex
-	X = random.random((10,10))
-	gnd = 2 * (random.randint(0,2,10) - 0.5)
-	lsfs.constructW(X,gnd, bLDA = 1)
-	#print lsfs.W
-	
-	# Turn off bLDA
-	X = ones((4,4)) + diag(range(1,5))
-	gnd = array([-1,1,-1,1])
-	lsfs.constructW(X, gnd)
-	#print lsfs.W
-	
-	
+    lsfs = LSFS.LSFS()
+    
+    # Test case simple
+    X = ones((4,4)) + diag(range(1,5))
+    gnd = array([-1,1,-1,1])
+    lsfs.constructW(X, gnd, bLDA = 1)
+    #print lsfs.W
+    
+    # Test case complex
+    X = random.random((10,10))
+    gnd = 2 * (random.randint(0,2,10) - 0.5)
+    lsfs.constructW(X,gnd, bLDA = 1)
+    #print lsfs.W
+    
+    # Turn off bLDA
+    X = ones((4,4)) + diag(range(1,5))
+    gnd = array([-1,1,-1,1])
+    lsfs.constructW(X, gnd)
+    #print lsfs.W
+    
+    
 def testLSFS():
-	lsfs = LSFS.LSFS()
-	
-	X = ones((4,4)) + diag(range(1,5))
-	gnd = array([-1,1,-1,1])
-	lsfs.run(X, gnd)
+    lsfs = LSFS.LSFS()
+    
+    X = ones((4,4)) + diag(range(1,5))
+    gnd = array([-1,1,-1,1])
+    lsfs.run(X, gnd)
 
 
 if __name__ == "__main__":
-	#testKDE()
-	#x = testSliceSample()
-	#testConstructW()
-	testLSFS()
-	
-	
-	
-	
-	
+    #testKDE()
+    #x = testSliceSample()
+    #testConstructW()
+    testLSFS()
+    
+    
+    
+    
+    

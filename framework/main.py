@@ -21,9 +21,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 '''
 
+import csv
 from ConfigParser import ConfigParser
 from glob import glob
-import csv
+from random import sample
 
 from helpers.general import *
 from helpers.plots import *
@@ -33,14 +34,13 @@ from controllers.kde import KDE
 from controllers.lsfs import LSFS
 from controllers.svm import SVM
 
-
 # Global parameters controlling the run
 K_INNER     = 5.5/6        # For KDE, defines critical region
 K_OUTER     = 6.5/6        # For KDE, defines critical region
-KDE_COUNTS  = dotdict({'nGood': 3000, 'nCritical': 500, 'nFail': 500})
+KDE_COUNTS  = dotdict({'nGood': 15000, 'nCritical': 5000, 'nFail': 5000})
 T_L         = 0.01
 IND_S       = 32           # 'XTR_SN_IDS_X01'
-TRAIN_WAFER = 0
+#TRAIN_WAFER = 1
 
 # Controller class instances
 config = ConfigParser(); config.read('settings.conf')
@@ -61,22 +61,36 @@ if __name__ == "__main__":
     baseData  = DatasetTI(dataFiles[0]); baseData.printSummary()
     ind       = baseData.genSubsetIndices(specs)
     specName  = baseData['sData'].names[IND_S]; print 'Analyzing specification', specName
-    trainData = DatasetTI(dataFiles[TRAIN_WAFER]).clean(specs, ind)
     
     # Run LSFS against the ORBiT data + the retained specification test
     lsfs.run(baseData['oData'].data, baseData['sData'].pfMat[:,IND_S]); lsfs.subset(T_L)
+    del baseData
+    
+    # Construct training dataset for synthetic dataset training
+    # use a random sample of 3 wafers
+    trainWaferInd = sample(xrange(len(dataFiles)),3)
+    print 'KDE: Training on wafers ', ', '.join(map(str, trainWaferInd))
+    trainData = DatasetTI(dataFiles[trainWaferInd[0]]).clean(specs, ind)
+    for i in xrange(1,len(trainWaferInd)):
+        trainData = trainData.joinRows(DatasetTI(dataFiles[trainWaferInd[i]]).clean(specs, ind))
+    trainData.computePF(specs, dataset='sData').printSummary()
     
     # Construct synthetic dataset
     kdeData   = trainData['oData'].subsetCols(lsfs.Subset).join(trainData['sData'].subsetCols(IND_S))
-    synthetic = kde.run(kdeData, specs, counts=KDE_COUNTS)    
+    synthetic = kde.run(kdeData, specs, counts=KDE_COUNTS)   
     synData   = DatasetTI(synData=synthetic, nRetained=lsfs.nRetained).computePF(specs, dataset='sData')
     
+    # Clean up because always run out of memory here
+    del trainData; del synthetic; del kde; kde = KDE.KDE()
+  
     # Train SVM
     svm.train(synData['oData'].data, synData['sData'].gnd, gridSearch = True)
     
     # Go through everything else and get TE/YL
-    errorReal, errorSyn = [], []
+    errorReal, errorSyn, runIndex = [], [], 0
     for j, dataFile in enumerate(dataFiles[2:len(dataFiles)]):
+        if j in trainWaferInd:
+            continue
         
         # Evaluate real data error metrics
         nData      = DatasetTI(dataFile).clean(specs, ind)
@@ -90,6 +104,9 @@ if __name__ == "__main__":
         TE_YL_Syn = svm.getTEYL(sData['sData'].pfMat[:,0], predSyn)
         errorSyn.append(TE_YL_Syn)
         
-        printRunInfo(dataFile, errorReal[j], errorSyn[j])
+        printRunInfo(dataFile, errorReal[runIndex], errorSyn[runIndex])
+        runIndex += 1
         
-    plotTEYL(array(errorReal), array(errorSyn), config.get('Settings', 'resultDir') + 'Result  - ' + specName + ' TrainWafer - ' + str(TRAIN_WAFER+1) + ' - T_L - ' + str(T_L) + ' .pdf')
+    plotTEYL(array(errorReal), array(errorSyn), config.get('Settings', 'resultDir') + 'Result  - ' + specName + ' TrainWafer - Random - T_L - ' + str(T_L) + '.pdf')
+
+

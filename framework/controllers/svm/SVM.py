@@ -29,23 +29,26 @@ from scikits.learn.svm import SVC
 from helpers.general import *
 
 class SVM:
-	def train(self, X, gnd, gridSearch = False):
-		self.gridSearch = gridSearch
-		if self.gridSearch:
-			paramGrid = { 'C': [1, 5, 10, 50, 100], 'gamma': [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.1] }
-			self.clf = GridSearchCV(SVC(kernel='rbf'), paramGrid, fit_params={'class_weight': {1 : 1, -1 : 1}})
-		else:
-			self.clf = SVC()
-		self.scaleDict = dotdict({'mean': X.mean(axis = 0), 'std': X.std(axis = 0)})
-		self.clf.fit(scale(X, self.scaleDict), gnd)
-	
-	def predict(self, X):
-		return self.clf.predict(scale(X, self.scaleDict))
+    def train(self, X, gnd, gridSearch = False):
+        print 'SVM: Training.'
+        self.gridSearch = gridSearch
+        if self.gridSearch:
+            paramGrid = { 'C': [1, 5, 10, 50, 100], 'gamma': [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.1] }
+            print 'SVM: Grid search using parameters: ', paramGrid
+            self.clf = GridSearchCV(SVC(kernel='rbf'), paramGrid, fit_params={'class_weight': {1 : 1, -1 : 1}})
+        else:
+            self.clf = SVC()
+        self.scaleDict = dotdict({'mean': X.mean(axis = 0), 'std': X.std(axis = 0)})
+        self.clf.fit(scale(X, self.scaleDict), gnd)
+        print 'SVM: Training complete.'
 
-	def getTEYL(self, gnd, predicted):
-		te = sum(logical_and((gnd < 0), (predicted > 0))) * 100.0 / len(gnd)
-		yl = sum(logical_and((gnd > 0), (predicted < 0))) * 100.0 / len(gnd)
-		return [te, yl]
+    def predict(self, X):
+        return self.clf.predict(scale(X, self.scaleDict))
+
+    def getTEYL(self, gnd, predicted):
+        te = sum(logical_and((gnd < 0), (predicted > 0))) * 100.0 / len(gnd)
+        yl = sum(logical_and((gnd > 0), (predicted < 0))) * 100.0 / len(gnd)
+        return [te, yl]
 
 
 

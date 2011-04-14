@@ -34,21 +34,21 @@ ENDCOLOR = '\033[0m'
 
 
 def printPassFail(gnd):
-	print 'Pass: '  + GREEN + str(sum(gnd ==  1)) + ENDCOLOR, 
-	print ' Fail: ' + RED   + str(sum(gnd == -1)) + ENDCOLOR
-		
+    print 'Pass: '  + GREEN + str(sum(gnd ==  1)) + ENDCOLOR, 
+    print ' Fail: ' + RED   + str(sum(gnd == -1)) + ENDCOLOR
+        
 # Changes True/False data to +1/-1 symmetric.
 def bool2symmetric(data):
-	return array((data - 0.5) * 2.0, dtype = int)
+    return array((data - 0.5) * 2.0, dtype = int)
 
-	
+    
 # Write mat to filename as a csv.
 def csvWriteMatrix(filename, mat):
-	out  = csv.writer(open(filename, 'wb'))
-	for row in mat:
-		out.writerow(row)
-		
-		
+    out  = csv.writer(open(filename, 'wb'))
+    for row in mat:
+        out.writerow(row)
+        
+        
 # Use dotdict to replace dictionaries. This enables dict.property access.
 class dotdict(dict):
     def __getattr__(self, attr):
@@ -66,17 +66,17 @@ def extract(keys, d):
 # the standard deviation. Set reverse to True to perform the inverse 
 # operation.
 def scale(data, scaleDict = None, reverse = False):
-	if reverse:
-		return (data * scaleDict.std) + scaleDict.mean
-	else:
-		if scaleDict is None:
-			scaleDict = dotdict({'mean': data.mean(axis = 0), 'std': data.std( axis = 0)})
-		return (data - scaleDict.mean) / scaleDict.std
+    if reverse:
+        return (data * scaleDict.std) + scaleDict.mean
+    else:
+        if scaleDict is None:
+            scaleDict = dotdict({'mean': data.mean(axis = 0), 'std': data.std( axis = 0)})
+        return (data - scaleDict.mean) / scaleDict.std
 
 
 # Set the diagonal of a matrix to all zeros
 def zeroMatrixDiagonal(X):
-	return X - diag(diag(X))
+    return X - diag(diag(X))
 
 
 # Returns a matrix which is the elementwise maximum of two matrices X and Y

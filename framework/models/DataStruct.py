@@ -25,61 +25,66 @@ from numpy import *
 from helpers.general import *
 
 class DataStruct:
-	def __init__(self, names = None, data = None, desc = None, pfMat = None, gnd = None):
-		self.names = names
-		self.data  = data
-		self.desc  = desc
-		self.pfMat = pfMat
-		self.gnd   = gnd
-		self.nrow  = size(data,0)
-		self.ncol  = size(data) if (size(data,0) == size(data)) else size(data,1)
-		
-	def subsetCols(self, cols, desc = None):
-		# Numpy won't hstack if data is un-reshaped column vector. So, we reshape if data is column vector.
-		# A hack, but not sure how to do this any better at the moment.
-		data 		= self.data[:,cols]
-		if size(data) == size(data,0):
-			data = array([self.data[:,cols]]).T
-			
-		description = self.desc if desc is None else desc
-		pfMat       = self.pfMat[:,cols] if (hasattr(self, 'pfMat') and self.pfMat is not None) else None
-		gnd 		= self.gnd if (hasattr(self, 'gnd') and self.gnd is not None) else None
-		return DataStruct(self.names[cols], data, description, pfMat, gnd)
+    def __init__(self, names = None, data = None, desc = None, pfMat = None, gnd = None):
+        self.names = names
+        self.data  = data
+        self.desc  = desc
+        self.pfMat = pfMat
+        self.gnd   = gnd
+        self.nrow  = size(data,0)
+        self.ncol  = size(data) if (size(data,0) == size(data)) else size(data,1)
+        
+    def subsetCols(self, cols, desc = None):
+        # Numpy won't hstack if data is un-reshaped column vector. So, we reshape if data is column vector.
+        # A hack, but not sure how to do this any better at the moment.
+        data         = self.data[:,cols]
+        if size(data) == size(data,0):
+            data = array([self.data[:,cols]]).T
+            
+        description = self.desc if desc is None else desc
+        pfMat       = self.pfMat[:,cols] if (hasattr(self, 'pfMat') and self.pfMat is not None) else None
+        gnd         = self.gnd if (hasattr(self, 'gnd') and self.gnd is not None) else None
+        return DataStruct(self.names[cols], data, description, pfMat, gnd)
 
-	def subsetRows(self, rows):
-		description = self.desc
-		pfMat 		= self.pfMat[rows,:] if (hasattr(self, 'pfMat') and self.pfMat is not None) else None
-		gnd 		= self.gnd[rows] if (hasattr(self, 'gnd') and self.gnd is not None) else None
-		return DataStruct(self.names, self.data[rows,:], self.desc, pfMat, gnd)
+    def subsetRows(self, rows):
+        description = self.desc
+        pfMat         = self.pfMat[rows,:] if (hasattr(self, 'pfMat') and self.pfMat is not None) else None
+        gnd         = self.gnd[rows] if (hasattr(self, 'gnd') and self.gnd is not None) else None
+        return DataStruct(self.names, self.data[rows,:], self.desc, pfMat, gnd)
 
-	# Joins the base datastruct with a secondary datastruct (by column)
-	def join(self, Secondary, desc = None):
-		return DataStruct(names = hstack((self.names, Secondary.names)),
-						  data  = hstack((self.data,  Secondary.data)),
-						  desc  = desc)
+    # Joins the base datastruct with a secondary datastruct (by column)
+    def join(self, Secondary, desc = None):
+        return DataStruct(names = hstack((self.names, Secondary.names)),
+                          data  = hstack((self.data,  Secondary.data)),
+                          desc  = desc)
 
-	# Save datasets to files.
-	def writeCSV(self, filename):	
-		if hasattr(self, 'gnd') and self.gnd is not None:
-			dataset = hstack((self.data, self.pfMat, self.gnd.reshape(len(self.gnd),1)))
-			names = hstack((self.names, self.names, 'gnd'))
-		else:
-			dataset = self.data
-			names = self.names
+    def joinRows(self, Secondary, desc = None):
+        return DataStruct(names = self.names,
+                          data  = vstack((self.data, Secondary.data)),
+                          desc  = self.desc)
+                            
+    # Save datasets to files.
+    def writeCSV(self, filename):    
+        if hasattr(self, 'gnd') and self.gnd is not None:
+            dataset = hstack((self.data, self.pfMat, self.gnd.reshape(len(self.gnd),1)))
+            names = hstack((self.names, self.names, 'gnd'))
+        else:
+            dataset = self.data
+            names = self.names
 
-		fileh 	  	= open(filename, 'w')
-		dataWriter 	= csv.writer(fileh)
-		dataWriter.writerow(names)
-		for row in dataset:
-			dataWriter.writerow(row)
-		fileh.close()
-		print GREEN + 'Saved dataset to ' + filename + ' successfully.' + ENDCOLOR
+        fileh           = open(filename, 'w')
+        dataWriter     = csv.writer(fileh)
+        dataWriter.writerow(names)
+        for row in dataset:
+            dataWriter.writerow(row)
+        fileh.close()
+        print GREEN + 'Saved dataset to ' + filename + ' successfully.' + ENDCOLOR
 
-	# Just print out a summary of the dataset (rows, cols, pass/fail info if available.)
-	def printSummary(self):
-		print '%-30s  %4d  %4d' % (self.desc, size(self.data,0), size(self.data,1))
-		if hasattr(self, 'gnd') and self.gnd is not None:
-			printPassFail(self.gnd)
+    # Just print out a summary of the dataset (rows, cols, pass/fail info if available.)
+    def printSummary(self):
+        print '%-30s  %4d  %4d' % (self.desc, size(self.data,0), size(self.data,1))
+        if hasattr(self, 'gnd') and self.gnd is not None:
+            printPassFail(self.gnd)
 
-		
+        
 
