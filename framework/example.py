@@ -29,7 +29,7 @@ from random import sample
 from helpers.general import *
 from helpers.plots import *
 from models.Specs import *
-from models.DatasetTI import *
+from models.Dataset import *
 from controllers.kde import KDE
 from controllers.lsfs import LSFS
 from controllers.svm import SVM

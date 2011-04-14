@@ -27,6 +27,29 @@
   * Modular support for "controllers" to implement machine-learning analysis techniques
   * Web-based interaction with machine-learning tasks running server-side via [node.js](http://nodejs.org)
 
+## Example
+Here's a simple example to get you started:
+
+     from models.Specs import *
+     from models.Dataset import *
+     from controllers.svm import SVM
+	 
+	 specs = Specs('/path/to/specs')
+	 svm   = SVM.SVM()
+	 
+	 # Get training data
+	 trainingData  = Dataset('/path/to/training/set').computePF(specs); trainingData.printSummary()
+	 
+	 # Train SVM
+	 svm.train(trainingData['raw'].data, trainingData['raw'].gnd, gridSearch=True)
+	 
+	 # Predict
+	 testData  = Dataset('/path/to/test/set').computePF(specs)
+	 predicted = svm.predict(testData['raw'].data)
+	 print svm.getTEYL(testData['raw'].gnd, predicted))
+
+A more involved example can be found in `framework/example.py`.
+
 ## Contributors
 
 The following are the major project contributors.
@@ -37,7 +60,7 @@ The following are the major project contributors.
 
 (The MIT License)
 
-Copyright (c) 2011 Nathan Kupp, Yale University.
+Copyright copy; 2011 Nathan Kupp, Yale University.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
