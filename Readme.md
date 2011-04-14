@@ -8,7 +8,8 @@
 
 ## Installation
 
-  This project is built on and requires the following software:
+  This project is built on and requires the following software:  
+  
   * python 2.7.1
   * numpy 1.5.1
   * scipy 0.9.0

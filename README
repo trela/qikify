@@ -1,2 +1,0 @@
-This project aims to simplify many of the basic analysis tasks typical of machine learning-based low-cost testing. Such analyses typically consist of a process along the lines of 1. loading up the analysis dataset, 2. cleaning up the dataset / partitioning into data subsets, and 3. running the desired analysis, such as regression, classification, kernel density estimation, and so on.
-
