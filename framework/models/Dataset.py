@@ -47,7 +47,7 @@ class Dataset(object):
             self.nrow  = size(self.datasets.raw.data,0)
             self.ncol  = size(self.datasets.raw.data,1)
 
-        if data is not None:
+        if dataset is not None:
             self.datasets.raw = DataStruct(names=dataset.names,
                                            data=dataset.data,
                                            desc='Raw dataset from input file.')
