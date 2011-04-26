@@ -75,31 +75,6 @@ def plotLSFSThresholds(results, filename, thresholds):
     plt.close()
 
 
-def plotTEYL(error, errorSyn, filename):
-    prop = matplotlib.font_manager.FontProperties(size=10)
-    [teSyn, ylSyn] = mean(errorSyn,0)
-    [teActual, ylActual] = mean(error,0)
-    nWafers = size(error,0)
-    fig = pylab.figure()
-    
-    ax = fig.add_subplot(211)
-    ax.plot(error[:,0],'k-')
-    ax.plot([0,nWafers],[teSyn, teSyn],'g--')
-    ax.plot([0,nWafers],[teActual, teActual],'k-')
-    leg = ax.legend((r"$T_E$", r"$\hat{T}_E$", r"$\bar{T}_E$"), 'best', shadow=True, prop = prop)
-    ax.grid(True)
-    ax.set_title('Test Escapes')
-    
-    ax = fig.add_subplot(212)
-    ax.plot(error[:,1],'k-',
-            [0,nWafers],[ylSyn, ylSyn],'g--',
-            [0,nWafers],[ylActual, ylActual],'k-')
-    leg = ax.legend((r"$Y_L$", r"$\hat{Y}_L$", r"$\bar{Y}_L$"), 'best', shadow=True, prop = prop)
-    ax.grid(True)
-    ax.set_title('Yield Loss')
-    plt.savefig(filename, dpi = 150, format='pdf')    
-    plt.close()
-
 
 # 2D Scatterplot of synthetic & actual data.
 def plotSyntheticAndReal(sData, bData, d1, d2, filename):

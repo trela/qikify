@@ -30,17 +30,17 @@ from helpers.general import *
 
 class SVM:
     def train(self, X, gnd, gridSearch = False):
-        print 'SVM: Training.'
+        #print 'SVM: Training.'
         self.gridSearch = gridSearch
         if self.gridSearch:
             paramGrid = { 'C': [1, 5, 10, 50, 100], 'gamma': [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.1] }
             print 'SVM: Grid search using parameters: ', paramGrid
-            self.clf = GridSearchCV(SVC(kernel='rbf'), paramGrid, fit_params={'class_weight': {1 : 1, -1 : 1}})
+            self.clf = GridSearchCV(SVC(kernel='rbf'), paramGrid, n_jobs=4, fit_params={'class_weight': {1 : 1, -1 : 1}})
         else:
             self.clf = SVC()
         self.scaleDict = dotdict({'mean': X.mean(axis = 0), 'std': X.std(axis = 0)})
-        self.clf.fit(scale(X, self.scaleDict), gnd)
-        print 'SVM: Training complete.'
+        self.clf.fit(scale(X, self.scaleDict), gnd, {1 : 1, -1 : 25})
+        #print 'SVM: Training complete.'
 
     def predict(self, X):
         return self.clf.predict(scale(X, self.scaleDict))
