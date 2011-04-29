@@ -42,17 +42,17 @@ class KDE:
         self.names   = dataset.names
 
         # Select bandwidth for Epanechnikov kernel (Rule of Thumb, see Silverman, p.86)
-        self.b             = 0.8                     # Default bandwidth scaling factor
+        self.b       = 0.8                     # Default bandwidth scaling factor
         self.c_d     = 2.0* pow( pi, (self.d/2.0) ) / ( self.d * gamma(self.d/2) )
         self.h       = self.compute_h(self.n, self.d, self.c_d, self.b)
         self.setBandwithFactors(a)
-
+        
         # Normalize data/bounds
-        self.scaleFactors        = dotdict({'mean': dataset.data.mean(axis = 0), 'std': dataset.data.std(axis = 0)})
-        self.datan                      = scale(dataset.data, self.scaleFactors)
-        self.bounds               = scale(array([dataset.data.min(axis=0), dataset.data.max(axis=0)]), self.scaleFactors)
+        self.scaleFactors       = dotdict({'mean': dataset.data.mean(axis = 0), 'std': dataset.data.std(axis = 0)})
+        self.datan              = scale(dataset.data, self.scaleFactors)
+        self.bounds             = scale(array([dataset.data.min(axis=0), dataset.data.max(axis=0)]), self.scaleFactors)
         if bounds is not None:
-            self.bounds        = scale(bounds, self.scaleFactors)
+            self.bounds         = scale(bounds, self.scaleFactors)
 
         # Generate samples
         if counts is None:
@@ -132,7 +132,7 @@ class KDE:
 
     # Compute pilot density point estimate f(x)
     def f_pilot(self, x, datan):
-        A = [K_e((x-datan[i,:])/h) for i in xrange(n)]
+        A = [K_e((x-datan[i,:])/self.h) for i in xrange(n)]
         return (pow(h,-d)*sum(A))/n
 
     # Computed here seperately to preserve readability of the equation. Otherwise nearly every 

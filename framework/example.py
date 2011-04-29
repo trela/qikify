@@ -74,7 +74,7 @@ if __name__ == "__main__":
     
     # Read in the first file, compute its pass/fail values based on specifications.
     baseData  = Dataset(dataFiles[0]).computePF(specs)
-    baseData.printSummary()
+    print baseData
     
     # Run supervised Laplacian score feature selection with the base dataset
     lsfs.run(baseData['raw'].data, baseData['raw'].gnd)

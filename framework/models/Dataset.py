@@ -129,13 +129,13 @@ class Dataset(object):
         return newData
 
     # Print a summary of the dataset.
-    def printSummary(self):    
+    def __str__(self):    
         print GREEN
         print '==============================================='
         print 'Dataset                         #Rows #Cols'
         print '===============================================' + ENDCOLOR
         for dataset in self.datasets.values():
-            dataset.printSummary()
+            print dataset
         print ''
         return self
 

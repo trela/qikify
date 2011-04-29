@@ -81,7 +81,7 @@ class DataStruct:
         print GREEN + 'Saved dataset to ' + filename + ' successfully.' + ENDCOLOR
 
     # Just print out a summary of the dataset (rows, cols, pass/fail info if available.)
-    def printSummary(self):
+    def __str__(self):
         print '%-30s  %4d  %4d' % (self.desc, size(self.data,0), size(self.data,1))
         if hasattr(self, 'gnd') and self.gnd is not None:
             printPassFail(self.gnd)
