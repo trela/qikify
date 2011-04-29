@@ -5,6 +5,11 @@
   built on [node.js](http://nodejs.org), [scikits.learn](http://scikit-learn.sourceforge.net/), and
   [numpy](http://numpy.scipy.org/) using Python.
 
+## Known issues
+
+  This software is in early pre-alpha state. There are several rounds of refactoring remaining before it approaches production quality.
+  Most importantly, the code should be refactored into a standard Python package so that framework components can be loaded in the usual Pythonic way, e.g. `import qikify.controllers.kde` and so on.
+
 
 ## Installation
 
