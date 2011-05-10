@@ -37,7 +37,7 @@ class Specs:
             self.names     = specReader.next()
             LSL           = specReader.next()
             USL           = specReader.next()
-
+            
             for i, limit in enumerate(zip(LSL, USL)):
                 # Use this lambda function because float() fails on empty/non-existent spec limit.
                 lsl, usl = map(lambda x: float(x) if x else float('nan'), limit)

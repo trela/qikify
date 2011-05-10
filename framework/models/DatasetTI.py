@@ -58,7 +58,7 @@ class DatasetTI(Dataset):
         ind.sData  = logical_and(ind.sData, ~alwaysPassing)
         
         self.subsetCols(ind).subsetRows({'sData': self.indOutliers, 'oData': self.indOutliers})
-        self.printSummary()
+        print self
         return ind
 
     # Run on every subsequent dataset.

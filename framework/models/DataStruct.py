@@ -82,9 +82,9 @@ class DataStruct:
 
     # Just print out a summary of the dataset (rows, cols, pass/fail info if available.)
     def __str__(self):
-        print '%-30s  %4d  %4d' % (self.desc, size(self.data,0), size(self.data,1))
+        output = '%-30s  %4d  %4d' % (self.desc, size(self.data,0), size(self.data,1))
         if hasattr(self, 'gnd') and self.gnd is not None:
-            printPassFail(self.gnd)
-
+            output += '\n' + outputPassFail(self.gnd)
+        return output
         
 

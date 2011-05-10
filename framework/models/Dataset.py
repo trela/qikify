@@ -130,12 +130,11 @@ class Dataset(object):
 
     # Print a summary of the dataset.
     def __str__(self):    
-        print GREEN
-        print '==============================================='
-        print 'Dataset                         #Rows #Cols'
-        print '===============================================' + ENDCOLOR
+        output = GREEN + \
+               '===============================================\n' + \
+               'Dataset                         #Rows #Cols    \n' + \
+               '===============================================\n' + ENDCOLOR
         for dataset in self.datasets.values():
-            print dataset
-        print ''
-        return self
+            output += dataset.__str__() + '\n'
+        return output
 
