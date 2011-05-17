@@ -6,3 +6,4 @@ tests/
 !setup.py
 build/
 dist/
+qikify.egg-info/
