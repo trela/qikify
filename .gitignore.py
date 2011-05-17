@@ -3,4 +3,7 @@ tests/
 *.pyc
 *.py
 !example.py
-iccad/
+!setup.py
+build/
+dist/
+analyses/
