@@ -1,3 +1,4 @@
 *.pyc
+analyses/
 build/
 dist/
