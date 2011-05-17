@@ -1,9 +1,0 @@
-settings.conf
-tests/
-*.pyc
-*.py
-!example.py
-!setup.py
-build/
-dist/
-analyses/
