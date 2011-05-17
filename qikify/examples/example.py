@@ -26,13 +26,12 @@ from ConfigParser import ConfigParser
 from glob import glob
 from random import sample
 
-from helpers.general import *
-from helpers.plots import *
-from models.Specs import *
-from models.Dataset import *
-from controllers.kde import KDE
-from controllers.lsfs import LSFS
-from controllers.svm import SVM
+import qikify.helpers.general as helpers
+from qikify.models.Specs import Specs
+from qikify.models.DatasetTI import DatasetTI
+from qikify.controllers.kde import KDE
+from qikify.controllers.lsfs import LSFS
+from qikify.controllers.svm import SVM
 
 ''' 
 Global parameters controlling the run.
