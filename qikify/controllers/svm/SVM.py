@@ -39,7 +39,7 @@ class SVM:
         else:
             self.clf = SVC()
         self.scaleDict = dotdict({'mean': X.mean(axis = 0), 'std': X.std(axis = 0)})
-        self.clf.fit(scale(X, self.scaleDict), gnd, {1 : 1, -1 : 25})
+        self.clf.fit(scale(X, self.scaleDict), gnd)
         #print 'SVM: Training complete.'
 
     def predict(self, X):
@@ -49,7 +49,5 @@ class SVM:
         te = sum(logical_and((gnd < 0), (predicted > 0))) * 100.0 / len(gnd)
         yl = sum(logical_and((gnd > 0), (predicted < 0))) * 100.0 / len(gnd)
         return [te, yl]
-
-
 
 

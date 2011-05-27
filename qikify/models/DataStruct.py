@@ -22,7 +22,7 @@ THE SOFTWARE.
 '''
 import csv
 from numpy import *
-from helpers.general import *
+from ..helpers.general import *
 
 class DataStruct:
     def __init__(self, names = None, data = None, desc = None, pfMat = None, gnd = None):
@@ -37,6 +37,7 @@ class DataStruct:
     def subsetCols(self, cols, desc = None):
         # Numpy won't hstack if data is un-reshaped column vector. So, we reshape if data is column vector.
         # A hack, but not sure how to do this any better at the moment.
+        ## TODO: should be replaced with np.atleast_2d()!
         data         = self.data[:,cols]
         if size(data) == size(data,0):
             data = array([self.data[:,cols]]).T

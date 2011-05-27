@@ -24,7 +24,7 @@ THE SOFTWARE.
 import sys, os, csv
 from numpy import *
 
-from helpers.general import *
+from ..helpers.general import *
 from DataStruct import *
 
 class Dataset(object): 

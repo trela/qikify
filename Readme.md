@@ -19,6 +19,7 @@
   * numpy 1.5.1
   * scipy 0.9.0
   * node.js 0.5.0-pre
+  * scikits.learn 0.8
 
   Once the above are installed, just clone this github repository with
 
