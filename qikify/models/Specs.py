@@ -23,7 +23,7 @@ THE SOFTWARE.
 
 import sys, os, csv
 from numpy import *
-from helpers.general import *
+from ..helpers.general import *
 
 class Specs:    
     # Read in specs from `filename` and create {specname: [lsl,usl]} dictionary.

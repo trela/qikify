@@ -46,15 +46,15 @@ class DatasetTI(Dataset):
     # Run on first dataset, baseData.
     def genSubsetIndices(self, specs):
         # We will remove all parameters with less than 100 unique values.
-        ind = dotdict({'sData': apply_along_axis(lambda x: len(unique(x)) > 100, 0, self.datasets.sData.data),
-                       'oData': apply_along_axis(lambda x: len(unique(x)) > 100, 0, self.datasets.oData.data)})
+        ind = dotdict({'sData': apply_along_axis(lambda x: len(unique(x)) > 100, 0, self['sData'].data),
+                       'oData': apply_along_axis(lambda x: len(unique(x)) > 100, 0, self['oData'].data)})
 
         # Identify all outliers with signatures outside +/- 3 * (spec distance).
         self.identifyOutliers(specs, ind, dataset = 'sData', k_l = 3, k_u = 3)
         
         # Identify specification performances which now always pass.
         self.computePF(specs, ind, dataset = 'sData')
-        alwaysPassing = (sum(self.datasets.sData.pfMat[self.indOutliers,:],0) / sum(self.indOutliers) == 1)
+        alwaysPassing = (sum(self['sData'].pfMat[self.indOutliers,:],0) / sum(self.indOutliers) == 1)
         ind.sData  = logical_and(ind.sData, ~alwaysPassing)
         
         self.subsetCols(ind).subsetRows({'sData': self.indOutliers, 'oData': self.indOutliers})

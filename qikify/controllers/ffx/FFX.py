@@ -1,7 +1,19 @@
-"""FFX.py
+"""FFX.py v1.1 (June 15, 2011)
 This module implements the Fast Function Extraction (FFX) algorithm.
 
 Reference: Trent McConaghy, FFX: Fast, Scalable, Deterministic Symbolic Regression Technology, Genetic Programming Theory and Practice IX, Edited by R. Riolo, E. Vladislavleva, and J. Moore, Springer, 2011.  http://www.trent.st/ffx
+
+
+HOW TO USE THIS MODULE:
+
+Easiest to use by calling runffx.py.  Its code has example usage patterns.
+
+The main routines are:
+  models = MultiFFXModelFactory().build(train_X, train_y, test_X, test_y, varnames)
+  yhat = model.simulate(X)
+  print model
+
+Can expand / restrict the set of functions via the user-changeable constants (right below licence).
 """
 
 """
@@ -19,8 +31,18 @@ Redistribution and use in source and binary forms, with or without modification,
 For permissions beyond the scope of this license, please contact Trent McConaghy (trentmc@solidodesign.com).
 
 THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ''AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE DEVELOPERS OR THEIR INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+
+Patent pending.
 """
 
+#user-changeable constants
+CONSIDER_INTER = True #consider interactions?
+CONSIDER_DENOM = True #consider denominator?
+CONSIDER_EXPON = True #consider exponents?
+CONSIDER_NONLIN = True #consider abs() and log()?
+CONSIDER_THRESH = True #consider hinge functions?
+
+#======================================================================================
 import copy, itertools, math, signal, time, types
 
 #3rd party dependencies
@@ -28,26 +50,17 @@ import numpy
 import scipy
 from scikits.learn.linear_model.coordinate_descent import ElasticNet
 
-#constants
-MAX_TIME_REGULARIZE_UPDATE = 30 #maximum time (s) for regularization update during pathwise learn.
 INF = float('Inf')
+MAX_TIME_REGULARIZE_UPDATE = 10 #maximum time (s) for regularization update during pathwise learn.
 
 #GTH = Greater-Than Hinge function, LTH = Less-Than Hinge function
 OP_ABS, OP_MAX0, OP_MIN0, OP_LOG10, OP_GTH, OP_LTH = 1, 2, 3, 4, 5, 6
 
-#Use interactions?  Use denominator?  Use exponents?  Use nonlinear operators?  Use hinge ops?
-FFX_LIN = 'FFX inter0 denom0 expon0 nonlin0 thresh0' 
-FFX_QUAD = 'FFX inter1 denom0 expon0 nonlin0 thresh0' 
-FFX1 = 'FFX inter0 denom0 expon1 nonlin1 thresh1' 
-FFX2 = 'FFX inter0 denom1 expon1 nonlin1 thresh1' 
-FFX3 = 'FFX inter1 denom0 expon0 nonlin0 thresh1' 
-FFX4 = 'FFX inter1 denom1 expon0 nonlin0 thresh0' 
-FFX5 = 'FFX inter1 denom1 expon0 nonlin0 thresh1' 
-FFX6 = 'FFX inter1 denom0 expon1 nonlin1 thresh0' 
-FFX7 = 'FFX inter1 denom0 expon0 nonlin1 thresh0' 
-FFX8 = 'FFX inter1 denom0 expon0 nonlin1 thresh1' 
-
-ALL_FFX = [FFX_LIN, FFX_QUAD, FFX1, FFX2, FFX3, FFX4, FFX5, FFX6, FFX7, FFX8]
+def _approachStr(approach):
+    assert len(approach) == 5
+    assert set(approach).issubset([0,1])
+    return 'inter%d denom%d expon%d nonlin%d thresh%d' % \
+        (approach[0], approach[1], approach[2], approach[3], approach[4])
 
 #========================================================================================
 #strategy 
@@ -57,8 +70,10 @@ class FFXBuildStrategy(object):
     def __init__(self, approach):
         """
         @arguments
-          approach -- one of ALL_FFX
+          approach -- 5-d list of [use_inter, use_denom, use_expon, use_nonlin, use_thresh]
         """
+        assert len(approach) == 5
+        assert set(approach).issubset([0,1])
         self.approach = approach 
         
         self.num_alphas = 1000
@@ -83,27 +98,22 @@ class FFXBuildStrategy(object):
         self.all_expr_exponents = [-1.0, -0.5, +0.5, +1.0]
 
     def includeInteractions(self):
-        assert 'inter' in self.approach
-        return 'inter1' in self.approach
+        return bool(self.approach[0])
 
     def includeDenominator(self):
-        assert 'denom' in self.approach
-        return 'denom1' in self.approach
+        return bool(self.approach[1])
 
     def exprExponents(self):
-        assert 'expon' in self.approach
-        if 'expon0' in self.approach: return [1.0]
-        else:                         return self.all_expr_exponents
+        if self.approach[2]: return self.all_expr_exponents
+        else:                return [1.0]
 
     def nonlinOps(self):
-        assert 'nonlin' in self.approach
-        if 'nonlin0' in self.approach: return []
-        else:                          return self.all_nonlin_ops
+        if self.approach[3]: return self.all_nonlin_ops
+        else:                return []
 
     def thresholdOps(self):
-        assert 'thresh' in self.approach
-        if 'thresh0' in self.approach: return []
-        else:                          return self.all_threshold_ops
+        if self.approach[4]: return self.all_threshold_ops
+        else:                return []
 
     def eps(self):
         return self._eps
@@ -383,10 +393,31 @@ class MultiFFXModelFactory:
         models = []
         min_y = min(min(train_y), min(test_y))
         max_y = max(max(train_y), max(test_y))
-        for (i, ffx_approach) in enumerate(ALL_FFX): 
+
+        #build all combinations of approaches, except for (a) features we don't consider
+        # and (b) too many features at once
+        approaches = []
+        for inter in [0,1]: 
+            if inter==1 and not CONSIDER_INTER: continue
+            for denom in [0,1]:
+                if denom==1 and not CONSIDER_DENOM: continue
+                for expon in [0,1]:
+                    if expon==1 and not CONSIDER_EXPON: continue
+                    for nonlin in [0,1]:
+                        if nonlin==1 and not CONSIDER_NONLIN: continue
+                        for thresh in [0,1]:
+                            if thresh==1 and not CONSIDER_THRESH: continue
+                            approach = [inter, denom, expon, nonlin, thresh]
+                            if sum(approach) >= 4: continue #not too many features at once
+                            if sum(approach) >= 3 and denom==1: continue #fewer features if denom
+                            approaches.append(approach)
+
+        for (i, approach) in enumerate(approaches): 
             print '-' * 200
-            print 'Build with approach %d/%d (%s): begin' % (i+1, len(ALL_FFX), ffx_approach)
-            ss = FFXBuildStrategy(ffx_approach)
+            print 'Build with approach %d/%d (%s): begin' % \
+                (i+1, len(approaches), _approachStr(approach))
+            ss = FFXBuildStrategy(approach)
+
             next_models = FFXModelFactory().build(train_X, train_y, varnames, ss)
 
             #set test_nmse on each model
@@ -398,11 +429,15 @@ class MultiFFXModelFactory:
             print '  STEP 3: Nondominated filter'
             next_models = self._nondominatedModels(next_models)
             models += next_models
-            print 'Build with approach %d/%d (%s): done.  %d models.' % \
-                (i+1, len(ALL_FFX), ffx_approach, len(next_models))
+            print 'Build with approach %d/%d (%s): done.  %d model(s).' % \
+                (i+1, len(approaches), _approachStr(approach), len(next_models))
+            print 'Models:'
+            for model in next_models:
+                print "num_bases=%d, test_nmse=%.6f, model=%s" % \
+                    (model.numBases(), model.test_nmse, model.str2(500))
 
         #final pareto filter
-        models = self._nondominatedModels(next_models)
+        models = self._nondominatedModels(models)
 
         #log nondominated models
         print '=' * 200
@@ -412,6 +447,10 @@ class MultiFFXModelFactory:
                 (i+1, len(models), model.numBases(), model.test_nmse, model.str2(500))
 
         return models
+
+    def _FFXapproach(self, inter, denom, expon, nonlin, thresh):
+        return 'FFX inter%d denom%d expon%d nonlin%d thresh%d' % \
+            (inter, denom, expon, nonlin, thresh)
 
     def _nondominatedModels(self, models):
         test_nmses = [model.test_nmse for model in models]
