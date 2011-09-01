@@ -51,7 +51,7 @@ import scipy
 from scikits.learn.linear_model.coordinate_descent import ElasticNet
 
 INF = float('Inf')
-MAX_TIME_REGULARIZE_UPDATE = 10 #maximum time (s) for regularization update during pathwise learn.
+MAX_TIME_REGULARIZE_UPDATE = 30 #maximum time (s) for regularization update during pathwise learn.
 
 #GTH = Greater-Than Hinge function, LTH = Less-Than Hinge function
 OP_ABS, OP_MAX0, OP_MIN0, OP_LOG10, OP_GTH, OP_LTH = 1, 2, 3, 4, 5, 6
@@ -652,7 +652,7 @@ class FFXModelFactory:
         Returns list of model (or None if failure)."""
 
         print '    Pathwise learn: begin. max_num_bases=%d' % max_num_bases
-        max_iter = 1000 #default 1000. magic number.
+        max_iter = 10000 #default 1000. magic number.
 
         #Condition X and y: 
         # -subtract each row's mean, then divide by stddev
