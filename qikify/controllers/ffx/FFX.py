@@ -1,4 +1,4 @@
-"""FFX.py v1.1 (June 15, 2011)
+"""FFX.py v1.3 (Sept 16, 2011)
 This module implements the Fast Function Extraction (FFX) algorithm.
 
 Reference: Trent McConaghy, FFX: Fast, Scalable, Deterministic Symbolic Regression Technology, Genetic Programming Theory and Practice IX, Edited by R. Riolo, E. Vladislavleva, and J. Moore, Springer, 2011.  http://www.trent.st/ffx
@@ -51,7 +51,7 @@ import scipy
 from scikits.learn.linear_model.coordinate_descent import ElasticNet
 
 INF = float('Inf')
-MAX_TIME_REGULARIZE_UPDATE = 30 #maximum time (s) for regularization update during pathwise learn.
+MAX_TIME_REGULARIZE_UPDATE = 5 #maximum time (s) for regularization update during pathwise learn.
 
 #GTH = Greater-Than Hinge function, LTH = Less-Than Hinge function
 OP_ABS, OP_MAX0, OP_MIN0, OP_LOG10, OP_GTH, OP_LTH = 1, 2, 3, 4, 5, 6
@@ -274,8 +274,8 @@ class OperatorBase:
         y_lin = self.simple_base.simulate(X)
 
         if op == OP_ABS:     ya = abs(y_lin)
-        elif op == OP_MAX0:  ya = numpy.clip(0.0, -INF, y_lin)
-        elif op == OP_MIN0:  ya = numpy.clip(INF, 0.0, y_lin)
+        elif op == OP_MAX0:  ya = numpy.clip(y_lin, 0.0, INF)
+        elif op == OP_MIN0:  ya = numpy.clip(y_lin, -INF, 0.0)
         elif op == OP_LOG10:
             #safeguard against: log() on values <= 0.0
             mn, mx = min(y_lin), max(y_lin)
@@ -283,8 +283,8 @@ class OperatorBase:
                 ok = False
             else:
                 ya = numpy.log10(y_lin)
-        elif op == OP_GTH:   ya = numpy.clip(0.0, -INF, y_lin - self.thr)
-        elif op == OP_LTH:   ya = numpy.clip(0.0, -INF, self.thr - y_lin)
+        elif op == OP_GTH:   ya = numpy.clip(self.thr - y_lin, 0.0, INF)
+        elif op == OP_LTH:   ya = numpy.clip(y_lin - self.thr, 0.0, INF)
         else:                raise 'Unknown op %d' % op
 
         if ok: #could always do ** exp, but faster ways if exp is 0,1
@@ -397,20 +397,23 @@ class MultiFFXModelFactory:
         #build all combinations of approaches, except for (a) features we don't consider
         # and (b) too many features at once
         approaches = []
-        for inter in [0,1]: 
-            if inter==1 and not CONSIDER_INTER: continue
+        print "Approaches:"
+        if CONSIDER_INTER: inters = [1] #inter=0 is a subset of inter=1
+        else:              inters = [0]
+        for inter in inters: 
             for denom in [0,1]:
                 if denom==1 and not CONSIDER_DENOM: continue
                 for expon in [0,1]:
                     if expon==1 and not CONSIDER_EXPON: continue
+                    if expon==1 and inter==1: continue #never need both exponent and inter
                     for nonlin in [0,1]:
                         if nonlin==1 and not CONSIDER_NONLIN: continue
                         for thresh in [0,1]:
                             if thresh==1 and not CONSIDER_THRESH: continue
                             approach = [inter, denom, expon, nonlin, thresh]
                             if sum(approach) >= 4: continue #not too many features at once
-                            if sum(approach) >= 3 and denom==1: continue #fewer features if denom
                             approaches.append(approach)
+                            print "  ", _approachStr(approach)
 
         for (i, approach) in enumerate(approaches): 
             print '-' * 200
@@ -563,9 +566,12 @@ class FFXModelFactory:
             print '  STEP 1B: Find order-1 base infls: done'
 
             #don't let inter coeffs swamp linear ones; but handle more when n small
-            if ss.includeDenominator(): overall_max = 4000
-            else:                       overall_max = 8000
-            max_n_order2_bases = min(overall_max, max(10, len(order1_bases)*2))
+            n_order1_bases = len(order1_bases)
+            max_n_order2_bases = 3 * math.sqrt(n_order1_bases)  #default
+            max_n_order2_bases = max(max_n_order2_bases, 10)                 #lower limit
+            max_n_order2_bases = max(max_n_order2_bases, 2 * n_order1_bases) #  ""
+            if ss.includeDenominator(): max_n_order2_bases = min(max_n_order2_bases, 4000) #upper limit
+            else:                       max_n_order2_bases = min(max_n_order2_bases, 8000) # ""
             
             #build up order2 bases
             print '  STEP 1C: Build order-2 bases: begin'
@@ -652,10 +658,10 @@ class FFXModelFactory:
         Returns list of model (or None if failure)."""
 
         print '    Pathwise learn: begin. max_num_bases=%d' % max_num_bases
-        max_iter = 10000 #default 1000. magic number.
+        max_iter = 1000 #default 1000. magic number.
 
         #Condition X and y: 
-        # -subtract each row's mean, then divide by stddev
+        # -"unbias" = rescale so that (mean=0, stddev=1) -- subtract each row's mean, then divide by stddev
         # -X transposed
         # -X as fortran array
         (X_unbiased, y_unbiased, X_avgs, X_stds, y_avg, y_std) = self._unbiasedXy(X_orig_regress, y_orig)
@@ -684,7 +690,7 @@ class FFXModelFactory:
         cur_unbiased_coefs = None # init values for coefs
         start_time = time.time()
         for (alpha_i, alpha) in enumerate(alphas):
-            #compute (unbiased) coefficients
+            #compute (unbiased) coefficients. Recall that mean=0 so no intercept needed
             clf = ElasticNetWithTimeout(alpha=alpha, rho=ss.rho(), fit_intercept=False)
             try:
                 clf.fit(X_unbiased, y_unbiased, coef_init=cur_unbiased_coefs, 
@@ -695,6 +701,7 @@ class FFXModelFactory:
             cur_unbiased_coefs = clf.coef_.copy() 
 
             #compute model; update models
+            #  -"rebias" means convert from (mean=0, stddev=1) to original (mean, stddev)
             coefs = self._rebiasCoefs([0.0] + list(cur_unbiased_coefs), X_stds, X_avgs, y_std, y_avg)
             (coefs_n, bases_n, coefs_d, bases_d) = self._allocateToNumerDenom(ss, bases, coefs)
             model = FFXModel(varnames, coefs_n, bases_n, coefs_d, bases_d)
@@ -933,3 +940,6 @@ def coefStr(x):
 def basesStr(bases):
     """Pretty print list of bases"""
     return ', '.join([str(base) for base in bases])
+
+def rail(x, minx, maxx):
+    return max(minx, max(maxx, x))
