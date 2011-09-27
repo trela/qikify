@@ -21,19 +21,59 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 '''
 import csv
-from numpy import *
+import numpy as np
 from ..helpers.general import *
 
-class DataStruct:
-    def __init__(self, names = None, data = None, desc = None, pfMat = None, gnd = None):
-        self.names = names
-        self.data  = data
-        self.desc  = desc
-        self.pfMat = pfMat
-        self.gnd   = gnd
-        self.nrow  = size(data,0)
-        self.ncol  = size(data) if (size(data,0) == size(data)) else size(data,1)
+
+class DataStruct(np.ndarray):
+    
+    def __new__(cls, input_array, names=None, desc=None, pfMat=None, gnd=None):
+        obj       = np.asarray(input_array).view(cls)
+        obj.names = names
+        obj.desc  = desc
+        obj.pfMat = pfMat
+        obj.gnd   = gnd
+        return obj
+
+    def __array_finalize__(self, obj):
+        if obj is None: return
+        self.names = getattr(obj, 'names',  None)
+        self.desc  = getattr(obj, 'desc',   None)
+        self.pfMat = getattr(obj, 'pfMat',  None)
+        self.gnd   = getattr(obj, 'gnd',    None)
+
+    # Print out a summary of the dataset (rows, cols, pass/fail info if available.)
+    def __str__(self):
+        output = '%-30s  %4d  %4d' % (self.desc, self.shape[0], self.shape[1])
+        if hasattr(self, 'gnd') and self.gnd is not None:
+            output += '\n' + outputPassFail(self.gnd)
+        return output
         
+    # Save datasets to files.
+    def writeCSV(self, filename):    
+        if hasattr(self, 'gnd') and self.gnd is not None:
+            dataset = hstack((self.data, self.pfMat, self.gnd.reshape(len(self.gnd),1)))
+            names   = hstack((self.names, self.names, 'gnd'))
+        else:
+            dataset = self.data
+            names   = self.names
+
+        fileh      = open(filename, 'w')
+        dataWriter = csv.writer(fileh)
+        dataWriter.writerow(names)
+        for row in dataset:
+            dataWriter.writerow(row)
+        fileh.close()
+        print GREEN + 'Saved dataset to ' + filename + ' successfully.' + ENDCOLOR
+
+    def nrow(self):
+        return self.shape[0]
+
+    def ncol(self):
+        return self.shape[1]
+        
+        
+    '''
     def subsetCols(self, cols, desc = None):
         # Numpy won't hstack if data is un-reshaped column vector. So, we reshape if data is column vector.
         # A hack, but not sure how to do this any better at the moment.
@@ -63,29 +103,6 @@ class DataStruct:
         return DataStruct(names = self.names,
                           data  = vstack((self.data, Secondary.data)),
                           desc  = self.desc)
-                            
-    # Save datasets to files.
-    def writeCSV(self, filename):    
-        if hasattr(self, 'gnd') and self.gnd is not None:
-            dataset = hstack((self.data, self.pfMat, self.gnd.reshape(len(self.gnd),1)))
-            names = hstack((self.names, self.names, 'gnd'))
-        else:
-            dataset = self.data
-            names = self.names
-
-        fileh           = open(filename, 'w')
-        dataWriter     = csv.writer(fileh)
-        dataWriter.writerow(names)
-        for row in dataset:
-            dataWriter.writerow(row)
-        fileh.close()
-        print GREEN + 'Saved dataset to ' + filename + ' successfully.' + ENDCOLOR
-
-    # Just print out a summary of the dataset (rows, cols, pass/fail info if available.)
-    def __str__(self):
-        output = '%-30s  %4d  %4d' % (self.desc, size(self.data,0), size(self.data,1))
-        if hasattr(self, 'gnd') and self.gnd is not None:
-            output += '\n' + outputPassFail(self.gnd)
-        return output
-        
+    '''
+    
 
