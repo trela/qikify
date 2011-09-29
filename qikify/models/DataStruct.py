@@ -26,7 +26,6 @@ from ..helpers.general import *
 
 
 class DataStruct(np.ndarray):
-    
     def __new__(cls, input_array, names=None, desc=None, pfMat=None, gnd=None):
         obj       = np.asarray(input_array).view(cls)
         obj.names = names
@@ -51,19 +50,17 @@ class DataStruct(np.ndarray):
         
     # Save datasets to files.
     def writeCSV(self, filename):    
-        if hasattr(self, 'gnd') and self.gnd is not None:
-            dataset = hstack((self.data, self.pfMat, self.gnd.reshape(len(self.gnd),1)))
-            names   = hstack((self.names, self.names, 'gnd'))
-        else:
-            dataset = self.data
-            names   = self.names
-
-        fileh      = open(filename, 'w')
-        dataWriter = csv.writer(fileh)
-        dataWriter.writerow(names)
-        for row in dataset:
-            dataWriter.writerow(row)
-        fileh.close()
+        #if hasattr(self, 'gnd') and self.gnd is not None:
+        #    dataset = hstack((self.data, self.pfMat, self.gnd.reshape(len(self.gnd),1)))
+        #    names   = hstack((self.names, self.names, 'gnd'))
+        #else:
+        #    dataset = self.data
+        #    names   = self.names            
+        with open(filename, 'w') as f:
+            csvWriter = csv.writer(f)
+            csvWriter.writerow(self.names)
+            for row in self.view():
+                csvWriter.writerow(row)
         print GREEN + 'Saved dataset to ' + filename + ' successfully.' + ENDCOLOR
 
     def nrow(self):
@@ -71,38 +68,3 @@ class DataStruct(np.ndarray):
 
     def ncol(self):
         return self.shape[1]
-        
-        
-    '''
-    def subsetCols(self, cols, desc = None):
-        # Numpy won't hstack if data is un-reshaped column vector. So, we reshape if data is column vector.
-        # A hack, but not sure how to do this any better at the moment.
-        ## TODO: should be replaced with np.atleast_2d()!
-        data         = self.data[:,cols]
-        if size(data) == size(data,0):
-            data = array([self.data[:,cols]]).T
-            
-        description = self.desc if desc is None else desc
-        pfMat       = self.pfMat[:,cols] if (hasattr(self, 'pfMat') and self.pfMat is not None) else None
-        gnd         = self.gnd if (hasattr(self, 'gnd') and self.gnd is not None) else None
-        return DataStruct(self.names[cols], data, description, pfMat, gnd)
-
-    def subsetRows(self, rows):
-        description = self.desc
-        pfMat         = self.pfMat[rows,:] if (hasattr(self, 'pfMat') and self.pfMat is not None) else None
-        gnd         = self.gnd[rows] if (hasattr(self, 'gnd') and self.gnd is not None) else None
-        return DataStruct(self.names, self.data[rows,:], self.desc, pfMat, gnd)
-
-    # Joins the base datastruct with a secondary datastruct (by column)
-    def join(self, Secondary, desc = None):
-        return DataStruct(names = hstack((self.names, Secondary.names)),
-                          data  = hstack((self.data,  Secondary.data)),
-                          desc  = desc)
-
-    def joinRows(self, Secondary, desc = None):
-        return DataStruct(names = self.names,
-                          data  = vstack((self.data, Secondary.data)),
-                          desc  = self.desc)
-    '''
-    
-
