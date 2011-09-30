@@ -2,7 +2,7 @@
 # Qikify
       
   MVC framework for adaptive test and semiconductor data analysis
-  built on [node.js](http://nodejs.org), [scikits.learn](http://scikit-learn.sourceforge.net/), and
+  built on [scikits.learn](http://scikit-learn.sourceforge.net/), and
   [numpy](http://numpy.scipy.org/) using Python.
 
 ## Known issues
@@ -22,7 +22,7 @@
 
   Once the above are installed, install qikify with:
 
-     git clone git@github.com:natekupp/qikify.git
+     git clone https://github.com/natekupp/qikify.git
 	 cd qikify
 	 python setup.py install
 
