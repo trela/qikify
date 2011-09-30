@@ -18,12 +18,13 @@
   * python 2.7.1
   * numpy 1.5.1
   * scipy 0.9.0
-  * node.js 0.5.0-pre
   * scikits.learn 0.8
 
-  Once the above are installed, just clone this github repository with
+  Once the above are installed, install qikify with:
 
-     git clone git://github.com/natekupp/mvc-framework.git
+     git clone git@github.com:natekupp/qikify.git
+	 cd qikify
+	 python setup.py install
 
   to get started.
 
@@ -50,14 +51,14 @@ the dataset given the `specs` object.
 
 Next, we train an SVM model:
 
-	svm.train(trainingData['raw'].data, trainingData['raw'].gnd, gridSearch=True)
+	svm.train(trainingData.raw.data, trainingData.raw.gnd, gridSearch=True)
 	
 This just trains a support vector machine using the data from "raw" and the derived pass/fail column. Finally, we go
 to a test set and predict, reporting results:
 
 	 testData  = Dataset('/path/to/test/set').computePF(specs)
- 	 predicted = svm.predict(testData['raw'].data)
- 	 print svm.getTEYL(testData['raw'].gnd, predicted))
+ 	 predicted = svm.predict(testData.raw.data)
+ 	 print svm.getTEYL(testData.raw.gnd, predicted))
 
 And that's it! Putting it all together into a working script:
 
@@ -72,12 +73,12 @@ And that's it! Putting it all together into a working script:
 	 trainingData = Dataset('/path/to/training/set').computePF(specs)
 	 
 	 # Train SVM
-	 svm.train(trainingData['raw'].data, trainingData['raw'].gnd, gridSearch=True)
+	 svm.train(trainingData.raw.data, trainingData.raw.gnd, gridSearch=True)
 	 
 	 # Predict on test set
 	 testData  = Dataset('/path/to/test/set').computePF(specs)
-	 predicted = svm.predict(testData['raw'].data)
-	 print svm.getTEYL(testData['raw'].gnd, predicted))
+	 predicted = svm.predict(testData.raw.data)
+	 print svm.getTEYL(testData.raw.gnd, predicted))
 
 A more involved example can be found in `framework/example.py`. You can also contact me if you need further help or
 if you would like to contribute.
