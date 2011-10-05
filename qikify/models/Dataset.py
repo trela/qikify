@@ -23,18 +23,17 @@ THE SOFTWARE.
 
 import sys, os, csv
 import numpy as np
-from dotdict import dotdict
-from DataStruct import *
+from qikify.helpers.general import *
+from qikify.models.dotdict import dotdict
+from qikify.models.DataStruct import DataStruct
 
 class Dataset(dotdict): 
     def __init__(self, filename=None, hasHeader=True, dataset=None):
         if filename is not None:
             # Read dataset column names
             if ( hasHeader ):
-                fileh          = open(filename, 'rU')
-                dataReader     = csv.reader(fileh)
-                names          = np.array(dataReader.next())
-                fileh.close()
+                with open(filename, 'rU') as f:
+                    names = np.array(csv.reader(f).next())
             
             # Read numeric data
             rawData  = np.loadtxt(filename, delimiter=',', skiprows=1)
@@ -42,76 +41,7 @@ class Dataset(dotdict):
         
         if dataset is not None:
             self.raw = DataStruct(dataset.data, names=dataset.names, desc='Raw dataset.')
-        
-        
     
-    # Identify outliers in the specified dataset using boundaries with margins determined by
-    # the k_l and k_u constants.
-    def identifyOutliers(self, specs, ind, dataset, k_l = 3, k_u = 3):
-        self.computePF(specs, ind, dataset, outlierFilter = True, k_l = k_l, k_u = k_u)
-
-    
-    # Multipurpose compute pass/fail function. If outlierFilter is False, this function takes
-    # the specification performance data, compares each column to spec lsl/usl, and saves
-    # pass/fail information for individial specs (pfMat) and the global pass/fail (gnd).
-    def computePF(self, specs, ind = None, dataset = 'raw', outlierFilter = False, k_l = None, k_u = None):
-        if dataset not in self.keys():
-            raise KeyError('Not a valid dataset.')
-
-        pfData = self[dataset]
-        n, p   = size(pfData.data,0), size(pfData.data,1)
-        pfMat  = ones((n,p))
-        mu        = mean(pfData.data,0) if p > 1 else mean(pfData.data,0)[0]
-        
-        # Iterate over columns in pfData
-        for j in xrange(p):
-            # Logical column indices permit skipping some columns
-            if type(ind) is dict and ~(ind[dataset][j]):
-                continue
-            else:
-                lsl, usl = specs[pfData.names[j]] if p > 1 else specs[pfData.names]
-                if outlierFilter:
-                    lsl = mu[j] - k_l * abs(mu[j] - lsl) if not isnan(lsl) else nan
-                    usl = mu[j] + k_u * abs(mu[j] - usl) if not isnan(usl) else nan
-                pfMat[:,j]  = specs.compareToSpecs(pfData.data[:,j], lsl, usl)
-
-        # If we are filtering outliers, return a logical index describing outlier observations.
-        # Otherwise, we are computing pass/fail and want to save pfMat and gnd.
-        if outlierFilter:
-            self.indOutliers = (sum(pfMat, 1) == p)
-        else:
-            self[dataset].pfMat = pfMat
-            self[dataset].gnd   = bool2symmetric(sum(pfMat, 1) == p)
-        return self
-
-    
-    # Subset the columns of the datasets identified in the ind dictionary.
-    # Argument:
-    #    ind = {'datasetName': columnIndices }
-    def subsetCols(self, ind, desc = None):
-        for dataset in ind.keys():
-            if dataset not in self.keys():
-                raise KeyError(dataset + ' is not a valid dataset.')
-            self[dataset] = self[dataset].subsetCols(ind[dataset], desc = desc)
-        return self
-        
-    # Subset the rows of the datasets identified in the ind dictionary.
-    # Argument:
-    #    ind = {'datasetName': rowIndices }
-    def subsetRows(self, ind):
-        for dataset in ind.keys():
-            if dataset not in self.keys():
-                raise KeyError(dataset + ' is not a valid dataset.')
-            self[dataset] = self[dataset].subsetRows(ind[dataset])
-        return self
-        
-    # Join datasets
-    def joinRows(self, Secondary):
-        newData = self
-        for dataset in newData.keys():
-            newData[dataset] = newData[dataset].joinRows(Secondary[dataset])
-        return newData
-
     # Print a summary of the dataset.
     def __str__(self):    
         output = RED + \
@@ -121,7 +51,22 @@ class Dataset(dotdict):
         for dataset in self.values():
             output += dataset.__str__() + '\n'
         return output
+        
+''' 
+    # Subset the columns of the datasets identified in the ind dictionary.
+    # Argument: ind = {'datasetName': columnIndices }
+    def subsetCols(self, ind, desc = None):
+        for dataset,idx in ind.iteritems():
+            self[dataset] = self[dataset][:,idx]
+            if self.names:
+                self.names = self.names[idx]
+        return self
 
-
-
-
+    # Subset the rows of the datasets identified in the ind dictionary.
+    # Argument: ind = {'datasetName': rowIndices }
+    def subsetRows(self, ind):
+        for dataset,idx in ind.iteritems():
+            self[dataset] = self[dataset][idx,:]
+        return self
+        
+'''

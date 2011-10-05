@@ -23,10 +23,8 @@ THE SOFTWARE.
 
 import matplotlib.pyplot as plt
 from numpy import *
-from scipy.sparse import lil_matrix
-from scipy.sparse import coo_matrix
-
-from helpers.general import *
+from scipy.sparse import lil_matrix, coo_matrix
+from qikify.helpers.general import *
 
 # Laplacian score feature selection
 class LSFS:
@@ -39,14 +37,14 @@ class LSFS:
     #              sigma_2
     #
     def run(self, X, gnd):
-        if not (size(X,0) == len(gnd)): raise Exception( "Data and gnd do not have matching sizes" )
+        if not (size(X,0) == len(gnd)): raise Exception( "Data and gnd do not have matching sizes" )        
+        _, X = scale(X)
+        self.constructW(X, gnd, t = size(X,1), bLDA = False)
         
-        self.constructW(scale(X), gnd, t = size(X,1), bLDA = False)
-        
-        nSmp    = size(X,0)
-        D         = sum(self.W,1)
-        z         = dot(D,X) * dot(D,X) / sum(diag(D))
-        D         = coo_matrix((D,(range(nSmp),range(nSmp))), shape=(nSmp,nSmp))
+        nSmp       = size(X,0)
+        D          = sum(self.W,1)
+        z          = dot(D,X) * dot(D,X) / sum(diag(D))
+        D          = coo_matrix((D,(range(nSmp),range(nSmp))), shape=(nSmp,nSmp))
         DPrime     = array(sum(multiply(dot(X.T,D.todense()).T, X),0) - z)[0]
         LPrime     = array(sum(multiply(dot(X.T,self.W).T, X).T, 1) - z)
         DPrime[DPrime < 1e-12] = 10000
@@ -57,18 +55,16 @@ class LSFS:
         
         # Clean up to save memory
         del self.W
-        
         return self
         
-    def subset(self, thresh):    
-        self.Subset    = self.Scores < thresh
-        self.nRetained = sum(self.Subset)
+    def threshold(self, T_L):    
+        self.subset    = self.Scores < T_L
+        self.nRetained = sum(self.subset)
         print 'LSFS: retained', GREEN+str(self.nRetained)+ENDCOLOR, 'parameters.'
-        return self.Subset
-
+        return self.subset
 
     # Construct the W matrix used in LSFS
-    def constructW(self, fea, gnd, k = 0, t = 1, bLDA = 0, bSelfConnected = 1):
+    def constructW(self, X, gnd, k = 0, t = 1, bLDA = 0, bSelfConnected = 1):
         label      = unique(gnd)
         nSamples = len(gnd)
         G          = zeros((nSamples,nSamples))
@@ -80,7 +76,7 @@ class LSFS:
         else:
             for i in xrange(len(label)):
                 ind = nonzero(gnd==label[i])[0]
-                D = self.euDist(fea[ind,:], bSqrt = False)
+                D = self.euDist(X[ind,:], bSqrt = False)
                 D = exp(-D/t)
                 self.setSubMat(G, D, ind)
             if not bSelfConnected:

@@ -22,50 +22,50 @@ THE SOFTWARE.
 '''
 
 import sys, os, csv
-from numpy import *
-from ..helpers.general import *
+import numpy as np
+from qikify.helpers.general import *
 
 class Specs:    
     # Read in specs from `filename` and create {specname: [lsl,usl]} dictionary.
     def __init__(self, filename = None, names = [], specs = {}):
-        self.names = names
-        self.specs = specs
-            
+        self.names, self.specs = names, specs
         if filename is not None:
-            fileh           = open(filename, 'rU')
-            specReader     = csv.reader(fileh)
-            self.names     = specReader.next()
-            LSL           = specReader.next()
-            USL           = specReader.next()
-            
-            for i, limit in enumerate(zip(LSL, USL)):
-                # Use this lambda function because float() fails on empty/non-existent spec limit.
-                lsl, usl = map(lambda x: float(x) if x else float('nan'), limit)
-                self.specs[self.names[i]] = array([lsl, usl])
-            fileh.close()
-
+            with open(filename, 'rU') as f:
+                reader     = csv.reader(f)
+                self.names = reader.next()
+                LSL        = reader.next()
+                USL        = reader.next()
+                for i, limit in enumerate(zip(LSL, USL)):
+                    # Use this lambda function because float() fails on empty/non-existent spec limit.
+                    lsl, usl = [float(x) if x else float('nan') for x in limit]
+                    self.specs[self.names[i]] = np.array([lsl, usl])
 
     # Compare data to lsl, usl and return +1/-1 label vector
-    def compareToSpecs(self, data, lsl, usl):
-        result = ones(size(data))
-        if isfinite(lsl):
-            result = logical_and(result, data >= lsl)
-        if isfinite(usl):
-            result = logical_and(result, data <= usl)
+    def compare(self, data, lsl, usl):
+        result = np.ones(data.shape)
+        if np.isfinite(lsl): result = np.logical_and(result, data >= lsl)
+        if np.isfinite(usl): result = np.logical_and(result, data <= usl)
         return bool2symmetric(result)
 
     def __getitem__(self, key):
         return self.specs[key]
     
-    
+    # Print a summary of the dataset.
+    def __str__(self):
+        output = ''
+        for name in self.names:
+           output += RED + '%27s' % name + ENDCOLOR +  ': \t'
+           output += ' <> '.join([str(x) for x in self.specs[name].tolist() if not np.isnan(x)]) + '\n'
+        return output
+
     # =============== Partitioned Sampling Methods =============== 
     # Takes specification boundary and generates two boundaries to define 'critical' device region.
     def genCriticalRegion(self, k_i, k_o):
         self.inner, self.outer = {}, {}
         for name in self.specs.keys():
-            lsl, usl = self.specs[name]
-            mu         = mean([lsl, usl])
-            self.inner[name] = array([mu - k_i * abs(mu-lsl), mu + k_i * abs(mu-usl)])
-            self.outer[name] = array([mu - k_o * abs(mu-lsl), mu + k_o * abs(mu-usl)])
+            lsl, usl   = self.specs[name]
+            mu         = np.mean([lsl, usl])
+            self.inner[name] = np.array([mu - k_i * abs(mu-lsl), mu + k_i * abs(mu-usl)])
+            self.outer[name] = np.array([mu - k_o * abs(mu-lsl), mu + k_o * abs(mu-usl)])
         return self
 

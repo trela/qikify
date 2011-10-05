@@ -21,9 +21,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 '''
 
-import csv
 import numpy as np
-import scipy
+import scipy, csv
+from qikify.models.dotdict import dotdict
 
 # Colors for printing to terminal
 HEADER   = '\033[95m'
@@ -34,19 +34,19 @@ RED      = '\033[91m'
 ENDCOLOR = '\033[0m'
 
 def outputPassFail(gnd):
-    return 'Pass: '  + GREEN + str(sum(gnd ==  1)) + ENDCOLOR + ' Fail: ' + RED + str(sum(gnd == -1)) + ENDCOLOR
+    return 'Pass: '+GREEN+str(np.sum(gnd==1))+ENDCOLOR + ' Fail: '+RED+str(np.sum(gnd==-1))+ENDCOLOR
 
 def bool2symmetric(data):
     """
     Changes True/False data to +1/-1 symmetric.
     """
-    return np.array((data - 0.5) * 2.0, dtype = int)
+    return np.array((data-0.5)*2.0,dtype = int)
 
 def csvWriteMatrix(filename, mat):
     """
     Write mat to filename as a csv.
     """
-    out  = csv.writer(open(filename, 'wb'))
+    out = csv.writer(open(filename, 'wb'))
     for row in np.atleast_2d(mat):
         out.writerow(row)        
 

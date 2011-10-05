@@ -49,5 +49,3 @@ class SVM:
         te = sum(logical_and((gnd < 0), (predicted > 0))) * 100.0 / len(gnd)
         yl = sum(logical_and((gnd > 0), (predicted < 0))) * 100.0 / len(gnd)
         return [te, yl]
-
-

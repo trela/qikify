@@ -22,7 +22,7 @@ THE SOFTWARE.
 '''
 
 import sys, os, random
-from numpy import *
+import numpy as np
 from scipy.special import gamma
 
 from helpers.general import *
@@ -36,10 +36,9 @@ class KDE:
     # any of the class-membership based KDE arguments are set, it will be run instead of 
     # standard KDE.
     def run(self, dataset, specs = None, nSamples = 0, counts = None, a = 0, bounds = None):
-        self.n             = size(dataset.data,0)
-        self.d             = size(dataset.data,1)
-        self.specs   = specs
-        self.names   = dataset.names
+        self.n, self.d = dataset.shape
+        self.specs     = specs
+        self.names     = dataset.names
 
         # Select bandwidth for Epanechnikov kernel (Rule of Thumb, see Silverman, p.86)
         self.b       = 0.8                     # Default bandwidth scaling factor
@@ -48,9 +47,9 @@ class KDE:
         self.setBandwithFactors(a)
         
         # Normalize data/bounds
-        self.scaleFactors       = dotdict({'mean': dataset.data.mean(axis = 0), 'std': dataset.data.std(axis = 0)})
-        self.datan              = scale(dataset.data, self.scaleFactors)
-        self.bounds             = scale(array([dataset.data.min(axis=0), dataset.data.max(axis=0)]), self.scaleFactors)
+        self.scaleFactors       = dotdict({'mean': dataset.mean(axis = 0), 'std': dataset.std(axis = 0)})
+        self.datan              = scale(dataset, self.scaleFactors)
+        self.bounds             = scale(array([dataset.min(axis=0), dataset.max(axis=0)]), self.scaleFactors)
         if bounds is not None:
             self.bounds         = scale(bounds, self.scaleFactors)
 
@@ -100,7 +99,7 @@ class KDE:
                 print 'Ng:%i/%i Nc:%i/%i Nf:%i/%i' % (ng,counts.nGood,nc,counts.nCritical,nf,counts.nFail)
                 thresh += 0.02
         print 'Synthetic data generation complete.'
-        return DataStruct(names = self.names, data = vstack((Sc,Sg,Sf)))
+        return DataStruct(vstack((Sc,Sg,Sf)), names=self.names)
 
 
     # Generate a single device sample, use algorithm in Silverman, p. 143
