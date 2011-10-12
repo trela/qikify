@@ -22,7 +22,7 @@ THE SOFTWARE.
 '''
 import csv
 import numpy as np
-from qikify.helpers.general import *
+from qikify.helpers import *
 from scipy import r_
 
 class DataStruct(np.ndarray):
@@ -84,37 +84,18 @@ class DataStruct(np.ndarray):
         out.indOutliers = getattr(self, 'indOutliers', None)
         return out
 
-    # Identify outliers using boundaries with margins determined by k_l / k_u.
-    def identifyOutliers(self, specs, ind, k_l = 3, k_u = 3):
-        self.computePassFail(specs, ind, outlierFilter=True, k_l=k_l, k_u=k_u)
-        return self.indOutliers
-        
     # Multipurpose compute pass/fail function. If outlierFilter is False, this function takes
     # the specification performance data, compares each column to spec lsl/usl, and saves
     # pass/fail information for individial specs (pfMat) and the global pass/fail (gnd).
-    def computePassFail(self, specs, ind = None, outlierFilter = False, k_l = None, k_u = None):
-        pfMat = np.ones(self.shape)
-        mu    = np.mean(self,0) if self.ncol > 1 else np.mean(self,0)
-     
-        # Iterate over columns in pfData     
+    def computePassFail(self, specs, ind=None):
+        self.pfMat = np.ones(self.shape,dtype=bool)
         for j in xrange(self.ncol):
-            # Logical column indices permit skipping some columns
-            if type(ind) is dict and ~(ind[dataset][j]):
+            if ind is not None and ~ind[j]:
                 continue
             else:
-                lsl, usl = specs[self.names[j]] if self.ncol > 1 else specs[self.names]
-                if outlierFilter:
-                    lsl = mu[j] - k_l * abs(mu[j] - lsl) if not np.isnan(lsl) else np.nan
-                    usl = mu[j] + k_u * abs(mu[j] - usl) if not np.isnan(usl) else np.nan
-                pfMat[:,j]  = specs.compare(self[:,j], lsl, usl)
-
-        # If we are filtering outliers, return a logical index describing outlier observations.
-        # Otherwise, we are computing pass/fail and want to save pfMat and gnd.
-        if outlierFilter:
-            self.indOutliers = (np.sum(pfMat, 1) == self.ncol)
-        else:
-            self.pfMat = pfMat
-            self.gnd   = bool2symmetric(np.sum(pfMat, 1) == self.ncol)
+                lsl, usl        = specs[self.names[j]] if self.ncol > 1 else specs[self.names]
+                self.pfMat[:,j] = specs.compare(self[:,j], lsl, usl)
+        self.gnd = np.logical_and.reduce(self.pfMat, 1)
         return self
 
     

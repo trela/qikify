@@ -25,8 +25,7 @@ from scikits.learn.grid_search import GridSearchCV
 from scikits.learn.metrics import classification_report
 from scikits.learn.metrics import confusion_matrix
 from scikits.learn.svm import SVC
-
-from helpers.general import *
+from helpers import *
 
 class SVM:
     def train(self, X, gnd, gridSearch = False):

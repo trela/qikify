@@ -24,7 +24,7 @@ THE SOFTWARE.
 import matplotlib.pyplot as plt
 from numpy import *
 from scipy.sparse import lil_matrix, coo_matrix
-from qikify.helpers.general import *
+from qikify.helpers import *
 
 # Laplacian score feature selection
 class LSFS:
@@ -105,12 +105,12 @@ class LSFS:
 
     # Set a submatrix to values in D. That is:
     #          [0, 0, 0]
-    #    X = [0, 0, 0]  D = [1 2] ind = [0 1]
+    #      X = [0, 0, 0]   D = [1 2] ind = [0 1]
     #          [0, 0, 0]       [1 2]
     # Gives:
     #
     #          [1, 2, 0]
-    #    X = [1, 2, 0]
+    #      X = [1, 2, 0]
     #          [0, 0, 0]
     def setSubMat(self, X, D, ind):
         for i, row in enumerate(ind):

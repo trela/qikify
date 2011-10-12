@@ -147,9 +147,7 @@ class OLS:
         ll, aic, bic = self.ll()
         JB, JBpv, skew, kurtosis = self.JB()
         omni, omnipv = self.omni()
-        
-        
-        
+
         output = GREEN + \
                '==============================================================================\n'                           + \
                'OLS Fit                                                                       \n'                           + \
@@ -171,9 +169,3 @@ class OLS:
             output += '% -5s          % -5.6f     % -5.6f     % -5.6f     % -5.6f\n' % (self.x_varnm[i],self.b[i+1],self.se[i+1],self.t[i+1],self.p[i+1]) 
         return output
         
-
-if __name__ == '__main__':
-    pass
-    
-    ## TODO: write new tests which support DataStruct class inputs
-    

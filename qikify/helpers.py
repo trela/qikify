@@ -28,13 +28,13 @@ from qikify.models.dotdict import dotdict
 # Colors for printing to terminal
 HEADER   = '\033[95m'
 BLUE     = '\033[94m'
-GREEN    = '\033[92m'
+GREEN    = '\033[0;32m'
 WARNING  = '\033[93m'
 RED      = '\033[91m'
 ENDCOLOR = '\033[0m'
 
 def outputPassFail(gnd):
-    return 'Pass: '+GREEN+str(np.sum(gnd==1))+ENDCOLOR + ' Fail: '+RED+str(np.sum(gnd==-1))+ENDCOLOR
+    return 'Pass: '+GREEN+str(np.sum(gnd==1))+ENDCOLOR + ' Fail: '+RED+str(np.sum(gnd==0))+ENDCOLOR
 
 def bool2symmetric(data):
     """
@@ -49,7 +49,6 @@ def csvWriteMatrix(filename, mat):
     out = csv.writer(open(filename, 'wb'))
     for row in np.atleast_2d(mat):
         out.writerow(row)        
-
 
 def scale(data, scaleDict = None, reverse = False):
     """

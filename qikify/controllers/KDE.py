@@ -25,7 +25,7 @@ import sys, os, random
 import numpy as np
 from scipy.special import gamma
 
-from helpers.general import *
+from helpers import *
 from models.Specs import Specs
 from models.DataStruct import DataStruct
 

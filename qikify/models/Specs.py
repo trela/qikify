@@ -23,7 +23,7 @@ THE SOFTWARE.
 
 import sys, os, csv
 import numpy as np
-from qikify.helpers.general import *
+from qikify.helpers import *
 
 class Specs:    
     # Read in specs from `filename` and create {specname: [lsl,usl]} dictionary.
@@ -42,10 +42,10 @@ class Specs:
 
     # Compare data to lsl, usl and return +1/-1 label vector
     def compare(self, data, lsl, usl):
-        result = np.ones(data.shape)
+        result = np.ones(data.shape,dtype=bool)
         if np.isfinite(lsl): result = np.logical_and(result, data >= lsl)
         if np.isfinite(usl): result = np.logical_and(result, data <= usl)
-        return bool2symmetric(result)
+        return result
 
     def __getitem__(self, key):
         return self.specs[key]
