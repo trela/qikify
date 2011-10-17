@@ -38,7 +38,7 @@ class KDE:
     def run(self, dataset, specs = None, nSamples = 0, counts = None, a = 0, bounds = None):
         self.n, self.d = dataset.shape
         self.specs     = specs
-        self.names     = dataset.names
+        self.names     = getattr(dataset, 'names', None)
 
         # Select bandwidth for Epanechnikov kernel (Rule of Thumb, see Silverman, p.86)
         self.b       = 0.8                     # Default bandwidth scaling factor
@@ -75,7 +75,7 @@ class KDE:
     # Default method of generating device samples
     def genSamples(self, nSamples):
         Sn = vstack([ self.genSample() for _ in xrange(nSamples) ])
-        return DataStruct(names = self.names, data = scale(Sn, self.scaleFactors, reverse = True))
+        return DataStruct(scale(Sn, self.scaleFactors, reverse = True), names = self.names)
       
     # Generates Ngc critical devices, Ng good devices, Nf failing devices.
     def genPartitionedSamples(self, counts):

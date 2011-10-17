@@ -21,6 +21,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 '''
 
+import numpy as np
+
 from scikits.learn.grid_search import GridSearchCV
 from scikits.learn.metrics import classification_report
 from scikits.learn.metrics import confusion_matrix
@@ -45,6 +47,6 @@ class SVM:
         return self.clf.predict(scale(X, self.scaleDict))
 
     def getTEYL(self, gnd, predicted):
-        te = sum(logical_and((gnd < 0), (predicted > 0))) * 100.0 / len(gnd)
-        yl = sum(logical_and((gnd > 0), (predicted < 0))) * 100.0 / len(gnd)
+        te = sum(np.logical_and((gnd < 0), (predicted > 0))) * 100.0 / len(gnd)
+        yl = sum(np.logical_and((gnd > 0), (predicted < 0))) * 100.0 / len(gnd)
         return [te, yl]

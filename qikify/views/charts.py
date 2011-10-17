@@ -107,7 +107,7 @@ class QFPlot:
             plt.savefig(filename, dpi = 150, format='pdf')
 
 
-    def pair(self, data, labels=None):
+    def pairs(self, data, labels=None):
         """
         Generates something similar to R pairs()
         """
@@ -115,7 +115,7 @@ class QFPlot:
         if labels is None:
             labels = ['var%d'%i for i in range(nVariables)]
         fig = plt.figure()
-        for i in min(5, range(nVariables)):
+        for i in range(nVariables):
             for j in range(nVariables):
                 ax = fig.add_subplot(nVariables, nVariables, i * nVariables + j + 1)
                 if i == j:
@@ -156,3 +156,17 @@ class QFPlot:
             plt.savefig(filename, dpi = 150, format='pdf')
         pylab.close()
 
+
+    def laplacianScores(self, filename, Scores, Ranking):
+        plt.plot(Scores[Ranking], 'k-')
+        plt.grid(True)
+        plt.xlabel('Features Retained')
+        plt.ylabel('Laplacian Score')
+        if filename==None:
+            plt.show()
+        else:
+            plt.savefig(filename, dpi = 150, format='pdf')
+        plt.close()
+        return self
+        
+        

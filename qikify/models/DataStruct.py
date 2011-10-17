@@ -87,14 +87,11 @@ class DataStruct(np.ndarray):
     # Multipurpose compute pass/fail function. If outlierFilter is False, this function takes
     # the specification performance data, compares each column to spec lsl/usl, and saves
     # pass/fail information for individial specs (pfMat) and the global pass/fail (gnd).
-    def computePassFail(self, specs, ind=None):
+    def computePassFail(self, specs):
         self.pfMat = np.ones(self.shape,dtype=bool)
         for j in xrange(self.ncol):
-            if ind is not None and ~ind[j]:
-                continue
-            else:
-                lsl, usl        = specs[self.names[j]] if self.ncol > 1 else specs[self.names]
-                self.pfMat[:,j] = specs.compare(self[:,j], lsl, usl)
+            lsl, usl        = specs[self.names[j]] if self.ncol > 1 else specs[self.names]
+            self.pfMat[:,j] = specs.compare(self[:,j], lsl, usl)
         self.gnd = np.logical_and.reduce(self.pfMat, 1)
         return self
 
