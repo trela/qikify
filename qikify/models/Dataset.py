@@ -25,13 +25,10 @@ import sys, os, csv, gzip, pandas
 import numpy as np
 from qikify.helpers import *
 from qikify.models.dotdict import dotdict
-#from qikify.models.DataFrame import DataFrame
 
 class Dataset(dotdict): 
-    '''
-    This class is the fundamental data structure of the Qikify framework.
-    
-    '''
+    """This class is the fundamental data structure of the Qikify framework.
+    """
     def __init__(self, filename=None, dataset=None):
         if filename is not None:
             filetype = filename.split('.')[-1]
@@ -45,7 +42,7 @@ class Dataset(dotdict):
 
                 self.raw.desc = 'Raw data from input file.'
 
-            # TODO: There's probably a better way to do this.
+            # TODO: There's probably a better way to do this. Want to elegantly handle gzipped data.
             # if filetype == 'gz':
             #     with gzip.open(filename, 'rb') as f:
             #         raw = f.read().split('\n')
@@ -56,8 +53,8 @@ class Dataset(dotdict):
         if dataset is not None:
             self.raw = dataset
     
-    # Print a summary of the dataset.
     def __str__(self):    
+        """Print a summary of the dataset."""
         output = GREEN + \
                '===============================================\n' + \
                'Dataset                         #Rows #Cols    \n' + \

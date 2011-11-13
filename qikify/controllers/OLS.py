@@ -9,16 +9,15 @@ class OLS(object):
     """
 
     def __init__(self):
-        """
-        Initializing the ols class. 
+        """Initializing the OLS class. 
         """
         pass
         
     def train(self,X,y,useQR = True, addConstant = True):    
-        '''
-        Solve y = Xb.
+        '''Solve y = Xb.
         
-        Parameters:
+        Parameters
+        ----------
         x : array, shape (M, N)
         y : array, shape (M,)
         useQR : boolean
@@ -68,8 +67,7 @@ class OLS(object):
 
 
     def dw(self):
-        """
-        Calculates the Durbin-Waston statistic
+        """Calculates the Durbin-Waston statistic
         """
         de = diff(self.e,1)
         dw = dot(de,de) / dot(self.e,self.e)
@@ -77,14 +75,12 @@ class OLS(object):
         return dw
 
     def omni(self):
-        """
-        Omnibus test for normality
+        """Omnibus test for normality
         """
         return stats.normaltest(self.e) 
     
     def JB(self):
-        """
-        Calculate residual skewness, kurtosis, and do the JB test for normality
+        """Calculate residual skewness, kurtosis, and do the JB test for normality
         """
 
         # Calculate residual skewness and kurtosis
@@ -98,17 +94,13 @@ class OLS(object):
         return JB, JBpv, skew, kurtosis
 
     def ll(self):
+        """Calculate model log-likelihood and two information criteria
         """
-        Calculate model log-likelihood and two information criteria
-        """
-        
         # Model log-likelihood, AIC, and BIC criterion values 
         ll = -(self.nobs*1/2)*(1+log(2*pi)) - (self.nobs/2)*log(dot(self.e,self.e)/self.nobs)
         aic = -2*ll/self.nobs + (2*self.ncoef/self.nobs)
         bic = -2*ll/self.nobs + (self.ncoef*log(self.nobs))/self.nobs
-
         return ll, aic, bic
-    
     
     def __str__(self):
         # extra stats

@@ -22,17 +22,16 @@ THE SOFTWARE.
 '''
 
 import numpy as np
-
-from ..helpers.general import *
-
-###############################################################################
-# Feature Selection
+from qikify.helpers import *
 
 class QFFS(object):
+    """Feature selection library. Doesn't do much yet; right now only implements
+    correlation coefficient-based feature selection.
+    """
     def __init__(self):
-        self.qfsh = statHelpers()
+        self.qfsh = stats()
         
-    def run(self, X, y, n_features=10, intercept=True, method='univariate'):
+    def run(self, X, y, n_features=10, intercept=True, method='corrcoef'):
         """Do feature selection on the basis of correlation coefficients.
         
         Parameters
@@ -62,19 +61,19 @@ class QFFS(object):
         We typically exclude the first column since it is the intercept
         all-constant column.
         """
-        if method=='univariate':
+        if method=='corrcoef':
             if intercept:
                 cc, cs = self.qfsh.computeCorrCoefs(X[:,1:],y)
                 return np.concatenate(([0],cs[0:n_features] + 1))
             else:
                 cc, cs = self.qfsh.computeCorrCoefs(X,y)
                 return cs[0:n_features]
-              
+        else:
+            raise 'Method Error: specified feature selection method does not exist.'
            
 
     def computeCorrCoefs(self, X,y):
-        '''
-        Returns the correlation coefficients between X and y, 
+        '''Returns the correlation coefficients between X and y, 
         along with the arg-sorted indices of ranked most-correlated X-to-y vars.
         '''
         if is1D(X):

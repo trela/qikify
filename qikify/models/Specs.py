@@ -45,7 +45,6 @@ class Specs(object):
         self.specs.ix[0,np.isnan(self.specs.ix[0,:])] = -np.inf  # lower spec limits
         self.specs.ix[1,np.isnan(self.specs.ix[1,:])] = np.inf   # upper spec limits
         
-    
     def __getitem__(self, key):
         return self.specs[key]
     
@@ -57,7 +56,6 @@ class Specs(object):
            output += RED + '%27s' % name + ENDCOLOR +  ': \t'
            output += ' <> '.join([str(x) for x in self.specs[name].tolist() if not np.isnan(x)]) + '\n'
         return output
-
 
     def genCriticalRegion(self, k_i, k_o):
         """Takes specification boundary and generates two boundaries to define 'critical' device 
@@ -75,9 +73,7 @@ class Specs(object):
             self.inner[name] = np.array([mu - k_i * abs(mu-lsl), mu + k_i * abs(mu-usl)])
             self.outer[name] = np.array([mu - k_o * abs(mu-lsl), mu + k_o * abs(mu-usl)])
         return self
-
     
-        
     def computePassFail(self, data):
         """Compare a pandas Series or DataFrame structure to specification limits defined by
         this spec class instance.

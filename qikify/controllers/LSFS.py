@@ -27,17 +27,18 @@ import pandas
 
 # Laplacian score feature selection
 class LSFS(object):
-    # Run LSFS. Arguments are `dataset`, a DataStruct object, and gnd, a pass/fail vector of the same size.
-    # Based on definition from paper:
-    #
-    # \sum_{ij} (f_r^i - f_r^j) * S_{ij}
-    # ----------------------------------
-    #              sigma_2
-    #
     def run(self, Xin, gnd):
-        # Now, with newfangled (albeit hacky) support for pandas DataFrames!
-        # TODO: Eventually, it'd be nice to maintain col names w/ Xin so we
-        #       can add plot method to plot scores vs. column names.
+        """Run LSFS. Arguments are `dataset`, a DataStruct object, and gnd, a 
+        pass/fail vector of the same size. Based on definition from paper:
+        
+         \sum_{ij} (f_r^i - f_r^j) * S_{ij}
+         ----------------------------------
+                      sigma_2
+        
+        Now, with newfangled (albeit hacky) support for pandas DataFrames!
+        TODO: Eventually, it'd be nice to maintain col names w/ Xin so we
+        can add plot method to plot scores vs. column names.
+        """
         if isinstance(Xin, pandas.DataFrame):
             X = Xin.as_matrix()
         else:
@@ -49,7 +50,11 @@ class LSFS(object):
         
         _, X = scale(X)
         
-        S          = self.constructS(X, gnd, t=size(X,1))            # Per LSFS paper, S_ij = exp(-||x_i - x_j||^2 / t)
+        # Per LSFS paper, S_ij = exp(-||x_i - x_j||^2 / t). I've found that
+        # t = ncol(X) to be a suitable choice; anything on that order should 
+        # work just fine.
+        S          = self.constructS(X, gnd, t=X.shape[1]) 
+                   
         D          = sum(S,1)
         z          = dot(D,X) * dot(D,X) / sum(diag(D))        
         LPrime     = sum((dot(X.T,S).T * X).T,1) - z
@@ -60,13 +65,13 @@ class LSFS(object):
         
         # Compute and retain Laplacian scores and rankings
         self.Scores    = (LPrime/DPrime).T
-        self.Ranking   = argsort(self.Scores)
+        self.Ranking   = argsort(-self.Scores)
         
         del S  # Clean up to save memory
         return self
         
     def threshold(self, T_L):
-        self.subset    = self.Scores < T_L
+        self.subset    = self.Scores > T_L
         self.nRetained = int(sum(self.subset))
         print 'LSFS: retained', GREEN+str(self.nRetained)+ENDCOLOR, 'parameters.'
         return self.subset
@@ -85,27 +90,28 @@ class LSFS(object):
                 ind = nonzero(gnd==label[i])[0]
                 D   = squareform(pdist(X[ind,:], 'sqeuclidean'))  # D_ij = ||x_i - x_j||^2
                 S   = exp(-D/t)                                   # Per LSFS paper, exp(-||x_i - x_j||^2 / t)
-                self.setSubMat(G, S, ind)                         
+                self._setSubMat(G, S, ind)                         
             if not bSelfConnected:
                 G = zeroMatrixDiagonal(G)
-            return self.genMaxMatrix(G)
+            return self._genMaxMatrix(G)
         print 'LSFS: Construction of W matrix complete.'
-        
-    # Set a submatrix to values in D. That is:
-    #          [0, 0, 0]
-    #      X = [0, 0, 0]   D = [1 2] ind = [0 1]
-    #          [0, 0, 0]       [1 2]
-    # Gives:
-    #
-    #          [1, 2, 0]
-    #      X = [1, 2, 0]
-    #          [0, 0, 0]
-    def setSubMat(self, X, D, ind):
+
+    def _setSubMat(self, X, D, ind):
+        """Set a submatrix of X defined by the index ind to values in D. 
+        That is:
+                 [0, 0, 0]
+             X = [0, 0, 0]   D = [1 2] ind = [0 1]
+                 [0, 0, 0]       [3 4]
+        Gives:
+                 [1, 2, 0]
+             X = [3, 4, 0]
+                 [0, 0, 0]
+        """
         for i, row in enumerate(ind):
             X[row,ind] = D[i,:]
 
-    # Takes a square matrix A and computes max(A, A')
-    def genMaxMatrix(self, A):
+    def _genMaxMatrix(self, A):
+        """Takes a square matrix A and computes max(A, A')"""
         ind = (A.T - A) > 0
         A[ind] = A.T[ind]
         return A

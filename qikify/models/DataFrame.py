@@ -26,13 +26,17 @@ from qikify.helpers import *
 from scipy import r_
 
 class DataFrame(pandas.DataFrame):
+    """Not used, for now. Need to implement subclass ix() property method 
+    correctly before this is worth pursuing... right now, indexing a
+    qikify.DataFrame with ix will return a pandas.DataFrame instance.
+    """
     def __init__(self, pfMat=None, gnd=None, **kwargs):
         super(DataFrame, self).__init__(**kwargs)
         self.pfMat = pfMat
         self.gnd   = gnd
         
-    # Print out a summary of the dataset (rows, cols, pass/fail info if available.)
     def __str__(self):
+        """Print out a summary of the dataset (rows, cols, pass/fail info if available.)"""
         output = '%-30s  %5d  %5d' % (self.desc, self.shape[0], self.shape[1])
         if hasattr(self, 'gnd') and self.gnd is not None:
             output += '\n' + outputPassFail(self.gnd)
@@ -47,6 +51,5 @@ class DataFrame(pandas.DataFrame):
         return 1 if is1D(self) else self.shape[1]
     
     @property
-    def ix(self, **kwargs):
-        for arg in kwargs:
-            print arg
+    def ix(self):
+        pass
