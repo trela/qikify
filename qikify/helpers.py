@@ -50,19 +50,21 @@ def csvWriteMatrix(filename, mat):
     for row in np.atleast_2d(mat):
         out.writerow(row)        
 
-def scale(data, scaleDict = None, reverse = False):
+
+def scale(X, scaleDict = None, reverse = False):
     """
     Facilitates standardizing data by subtracting the mean and dividing by
     the standard deviation. Set reverse to True to perform the inverse 
     operation.
     """
     if reverse:
-        return (data * scaleDict.std) + scaleDict.mean
+        return (X * scaleDict.std) + scaleDict.mean
     elif scaleDict is None:
-        scaleDict = dotdict({'mean': data.mean(axis = 0), 'std': data.std( axis = 0)})
-        return scaleDict, (data - scaleDict.mean) / scaleDict.std
+        scaleDict = dotdict({'mean': X.mean(0).tolist(), 'std': X.std(0).tolist()})
+        return scaleDict, (X - scaleDict.mean) / scaleDict.std
     else:
-        return (data - scaleDict.mean) / scaleDict.std
+        return (X - scaleDict.mean) / scaleDict.std
+
 
 def zeroMatrixDiagonal(X):
     """
@@ -70,29 +72,27 @@ def zeroMatrixDiagonal(X):
     """
     return X - np.diag(np.diag(X))
 
-def _strictly_dominated(x,y):
-    strictly_dominated = False
-    if (x[0] > y[0]) and (x[1] > y[1]):
-        strictly_dominated = True
-    return strictly_dominated
 
 def getParetoFront(data):
     """
     Extracts the 2D Pareto-optimal front from a 2D numpy array
     """
-    dflags  = np.zeros(data.shape[0], dtype=bool)
+    dflags  = np.ones(data.shape[0], dtype=bool)
     for i in xrange(data.shape[0]):
         point = data[i,:]
-        pareto_optimal = True
         for j in xrange(data.shape[0]):
             if i == j:
                 continue
-            if _strictly_dominated(point, data[j,:]):
-                dflags[i] = True
-    return np.array(data[~dflags,:])
+            if np.all(point > data[j,:]):
+                dflags[i] = False
+    return np.array(data[dflags,:])
 
 
-class statHelpers:
+def is1D(data):
+    return data.shape[0] == np.size(data)
+
+
+class stats(object):
     def nmse(self, yhat, y, min_y=None, max_y=None):
         """
         @description
@@ -130,22 +130,12 @@ class statHelpers:
             return np.Inf
 
 
-    def computeCorrCoefs(self, X,y):
-        '''
-        Returns the correlation coefficients between X and y, 
-        along with the arg-sorted indices of ranked most-correlated X-to-y vars.
-        '''
-        cc = []
-        for i in xrange(X.shape[1]):
-            cc.append(np.corrcoef(X[:,i], y)[0,1])
-        return np.array(cc), np.argsort(-abs(np.array(cc)))
-
-    def computeR2(self, yp, y):
+    def computeR2(self, yhat, y):
         """
         Compute R-squared coefficient of determination.
         R2 = 1 - sum((model.predict(X_test) - y_test)**2) / sum((y_test - np.mean(y_test))**2)
         """
-        e    = y - yp              # residuals
+        e    = y - yhat              # residuals
         return 1 - e.var()/y.var() # model R-squared
 
 

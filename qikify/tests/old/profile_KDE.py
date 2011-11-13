@@ -38,12 +38,12 @@ import cProfile, pstats
 # Global parameters controlling the run
 K_INNER        = 5.5/6        # For KDE, defines critical region
 K_OUTER     = 6.5/6        # For KDE, defines critical region
-#KDE_COUNTS      = dotdict({'nGood': 1000, 'nCritical': 200, 'nFail': 200})
+KDE_COUNTS      = dotdict({'nGood': 1000, 'nCritical': 200, 'nFail': 200})
 
 # Controller class instances
-config           = ConfigParser(); config.read('settings.conf')
-specs         = Specs(config.get('Settings', 'specFile')).genCriticalRegion(K_INNER, K_OUTER)
-kde           = KDE.KDE()
+config = ConfigParser(); config.read('settings.conf')
+specs  = Specs(config.get('Settings', 'specFile')).genCriticalRegion(K_INNER, K_OUTER)
+kde    = KDE.KDE()
 
 # Run LSFS for a series of threshold values to determine best threshold.
 if __name__ == "__main__":

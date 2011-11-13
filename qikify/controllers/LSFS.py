@@ -23,18 +23,27 @@ THE SOFTWARE.
 from numpy import *
 from scipy.spatial.distance import pdist, squareform
 from qikify.helpers import *
+import pandas
 
 # Laplacian score feature selection
-class LSFS:
+class LSFS(object):
     # Run LSFS. Arguments are `dataset`, a DataStruct object, and gnd, a pass/fail vector of the same size.
-    # Based on paper equation:
+    # Based on definition from paper:
     #
     # \sum_{ij} (f_r^i - f_r^j) * S_{ij}
     # ----------------------------------
     #              sigma_2
     #
-    def run(self, X, gnd):
-        nSmp = size(X,0)
+    def run(self, Xin, gnd):
+        # Now, with newfangled (albeit hacky) support for pandas DataFrames!
+        # TODO: Eventually, it'd be nice to maintain col names w/ Xin so we
+        #       can add plot method to plot scores vs. column names.
+        if isinstance(Xin, pandas.DataFrame):
+            X = Xin.as_matrix()
+        else:
+            X = Xin
+        
+        nSmp = X.shape[0]
         if nSmp != len(gnd): 
             raise Exception("Data and gnd do not have matching sizes")
         
@@ -47,7 +56,7 @@ class LSFS:
         DPrime     = sum(dot(X.T,diag(D)).T * X,0) - z
         
         # Remove trivial solutions
-        DPrime[DPrime < 1e-12] = 10000
+        DPrime[DPrime < 1e-12] = inf
         
         # Compute and retain Laplacian scores and rankings
         self.Scores    = (LPrime/DPrime).T

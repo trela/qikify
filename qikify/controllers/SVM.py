@@ -29,7 +29,7 @@ from scikits.learn.metrics import confusion_matrix
 from scikits.learn.svm import SVC
 from helpers import *
 
-class SVM:
+class SVM(object):
     def train(self, X, gnd, gridSearch = False):
         #print 'SVM: Training.'
         self.gridSearch = gridSearch

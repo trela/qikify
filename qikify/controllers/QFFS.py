@@ -28,7 +28,7 @@ from ..helpers.general import *
 ###############################################################################
 # Feature Selection
 
-class QFFS:
+class QFFS(object):
     def __init__(self):
         self.qfsh = statHelpers()
         
@@ -70,7 +70,18 @@ class QFFS:
                 cc, cs = self.qfsh.computeCorrCoefs(X,y)
                 return cs[0:n_features]
               
-                
+           
+
+    def computeCorrCoefs(self, X,y):
+        '''
+        Returns the correlation coefficients between X and y, 
+        along with the arg-sorted indices of ranked most-correlated X-to-y vars.
+        '''
+        if is1D(X):
+            return np.corrcoef(X,y), [0]
+        else:
+            cc = np.array([np.corrcoef(X[:,i], y)[0,1] for i in xrange(X.shape[1])])
+            return cc, np.argsort(-abs(cc))
                 
                 
                 

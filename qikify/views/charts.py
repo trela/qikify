@@ -107,22 +107,23 @@ class QFPlot:
             plt.savefig(filename, dpi = 150, format='pdf')
 
 
-    def pairs(self, data, labels=None):
+    def pairs(self, data, labels=None, filename=None):
         """
         Generates something similar to R pairs()
         """
         nVariables = data.shape[1]
-        if labels is None:
-            labels = ['var%d'%i for i in range(nVariables)]
+        #if labels is None:
+        #    labels = ['var%d'%i for i in range(nVariables)]
         fig = plt.figure()
         for i in range(nVariables):
             for j in range(nVariables):
                 ax = fig.add_subplot(nVariables, nVariables, i * nVariables + j + 1)
                 if i == j:
                     ax.hist(data[:,i])
-                    ax.set_title(labels[i])
+                    #ax.set_title(labels[i])
                 else:
                     ax.scatter(data[:,i], data[:,j])
+                ax.autoscale(True)
         if filename==None:
             plt.show()
         else:

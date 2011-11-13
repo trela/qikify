@@ -21,36 +21,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 '''
 
-import sys, os, csv, gzip
+import sys, os, csv, gzip, pandas
 import numpy as np
 from qikify.helpers import *
 from qikify.models.dotdict import dotdict
-from qikify.models.DataStruct import DataStruct
+#from qikify.models.DataFrame import DataFrame
 
 class Dataset(dotdict): 
-    def __init__(self, filename=None, hasHeader=True, dataset=None):
+    '''
+    This class is the fundamental data structure of the Qikify framework.
+    
+    '''
+    def __init__(self, filename=None, dataset=None):
         if filename is not None:
             filetype = filename.split('.')[-1]
+            
             if filetype == 'csv':
-                # Read dataset column names
-                if ( hasHeader ):
-                    with open(filename, 'rU') as f:
-                        names = np.array(csv.reader(f).next())
-                
-                # Read numeric data
-                rawData  = np.loadtxt(filename, delimiter=',', skiprows=1)
-                self.raw = DataStruct(rawData, names=names, desc='Raw dataset.')
+                self.raw = pandas.read_csv(filename)
+                try:
+                    self.raw = pandas.DataFrame(self.raw, dtype=float) # try to force floating-point data type
+                except Exception, e:
+                    pass # oh well, we tried
 
-            if filetype == 'gz':
-                # There's probably a better way to do this.
-                with gzip.open(filename, 'rb') as f:
-                    raw = f.read().split('\n')
-                    if ( hasHeader ):
-                        names = np.array(raw.pop(0).split(','))
-                    self.raw = [row.split(',') for row in raw]
-                    
+                self.raw.desc = 'Raw data from input file.'
+
+            # TODO: There's probably a better way to do this.
+            # if filetype == 'gz':
+            #     with gzip.open(filename, 'rb') as f:
+            #         raw = f.read().split('\n')
+            #         if ( hasHeader ):
+            #             names = np.array(raw.pop(0).split(','))
+            #         self.raw = [row.split(',') for row in raw]
+        
         if dataset is not None:
-            self.raw = DataStruct(dataset.data, names=dataset.names, desc='Raw dataset.')
+            self.raw = dataset
     
     # Print a summary of the dataset.
     def __str__(self):    
@@ -58,25 +62,8 @@ class Dataset(dotdict):
                '===============================================\n' + \
                'Dataset                         #Rows #Cols    \n' + \
                '===============================================\n' + ENDCOLOR
-        for dataset in self.values():
-            output += dataset.__str__() + '\n'
+        for key in self.keys():
+            output += '%-30s %5d %5d\n' % (key, self[key].shape[0], self[key].shape[1])
         return output
-        
-''' 
-    # Subset the columns of the datasets identified in the ind dictionary.
-    # Argument: ind = {'datasetName': columnIndices }
-    def subsetCols(self, ind, desc = None):
-        for dataset,idx in ind.iteritems():
-            self[dataset] = self[dataset][:,idx]
-            if self.names:
-                self.names = self.names[idx]
-        return self
-
-    # Subset the rows of the datasets identified in the ind dictionary.
-    # Argument: ind = {'datasetName': rowIndices }
-    def subsetRows(self, ind):
-        for dataset,idx in ind.iteritems():
-            self[dataset] = self[dataset][idx,:]
-        return self
-        
-'''
+    
+    

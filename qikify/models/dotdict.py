@@ -1,6 +1,7 @@
 class dotdict(dict):
-    """
-    Use dotdict to replace dictionaries. This enables dict.property access.
+    """We use dotdict to replace standard Python dictionaries. This 
+    is simply for the convenience of having dict.property access,
+    instead of the messier dict['property'] style.
     """
     def __getattr__(self, attr):
         return self.get(attr, None)
