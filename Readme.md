@@ -8,7 +8,6 @@
 ## Known issues
 
   This software is in early pre-alpha state. There are several rounds of refactoring remaining before it approaches production quality.
-  Most importantly, the code should be refactored into a standard Python package so that framework components can be loaded in the usual Pythonic way, e.g. `import qikify.controllers.kde` and so on.
 
 
 ## Installation
