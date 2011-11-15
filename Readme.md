@@ -15,14 +15,15 @@
 
   This project is built on and requires the following software:  
   
-  * python 2.7.1
-  * numpy 1.5.1
+  * python 2.7.2
+  * numpy 1.6.1rc1
   * scipy 0.9.0
-  * scikits.learn 0.8
+  * sklearn 0.9
+  * pandas 0.5.1.dev-75026f2
 
   Once the above are installed, install qikify with:
 
-     git clone https://github.com/natekupp/qikify.git
+     git clone git://github.com/natekupp/qikify.git
 	 cd qikify
 	 python setup.py install
 
@@ -35,53 +36,7 @@
   * Web-based interaction with machine-learning tasks running server-side via [node.js](http://nodejs.org)
 
 ## Example
-Here's a simple example to get you started. First, we load up the specifications:
-
-     specs = Specs('/path/to/specs')
-
-Then, load a dataset into a `Dataset` model:
-
-     trainingData = Dataset('/path/to/training/set').computePF(specs)
-
-Think of a `Dataset` as a dictionary or collection of datasets for a given analysis. When you create `trainingData`
-as above, you are initializing the so-called "raw" dataset. If your specific analysis requires further cleaning, you
-can subclass `Dataset` and implement that cleaning in the subclass constructor (see `models/DatasetTI`) or add another
-dataset to `Dataset` directly alongside "raw". Note the `.computePF(specs)` which computes the pass/fail column for
-the dataset given the `specs` object.
-
-Next, we train an SVM model:
-
-	svm.train(trainingData.raw.data, trainingData.raw.gnd, gridSearch=True)
-	
-This just trains a support vector machine using the data from "raw" and the derived pass/fail column. Finally, we go
-to a test set and predict, reporting results:
-
-	 testData  = Dataset('/path/to/test/set').computePF(specs)
- 	 predicted = svm.predict(testData.raw.data)
- 	 print svm.getTEYL(testData.raw.gnd, predicted))
-
-And that's it! Putting it all together into a working script:
-
-     from models.Specs import *
-     from models.Dataset import *
-     from controllers.svm import SVM
-	 
-	 specs = Specs('/path/to/specs')
-	 svm   = SVM.SVM()
-	 
-	 # Load training set
-	 trainingData = Dataset('/path/to/training/set').computePF(specs)
-	 
-	 # Train SVM
-	 svm.train(trainingData.raw.data, trainingData.raw.gnd, gridSearch=True)
-	 
-	 # Predict on test set
-	 testData  = Dataset('/path/to/test/set').computePF(specs)
-	 predicted = svm.predict(testData.raw.data)
-	 print svm.getTEYL(testData.raw.gnd, predicted))
-
-A more involved example can be found in `framework/example.py`. You can also contact me if you need further help or
-if you would like to contribute.
+TODO: Need example demonstrating usage.
 
 
 ## Contributors
