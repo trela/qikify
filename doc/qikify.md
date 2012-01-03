@@ -8,7 +8,7 @@ __Version 1.0.0 updated:1/3/2012 __
 This document provides a reference spec for the Qikify framework. Herein, we define roles for each "server" element in the system, communications protocols, and explain the implementations of each. This document is intended to be a evolutionary specification as work progresses on the individual components of the framework.
 
 ##### Architecture
-![Architecture](qikify_architecture.png)
+![Architecture](https://github.com/natekupp/qikify/raw/master/doc/qikify_architecture.png)
 
 ##### Index
 1. Analysis Server
