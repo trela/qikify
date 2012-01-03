@@ -1,0 +1,253 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote {
+    margin: 0;
+    padding: 0;
+}
+body {
+    font-family: "Helvetica Neue", Helvetica, "Hiragino Sans GB", Arial, sans-serif;
+    font-size: 13px;
+    line-height: 18px;
+    color: #737373;
+    margin: 10px 13px 10px 13px;
+}
+a {
+    color: #0069d6;
+}
+a:hover {
+    color: #0050a3;
+    text-decoration: none;
+}
+a img {
+    border: none;
+}
+p {
+    margin-bottom: 9px;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: #404040;
+    line-height: 36px;
+}
+h1 {
+    margin-bottom: 18px;
+    font-size: 30px;
+}
+h2 {
+    font-size: 24px;
+}
+h3 {
+    font-size: 18px;
+}
+h4 {
+    font-size: 16px;
+}
+h5 {
+    font-size: 14px;
+}
+h6 {
+    font-size: 13px;
+}
+hr {
+    margin: 0 0 19px;
+    border: 0;
+    border-bottom: 1px solid #ccc;
+}
+blockquote {
+    padding: 13px 13px 21px 15px;
+    margin-bottom: 18px;
+    font-family:georgia,serif;
+    font-style: italic;
+}
+blockquote:before {
+    content:"\201C";
+    font-size:40px;
+    margin-left:-10px;
+    font-family:georgia,serif;
+    color:#eee;
+}
+blockquote p {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 18px;
+    margin-bottom: 0;
+    font-style: italic;
+}
+code, pre {
+    font-family: Monaco, Andale Mono, Courier New, monospace;
+}
+code {
+    background-color: #fee9cc;
+    color: rgba(0, 0, 0, 0.75);
+    padding: 1px 3px;
+    font-size: 12px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+pre {
+    display: block;
+    padding: 14px;
+    margin: 0 0 18px;
+    line-height: 16px;
+    font-size: 11px;
+    border: 1px solid #d9d9d9;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+pre code {
+    background-color: #fff;
+    color:#737373;
+    font-size: 11px;
+    padding: 0;
+}
+@media screen and (min-width: 768px) {
+    body {
+        width: 748px;
+        margin:10px auto;
+    }
+}
+</style>
+<title>qikify.html</title>
+</head>
+<body>
+<h2>Qikify Reference Spec</h2>
+
+<hr />
+
+<p><strong>Version 1.0.0 updated:1/3/2012 </strong></p>
+
+<h5>Description</h5>
+
+<p>This document provides a reference spec for the Qikify framework. Herein, we define roles for each &ldquo;server&rdquo; element in the system, communications protocols, and explain the implementations of each. This document is intended to be a evolutionary specification as work progresses on the individual components of the framework.</p>
+
+<h5>Architecture</h5>
+
+<p><img src="qikify_architecture.png" alt="Architecture" /></p>
+
+<h5>Index</h5>
+
+<ol>
+<li>Analysis Server</li>
+<li>ATE Simulator</li>
+<li>View Server</li>
+<li>Database</li>
+</ol>
+
+
+<h5>Changelog</h5>
+
+<ul>
+<li>1.0.0: Initial version.</li>
+</ul>
+
+
+<h3>Analysis Server &ndash; <strong><font color="green">70% Complete</font></strong></h3>
+
+<h5>Description</h5>
+
+<p>The analysis server is the first element of the system we have implemented, as documented in our IEEE Design &amp; Test paper and various SRC presentations. Currently, the analysis server is written in 100% Python.</p>
+
+<p>Input to the analysis server is currently in the form of CSV files. Eventually, the analysis server will request and load data directly from a database server into a <code>pandas.DataFrame</code>.</p>
+
+<p>The atomic unit forming the basis of analysis server is its collection of <em>controllers</em>. Each controller is expected to operate on a <code>pandas.DataFrame</code> object (preferred) or possibly a <code>numpy.ndarray</code> via a <code>run()</code> class method. This <code>run()</code> class method is expected to process the dataset and return a result in the form of a <code>pandas.DataFrame</code>. Alternatively, the <code>run()</code> method may set class variables and provide accessor methods.</p>
+
+<p>The expected use of the analysis server is running <em>flows</em>. A flow is a Python script defining a composition/sequence of controller operations to extract results from an input dataset, ultimately generating some result set to be sent back to the database server. Alternatively, the output data can be sent via ØMQ directly to the view server.</p>
+
+<h5>Reference Implementation</h5>
+
+<p>In the Qikify framework, we specify a controller as a Python class using the following skeleton reference implementation:</p>
+
+<pre><code>class Foo(object)
+    def __init__(self):
+        # If the controller has static variables, define them here.
+        pass
+
+    def run(self, X):
+        # Run the controller action on input dataset X
+        # ...
+        return result
+</code></pre>
+
+<p>To implement a flow, consider an example case where we have a pair of framework controllers <code>Foo</code> and <code>Bar</code> that we intend to apply to an input dataset <code>indata</code>.</p>
+
+<pre><code>from qikify.controllers.Foo import Foo
+from qikify.controllers.Bar import Bar
+import pandas
+
+indata = # obtain from database server
+
+X = pandas.DataFrame(indata)
+foo = Foo()
+bar = Bar(optionA = True, optionB = False)
+
+y = foo.run(X)
+Z = bar.run(X,y)
+
+# send result back to database here.
+</code></pre>
+
+<h3>ATE Simulator &ndash; <strong><font color="red">0% Complete</font></strong></h3>
+
+<p>The ATE simulator component of the Qikify framework is designed to support adaptive test simulations. As we do not have automated test equipment available in the lab, we use the ATE simulator to model a live production environment. This allows us to conduct experiments where the input data to the analysis server is a live stream instead of a static dataset.</p>
+
+<p>At present, the ATE simulator is designed to accept a CSV file and per-test timings; the simulator will then read off device lines from the CSV file and emit data via ØMQ over TCP as if it were testing the devices in realtime.</p>
+
+<p>Eventually, this ATE simulator should handle multiprobe touchdowns and more sophisticated/accurate models of testers and test times. Progress on this simulator will likely be conditional on the quality of industrial ATE characterizations we can obtain.</p>
+
+<h3>View Server &ndash; <strong><font color="red">5% Complete</font></strong></h3>
+
+<p>The view server is designed to present &ldquo;views&rdquo; of the MVC adaptive test system. The view server has two components, a front-end and a back-end. The front-end is responsible for presenting an HTML page with a collection of charts representing views.</p>
+
+<h5>Front-end</h5>
+
+<p>Each front-end view is written in Coffeescript, a language that compiles to Javascript. A Cakefile is provided with the view server code that should be run in the background while developing with <code>cake watch</code>; this will ensure that any changes in front-end Coffeescript code will be instantaneously recompiled and minified to the Javascript served to connected clients. The front-end page is dynamically generated via interaction with the back-end via a live web sockets connection using <a href="http://socket.io">socket.io</a> and <a href="http://nodejs.org">node.js</a>.</p>
+
+<h5>Reference Implementation</h5>
+
+<p>Although the API is undergoing heavy development and changing rapidly, the current reference implementation is for all views to subclass <code>Chart</code>. Eventually, a <code>ChartCollection</code> class will be made available to subclass, if the particular view needs to present a collection of charts rather than just one. A <code>Chart</code> object, when instantiated, creates a pair of UUIDs, one for itself and one for the chart canvas. The <code>Chart</code> object is a subclass of <code>DOMInteractions</code>, which provides an <code>inject(parentID, content)</code> method. Thus, placing a chart on the client&rsquo;s page can be done with:</p>
+
+<pre><code>chart = new Chart('Title', 'Description.')
+chart.inject('#parent-id')
+chart.plot(data)
+</code></pre>
+
+<p>Future features:</p>
+
+<ol>
+<li>Charts will be given dynamic controls, enabling the user to quickly drill down to subsets of the data.</li>
+<li>Live server status icons should be presented here, showing the user the status of the database, analysis server, and view server.</li>
+</ol>
+
+
+<h5>Back-end</h5>
+
+<p>The back-end of the view server is a node.js server running socket.io. When a client connects to the view server, it retrieves the static HTML from a simple HTTP server and concurrently opens a web socket connection via socket.io to this node.js server, currently on port 8001.</p>
+
+<p>The current architecture provide a single request-response protocol: the client requests a list of available datasets/views, and the server responds with that list. The client can then select an available view to render, and send a request for the corresponding data. The server will then respond with data in JSON.</p>
+
+<p>This may presently be over-engineering. We intend to revisit the backend implementation in the future; web sockets may prove to be overkill for our needs and we can get by with a more simple jQuery AJAX implementation, using <code>$.get()</code> on the front end and Django on the back-end.</p>
+
+<h3>Database &ndash; <strong><font color="red">0% Complete</font></strong></h3>
+
+<p>The database has yet to be designed. Ultimately, we need to be able to run queries against the available datasets, to obtain summary statistics as well as raw matrices of data. We are currently exploring options to implement this. A simple CSV datastore would be the easiest option, and is currently how our system works. However, this does not support elegantly storing summary statistics or running queries against the data.</p>
+
+<p>MySQL is another option, and provides the means of storing summary statistics in tables, along with the ability to run SQL queries agains the data. However, this has the distinct disadvantage of not supporting a large number of columns, and needing to explicitly specify data types for every column. Given that our data comes with many thousands of columns and many data types, this seems like a mismatch.</p>
+
+<p>We are going to explore implementing the database using MongoDB. MongoDB appears to meet all of our criteria for speed, queryability, summary statistic storage, and high numbers of columns without explicit typing.</p>
+</body>
+</html>

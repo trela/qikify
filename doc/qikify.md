@@ -2,7 +2,7 @@
 
 -----------------
 
-__Version 1.0.0__
+__Version 1.0.0 updated:1/3/2012 __
 
 ##### Description
 This document provides a reference spec for the Qikify framework. Herein, we define roles for each "server" element in the system, communications protocols, and explain the implementations of each. This document is intended to be a evolutionary specification as work progresses on the individual components of the framework.
@@ -15,7 +15,6 @@ This document provides a reference spec for the Qikify framework. Herein, we def
 2. ATE Simulator
 3. View Server
 4. Database
-5. Client Browser
 
 ##### Changelog
 - 1.0.0: Initial version.
