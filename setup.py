@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import setuptools
+
 from setuptools import setup, find_packages
 
 setup(name='qikify',
@@ -9,6 +11,5 @@ setup(name='qikify',
       author_email='nathan.kupp@yale.edu',
       url='http://github.com/trela/qikify',
       license='MIT',
-      packages = find_packages('qikify'),  # include all packages under src
-      package_dir = {'':'qikify'},   # tell distutils packages are under src
+      packages = find_packages(),
      )
