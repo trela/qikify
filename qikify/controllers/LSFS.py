@@ -48,7 +48,7 @@ class LSFS(object):
         if nSmp != len(gnd): 
             raise Exception("Data and gnd do not have matching sizes")
         
-        _, X = scale(X)
+        _, X = standardize(X)
         
         # Per LSFS paper, S_ij = exp(-||x_i - x_j||^2 / t). I've found that
         # t = ncol(X) to be a suitable choice; anything on that order should 

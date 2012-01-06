@@ -40,11 +40,11 @@ class SVM(object):
         else:
             self.clf = SVC()
         self.scaleDict = dotdict({'mean': X.mean(axis = 0), 'std': X.std(axis = 0)})
-        self.clf.fit(scale(X, self.scaleDict), gnd)
+        self.clf.fit(standardize(X, self.scaleDict), gnd)
         #print 'SVM: Training complete.'
 
     def predict(self, X):
-        return self.clf.predict(scale(X, self.scaleDict))
+        return self.clf.predict(standardize(X, self.scaleDict))
 
     def getTEYL(self, gnd, predicted):
         te = sum(np.logical_and((gnd < 0), (predicted > 0))) * 100.0 / len(gnd)

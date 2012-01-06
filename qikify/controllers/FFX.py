@@ -43,7 +43,7 @@ CONSIDER_NONLIN = True #consider abs() and log()?
 CONSIDER_THRESH = True #consider hinge functions?
 
 #======================================================================================
-import copy, itertools, math, signal, time, types
+import copy, itertools, math, signal, time, types, pandas
 
 #3rd party dependencies
 import numpy
@@ -127,18 +127,18 @@ class FFXBuildStrategy(object):
 #========================================================================================
 #models / bases
 class FFXModel:
-    def __init__(self, varnames, coefs_n, bases_n, coefs_d, bases_d):
+    def __init__(self, coefs_n, bases_n, coefs_d, bases_d, varnames=None):
         """
         @arguments
-          varnames -- list of string
           coefs_n -- 1d array of float -- coefficients for numerator.
           bases_n -- list of *Base -- bases for numerator
           coefs_d -- 1d array of float -- coefficients for denominator
           bases_d -- list of *Base -- bases for denominator
+          varnames -- list of string
         """
         #preconditions
         assert 1+len(bases_n) == len(coefs_n)  #offset + numer_bases == numer_coefs
-        assert len(bases_d) == len(coefs_d)  #denom_bases == denom_coefs
+        assert   len(bases_d) == len(coefs_d)  #denom_bases == denom_coefs
 
         #make sure that the coefs line up with their 'pretty' versions
         coefs_n = numpy.array([float(coefStr(coef)) for coef in coefs_n])
@@ -171,12 +171,12 @@ class FFXModel:
     def simulate(self, X):
         """
         @arguments
-          X -- 2d array of [var_i][sample_i] : float
+          X -- 2d array of [sample_i][var_i] : float
         @return
           y -- 1d array of [sample_i] : float
         """
-        N = X.shape[1]
-
+        N = X.shape[0]
+        
         #numerator
         y = numpy.zeros(N, dtype=float)
         y += self.coefs_n[0]
@@ -237,11 +237,11 @@ class SimpleBase:
     def simulate(self, X):
         """
         @arguments
-          X -- 2d array of [var_i][sample_i] : float
+          X -- 2d array of [sample_i][var_i] : float
         @return
           y -- 1d array of [sample_i] : float
         """
-        return X[self.var] ** self.exponent
+        return X[:,self.var] ** self.exponent
 
     def __str__(self):
         if self.exponent == 1:
@@ -251,7 +251,7 @@ class SimpleBase:
                                 
 class OperatorBase:
     """e.g. log(x4^2)"""
-    def __init__(self, simple_base, nonlin_op, thr):
+    def __init__(self, simple_base, nonlin_op, thr=INF):
         """
         @arguments
           simple_base -- SimpleBase
@@ -265,7 +265,7 @@ class OperatorBase:
     def simulate(self, X):
         """
         @arguments
-          X -- 2d array of [var_i][sample_i] : float
+          X -- 2d array of [sample_i][var_i] : float
         @return
           y -- 1d array of [sample_i] : float
         """
@@ -290,14 +290,12 @@ class OperatorBase:
         if ok: #could always do ** exp, but faster ways if exp is 0,1
             y = ya
         else:
-            y = INF * numpy.ones(X.shape[1], dtype=float)
-            
+            y = INF * numpy.ones(X.shape[0], dtype=float)    
         return y
     
     def __str__(self):
         op = self.nonlin_op
         simple_s = str(self.simple_base)
-
         if op == OP_ABS:     return 'abs(%s)' % simple_s
         elif op == OP_MAX0:  return 'max(0, %s)' % simple_s
         elif op == OP_MIN0:  return 'min(0, %s)' % simple_s
@@ -315,7 +313,7 @@ class ProductBase:
     def simulate(self, X):
         """
         @arguments
-          X -- 2d array of [var_i][sample_i] : float
+          X -- 2d array of [sample_i][var_i] : float
         @return
           y -- 1d array of [sample_i] : float
         """
@@ -347,16 +345,15 @@ class ConstantModel:
     def simulate(self, X):
         """
         @arguments
-          X -- 2d array of [var_i][sample_i] : float
+          X -- 2d array of [sample_i][var_i] : float
         @return
           y -- 1d array of [sample_i] : float
         """
-        N = X.shape[1]
+        N = X.shape[0]
         if scipy.isnan(self.constant): #corner case
             yhat = numpy.array([INF] * N)
         else: #typical case
-            yhat = numpy.ones(N, dtype=float) * self.constant
-                
+            yhat = numpy.ones(N, dtype=float) * self.constant  
         return yhat
     
     def __str__(self):
@@ -372,14 +369,14 @@ class ConstantModel:
 
 class MultiFFXModelFactory:
 
-    def build(self, train_X, train_y, test_X, test_y, varnames):
+    def build(self, train_X, train_y, test_X, test_y, varnames=None):
         """
         @description
           Builds FFX models at many different settings, then merges the results
           into a single Pareto Optimal Set.
 
         @argument
-          train_X -- 2d array of [var_i][sample_i] : float -- training inputs 
+          train_X -- 2d array of [sample_i][var_i] : float -- training inputs 
           test_y -- 1d array of [sample_i] : float -- training outputs
           test_X -- 2d array -- testing inputs
           test_y -- 1d array -- testing outputs
@@ -388,8 +385,16 @@ class MultiFFXModelFactory:
         @return
           models -- list of FFXModel -- Pareto-optimal set of models
         """
-        print 'Build(): begin. %d variables, %d training samples, %d test samples' % \
-            (train_X.shape[0], train_X.shape[1], test_X.shape[1])
+        
+        if isinstance(train_X, pandas.DataFrame):
+            varnames = train_X.columns
+            train_X = train_X.as_matrix()
+            test_X = test_X.as_matrix()
+        if isinstance(train_X, numpy.ndarray) and varnames == None:
+            raise Exception, 'varnames required for numpy.ndarray'
+            
+        print 'Build(): begin. {2} variables, {1} training samples, {0} test samples'.format(test_X.shape[1], *train_X.shape)
+        
         models = []
         min_y = min(min(train_y), min(test_y))
         max_y = max(max(train_y), max(test_y))
@@ -421,7 +426,7 @@ class MultiFFXModelFactory:
                 (i+1, len(approaches), _approachStr(approach))
             ss = FFXBuildStrategy(approach)
 
-            next_models = FFXModelFactory().build(train_X, train_y, varnames, ss)
+            next_models = FFXModelFactory().build(train_X, train_y, ss, varnames)
 
             #set test_nmse on each model
             for model in next_models:
@@ -469,7 +474,7 @@ class MultiFFXModelFactory:
 
 class FFXModelFactory:
 
-    def build(self, X, y, varnames, ss):
+    def build(self, X, y, ss, varnames=None):
         """
         @description
           Build FFX models at the settings of input solution strategy 'ss'.
@@ -483,30 +488,40 @@ class FFXModelFactory:
         @return
           models -- list of FFXModel -- Pareto-optimal set of models
         """
-        (n,N) = X.shape
+        if isinstance(X, pandas.DataFrame):
+            varnames = X.columns
+            X = X.as_matrix()
+        if isinstance(X, numpy.ndarray) and varnames == None:
+            raise Exception, 'varnames required for numpy.ndarray'
+            
+        if X.ndim == 1:
+            self.nrow, self.ncol = len(X), 1
+        elif X.ndim == 2:
+            self.nrow, self.ncol = X.shape
+        else:
+            raise Exception, 'X is wrong dimensionality.'        
+        
         y = numpy.asarray(y)
-        assert N == len(y)
-
-        if n == 0:
+        if self.nrow != len(y):
+            raise Exception, 'X sample count and y sample count do not match'
+        
+        if self.ncol == 0:
             print '  Corner case: no input vars, so return a ConstantModel'
-            model = ConstantModel(y[0], 0)
-            return [model]
-
+            return [ConstantModel(y.mean(), 0)]
+        
         #Main work... 
         
         #build up each combination of all {var_i} x {op_j}, except for
         # when a combination is unsuccessful
         print '  STEP 1A: Build order-1 bases: begin'
         order1_bases = []
-        for var_i in range(X.shape[0]):
+        for var_i in range(self.ncol):
             #if (var_i+1) % 10 == 0: print '    Build bases at var %d/%d' % (var_i+1, X.shape[0])
             for exponent in ss.exprExponents():
                 if exponent == 0.0: continue
 
                 #'lin' version of base
                 simple_base = SimpleBase(var_i, exponent)
-                simple_base.var = var_i #easy access when considering interactions
-
                 lin_yhat = simple_base.simulate(X)
                 if exponent in [1.0, 2.0] or not yIsPoor(lin_yhat): #checking exponent is a speedup
                     order1_bases.append(simple_base) 
@@ -528,7 +543,7 @@ class FFXModelFactory:
 
                     #add e.g. OP_GTH, OP_LTH
                     if exponent == 1.0 and ss.thresholdOps():
-                        minx, maxx = min(X[var_i,:]), max(X[var_i,:])
+                        minx, maxx = min(X[:,var_i]), max(X[:,var_i])
                         rangex = maxx - minx
                         stepx = 0.8 * rangex / float(ss.num_thrs_per_var+1)
                         thrs = numpy.arange(
@@ -536,7 +551,6 @@ class FFXModelFactory:
                         for threshold_op in ss.thresholdOps(): 
                             for thr in thrs:
                                 nonsimple_base = OperatorBase(simple_base, threshold_op, thr)
-
                                 nonsimple_base.var = var_i #easy access when considering interactions
                                 order1_bases.append(nonsimple_base)
 
@@ -634,17 +648,15 @@ class FFXModelFactory:
         return models
 
     def _basesToModels(self, ss, varnames, bases, X, y, max_num_bases, target_train_nmse):
-        N = X.shape[1]
-
         #compute regress_X
-        if ss.includeDenominator(): regress_X = numpy.zeros((len(bases)*2, N), dtype=float)
-        else:                       regress_X = numpy.zeros((len(bases), N), dtype=float)
-        for (base_i, base) in enumerate(bases):
+        if ss.includeDenominator(): regress_X = numpy.zeros((self.nrow, len(bases)*2), dtype=float)
+        else:                       regress_X = numpy.zeros((self.nrow, len(bases)),   dtype=float)
+        for i, base in enumerate(bases):
             base_y = base.simulate(X)
-            regress_X[base_i,:] = base_y #numerators
+            regress_X[:,i] = base_y #numerators
             if ss.includeDenominator():
-                regress_X[len(bases)+base_i,:] = -1.0 * base_y * y #denominators
-
+                regress_X[:,len(bases)+i] = -1.0 * base_y * y #denominators
+        
         #compute models.  
         models = self._pathwiseLearn(ss, varnames, bases, X, regress_X, y, 
                                      max_num_bases, target_train_nmse)
@@ -656,16 +668,15 @@ class FFXModelFactory:
         http://scikit-learn.sourceforge.net/modules/linear_model.html
         Compute Elastic-Net path with coordinate descent.  
         Returns list of model (or None if failure)."""
-
+        
         print '    Pathwise learn: begin. max_num_bases=%d' % max_num_bases
         max_iter = 1000 #default 1000. magic number.
-
+        
         #Condition X and y: 
         # -"unbias" = rescale so that (mean=0, stddev=1) -- subtract each row's mean, then divide by stddev
         # -X transposed
         # -X as fortran array
         (X_unbiased, y_unbiased, X_avgs, X_stds, y_avg, y_std) = self._unbiasedXy(X_orig_regress, y_orig)
-        X_unbiased = X_unbiased.T
         X_unbiased = numpy.asfortranarray(X_unbiased) # make data contiguous in memory
 
         n_samples = X_unbiased.shape[0]
@@ -704,7 +715,7 @@ class FFXModelFactory:
             #  -"rebias" means convert from (mean=0, stddev=1) to original (mean, stddev)
             coefs = self._rebiasCoefs([0.0] + list(cur_unbiased_coefs), X_stds, X_avgs, y_std, y_avg)
             (coefs_n, bases_n, coefs_d, bases_d) = self._allocateToNumerDenom(ss, bases, coefs)
-            model = FFXModel(varnames, coefs_n, bases_n, coefs_d, bases_d)
+            model = FFXModel(coefs_n, bases_n, coefs_d, bases_d, varnames)
             models.append(model)
 
             #update nmses
@@ -757,17 +768,13 @@ class FFXModelFactory:
     def _unbiasedXy(self, Xin, yin):
         """Make all input rows of X, and y, to have mean=0 stddev=1 """ 
         #unbiased X
-        X_avgs = numpy.mean(Xin, axis=1)
-        X_stds = numpy.std(Xin, axis=1)
-        X_unbiased = numpy.zeros(Xin.shape, dtype=float)
-        for var_i in range(Xin.shape[0]):
-            X_unbiased[var_i,:] = (Xin[var_i,:] - X_avgs[var_i]) / X_stds[var_i]
-
+        X_avgs, X_stds = Xin.mean(0), Xin.std(0)
+        X_unbiased = (Xin - X_avgs) / X_stds
+        
         #unbiased y
-        y_avg = numpy.mean(yin)
-        y_std = numpy.std(yin)
+        y_avg, y_std = yin.mean(0), yin.std(0)
         y_unbiased = (yin - y_avg) / y_std
-
+        
         return (X_unbiased, y_unbiased, X_avgs, X_stds, y_avg, y_std)
 
     def _rebiasCoefs(self, unbiased_coefs, X_stds, X_avgs, y_std, y_avg):

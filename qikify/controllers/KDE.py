@@ -51,10 +51,10 @@ class KDE(object):
         self.columns   = getattr(X, 'columns', None)
         
         # Normalize data/bounds        
-        self.scaleFactors, self.Xn = scale(X)
-        self.bounds                = scale(np.array([X.min(0), X.max(0)]), self.scaleFactors)
+        self.scaleFactors, self.Xn = standardize(X)
+        self.bounds                = standardize(np.array([X.min(0), X.max(0)]), self.scaleFactors)
         if bounds is not None:
-            self.bounds = scale(bounds, self.scaleFactors)
+            self.bounds = standardize(bounds, self.scaleFactors)
             
         # Select bandwidth for Epanechnikov kernel (Rule of Thumb, see Silverman, p.86)
         self.b       = 0.8                     # Default bandwidth scaling factor
@@ -84,7 +84,7 @@ class KDE(object):
     def _genSamples(self, nSamples):
         """Generate KDE samples."""
         Sn = vstack([ self._genSample() for _ in xrange(nSamples) ])
-        return pandas.DataFrame(scale(Sn, self.scaleFactors, reverse = True), columns = self.columns)
+        return pandas.DataFrame(standardize(Sn, self.scaleFactors, reverse = True), columns = self.columns)
       
     def _genPartitionedSamples(self, counts):
         """Generates nCritical critical devices, nGood good devices, nFail failing devices,
@@ -96,7 +96,7 @@ class KDE(object):
         
         thresh = 0.02
         while ( ng+nc+nf < sum(counts.values()) ):
-            sample = scale(self._genSample(), self.scaleFactors, reverse = True)
+            sample = standardize(self._genSample(), self.scaleFactors, reverse = True)
             if self.isGood(sample) and ng < counts.nGood:
                 Sg[ng,:] = sample
                 ng += 1

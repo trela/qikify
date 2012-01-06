@@ -22,7 +22,7 @@ THE SOFTWARE.
 '''
 
 import numpy as np
-import scipy, csv
+import scipy, csv, pandas
 from qikify.models.dotdict import dotdict
 
 # Colors for printing to terminal
@@ -51,11 +51,26 @@ def csvWriteMatrix(filename, mat):
         out.writerow(row)        
 
 
-def scale(X, scaleDict = None, reverse = False):
-    """
-    Facilitates standardizing data by subtracting the mean and dividing by
+def standardize(X, scaleDict = None, reverse = False):
+    """Facilitates standardizing data by subtracting the mean and dividing by
     the standard deviation. Set reverse to True to perform the inverse 
     operation.
+    
+    Parameters
+    ----------
+    X : numpy ndarray, or pandas.DataFrame
+        Data for which we want pareto-optimal front.
+    scaleDict: dict, default None
+        Dictionary with elements mean/std to control standardization.
+    reverse: boolean, default False
+        If this flag is set, the standardization will be reversed; e.g.,
+        we take a dataset with zero mean and unit variance and change to
+        dataset with mean=scaleDict.mean and std=scaleDict.std.
+    
+    Examples
+    --------
+    TODO
+        
     """
     if reverse:
         return (X * scaleDict.std) + scaleDict.mean
@@ -67,15 +82,33 @@ def scale(X, scaleDict = None, reverse = False):
 
 
 def zeroMatrixDiagonal(X):
-    """
-    Set the diagonal of a matrix to all zeros
+    """Set the diagonal of a matrix to all zeros.
+    
+    Parameters
+    ----------
+    X : numpy ndarray
+        Matrix on which to zero out the diagonal.
+        
+    Examples
+    --------
+    Xp = zeroMatrixDiagonal(X)
+    
     """
     return X - np.diag(np.diag(X))
 
 
 def getParetoFront(data):
-    """
-    Extracts the 2D Pareto-optimal front from a 2D numpy array
+    """Extracts the 2D Pareto-optimal front from a 2D numpy array.
+    
+    Parameters
+    ----------
+    data : numpy ndarray, or pandas.DataFrame
+        Data for which we want pareto-optimal front.
+    
+    Examples
+    --------
+    p = getParetoFront(data)
+    
     """
     dflags  = np.ones(data.shape[0], dtype=bool)
     for i in xrange(data.shape[0]):
@@ -92,21 +125,67 @@ def is1D(data):
     return data.shape[0] == np.size(data)
 
 
+def partition(data, threshold=0.5):
+    """Partitions data into training and test sets. Assumes the last column of
+    data is y.
+    
+    Parameters
+    ----------
+    data : numpy ndarray, or pandas.DataFrame
+        Data to partition into training and test sets.
+    threshold : float
+        Determines ratio of training : test.
+        
+    Examples
+    --------
+    TODO
+        
+    """
+    
+    if data.ndim != 2:
+        raise Exception, 'data must be 2-dimensional'
+
+    nrow, ncol = data.shape
+    
+    # create boolean vector identifying rows in training/test sets.
+    index = np.random.sample(nrow)
+    train_index = index < threshold
+    test_index = index >= threshold
+    
+    if isinstance(data, pandas.DataFrame):        
+        xtrain = data.ix[train_index,:ncol-1]
+        ytrain = data.ix[train_index,ncol-1]
+        xtest  = data.ix[test_index,:ncol-1]
+        ytest  = data.ix[test_index,ncol-1]
+    elif isinstance(data, np.ndarray):
+        xtrain = data[train_index,:-1]
+        ytrain = data[train_index,-1]
+        xtest  = data[test_index,:-1]
+        ytest  = data[test_index,-1]
+    else:
+        raise Exception, 'data must be numpy.ndarray or pandas.DataFrame'
+        
+    return xtrain, ytrain, xtest, ytest
+
+
 class stats(object):
     def nmse(self, yhat, y, min_y=None, max_y=None):
-        """
-        @description
-            Calculates the normalized mean-squared error. 
+        """Calculates the normalized mean-squared error. 
         
-        @arguments
-            yhat -- 1d array or list of floats -- estimated values of y
-            y -- 1d array or list of floats -- true values
-            min_y, max_y -- float, float -- roughly the min and max; they
-              do not have to be the perfect values of min and max, because
-              they're just here to scale the output into a roughly [0,1] range
+        Parameters
+        ----------
+        yhat : 1d array or list of floats
+            estimated values of y
+        y : 1d array or list of floats
+            true values
+        min_y, max_y : float, float
+          roughly the min and max; they do not have to be the perfect values of min and max, because
+          they're just here to scale the output into a roughly [0,1] range
+    
+        Examples
+        --------
+        nmse = stats.nmse(yhat, y)
         
-        @return
-            nmse -- float -- normalized mean-squared error
         """
         #base case: no entries
         if len(yhat) == 0:
@@ -131,9 +210,18 @@ class stats(object):
 
 
     def computeR2(self, yhat, y):
-        """
-        Compute R-squared coefficient of determination.
-        R2 = 1 - sum((model.predict(X_test) - y_test)**2) / sum((y_test - np.mean(y_test))**2)
+        """Compute R-squared coefficient of determination:
+           R2 = 1 - sum((y_hat - y_test)**2) / sum((y_test - np.mean(y_test))**2)
+
+        Parameters
+        ----------
+        yhat : 1d array or list of floats -- estimated values of y
+        y : 1d array or list of floats -- true values
+        
+        Examples
+        --------
+        r2 = stats.computeR2(yhat, y)
+        
         """
         e    = y - yhat              # residuals
         return 1 - e.var()/y.var() # model R-squared
