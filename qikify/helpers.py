@@ -125,7 +125,7 @@ def is1D(data):
     return data.shape[0] == np.size(data)
 
 
-def partition(data, threshold=0.5):
+def partition(data, threshold=0.5, verbose = False):
     """Partitions data into training and test sets. Assumes the last column of
     data is y.
     
@@ -164,66 +164,78 @@ def partition(data, threshold=0.5):
         ytest  = data[test_index,-1]
     else:
         raise Exception, 'data must be numpy.ndarray or pandas.DataFrame'
+    
+    if verbose:
+        print 'Randomly partitioned data, with threshold={0}'.format(threshold)
+        print '{:<10} nrow: {:<4} ncol: {:<4}'.format('xtrain', *xtrain.shape)
+        print '{:<10} nrow: {:<4} ncol: {:<4}'.format('ytrain', ytrain.size, 1)
+        print '{:<10} nrow: {:<4} ncol: {:<4}'.format('xtest', *xtest.shape)
+        print '{:<10} nrow: {:<4} ncol: {:<4}'.format('ytest', ytest.size, 1)
         
     return xtrain, ytrain, xtest, ytest
 
 
-class stats(object):
-    def nmse(self, yhat, y, min_y=None, max_y=None):
-        """Calculates the normalized mean-squared error. 
-        
-        Parameters
-        ----------
-        yhat : 1d array or list of floats
-            estimated values of y
-        y : 1d array or list of floats
-            true values
-        min_y, max_y : float, float
-          roughly the min and max; they do not have to be the perfect values of min and max, because
-          they're just here to scale the output into a roughly [0,1] range
+def nmse(yhat, y, min_y=None, max_y=None):
+    """Calculates the normalized mean-squared error. 
     
-        Examples
-        --------
-        nmse = stats.nmse(yhat, y)
-        
-        """
-        #base case: no entries
-        if len(yhat) == 0:
-            return 0.0
-        
-        #base case: both yhat and y are constant, and same values
-        if (max_y == min_y) and (max(yhat) == min(yhat) == max(y) == min(y)):
-            return 0.0
-        
-        #main case
-        assert max_y > min_y, 'max_y=%g was not > min_y=%g' % (max_y, min_y)
-        yhat_a, y_a = np.asarray(yhat), np.asarray(y)
-        y_range = float(max_y - min_y)
-        try:
-            result = np.sqrt(np.mean(((yhat_a - y_a) / y_range) ** 2))
-            if scipy.isnan(result):
-                return np.Inf
-            return result
-        except ValueError:
-            print 'Invalid result %d' % (result)
+    Parameters
+    ----------
+    yhat : 1d array or list of floats
+        estimated values of y
+    y : 1d array or list of floats
+        true values
+    min_y, max_y : float, float
+      roughly the min and max; they do not have to be the perfect values of min and max, because
+      they're just here to scale the output into a roughly [0,1] range
+
+    Examples
+    --------
+    nmse = nmse(yhat, y)
+    
+    """
+    #base case: no entries
+    if len(yhat) == 0:
+        return 0.0
+    
+    #base case: both yhat and y are constant, and same values
+    if (max_y == min_y) and (max(yhat) == min(yhat) == max(y) == min(y)):
+        return 0.0
+    
+    #main case
+    assert max_y > min_y, 'max_y=%g was not > min_y=%g' % (max_y, min_y)
+    yhat_a, y_a = np.asarray(yhat), np.asarray(y)
+    y_range = float(max_y - min_y)
+    try:
+        result = np.sqrt(np.mean(((yhat_a - y_a) / y_range) ** 2))
+        if scipy.isnan(result):
             return np.Inf
+        return result
+    except ValueError:
+        print 'Invalid result %d' % (result)
+        return np.Inf
 
 
-    def computeR2(self, yhat, y):
-        """Compute R-squared coefficient of determination:
-           R2 = 1 - sum((y_hat - y_test)**2) / sum((y_test - np.mean(y_test))**2)
+def computeR2(yhat, y):
+    """Compute R-squared coefficient of determination:
+       R2 = 1 - sum((y_hat - y_test)**2) / sum((y_test - np.mean(y_test))**2)
 
-        Parameters
-        ----------
-        yhat : 1d array or list of floats -- estimated values of y
-        y : 1d array or list of floats -- true values
-        
-        Examples
-        --------
-        r2 = stats.computeR2(yhat, y)
-        
-        """
-        e    = y - yhat              # residuals
-        return 1 - e.var()/y.var() # model R-squared
-
+    Parameters
+    ----------
+    yhat : 1d array or list of floats -- estimated values of y
+    y : 1d array or list of floats -- true values
+    
+    Examples
+    --------
+    r2 = computeR2(yhat, y)
+    
+    """
+    #e    = y - yhat              # residuals
+    #return 1 - e.var()/y.var() # model R-squared
+    #y_bar = np.mean(y)
+    #SSReg = sum((yhat - y_bar)**2)
+    #SST   = sum((y    - y_bar)**2)
+    #return SSReg/SST
+    return np.corrcoef(yhat, y)[0,1]**2
+    
+    
 

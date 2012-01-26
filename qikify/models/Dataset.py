@@ -21,8 +21,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 '''
 
-import sys, os, csv, gzip, pandas
+import sys, os, csv, gzip, StringIO, pandas
 import numpy as np
+
 from qikify.helpers import *
 from qikify.models.dotdict import dotdict
 
@@ -35,21 +36,12 @@ class Dataset(dotdict):
             
             if filetype == 'csv':
                 self.raw = pandas.read_csv(filename)
-                try:
-                    self.raw = pandas.DataFrame(self.raw, dtype=float) # try to force floating-point data type
-                except Exception, e:
-                    pass # oh well, we tried
-
                 self.raw.desc = 'Raw data from input file.'
 
-            # TODO: There's probably a better way to do this. Want to elegantly handle gzipped data.
-            # if filetype == 'gz':
-            #     with gzip.open(filename, 'rb') as f:
-            #         raw = f.read().split('\n')
-            #         if ( hasHeader ):
-            #             names = np.array(raw.pop(0).split(','))
-            #         self.raw = [row.split(',') for row in raw]
-        
+            if filetype == 'gz':
+                with gzip.open(filename, 'r') as f:
+                    self.raw = pandas.read_csv(StringIO.StringIO(f.read()))
+                    
         if dataset is not None:
             self.raw = dataset
     
