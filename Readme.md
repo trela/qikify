@@ -1,7 +1,7 @@
 
 # Qikify
       
-  MVC framework for adaptive test and semiconductor data analysis
+  Qikify is an MVC framework for adaptive test and semiconductor data analysis
   built on [scikits.learn](http://scikit-learn.sourceforge.net/), and
   [numpy](http://numpy.scipy.org/) using Python.
 
