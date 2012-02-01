@@ -1,3 +1,9 @@
+#!/usr/bin/python
+'''
+This python file is able to extract all the infor mation from a csv file and is able to store it in a dictionary. The dictiobary contains the different measurements specification as the keys. All the corresponding data of the the specification are stored in a list format as the value of that corresponding key. 
+'''
+#Read CSV file and store it in a dictionary
+
 import csv
 import re
 #import 
