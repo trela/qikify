@@ -20,18 +20,32 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 '''
-
 import numpy as np
-import scipy, csv, pandas
-from qikify.models.dotdict import dotdict
+import scipy, csv, pandas, curses
+from qikify.models import dotdict
 
-# Colors for printing to terminal
-HEADER   = '\033[95m'
-BLUE     = '\033[94m'
-GREEN    = '\033[0;32m'
-WARNING  = '\033[93m'
-RED      = '\033[91m'
-ENDCOLOR = '\033[0m'
+class colors(object):
+    def __init__(self):
+        self.GREEN    = '\033[0;32m'
+        self.HEADER = '\033[95m'
+        self.OKBLUE = '\033[94m'
+        self.OKGREEN = '\033[92m'
+        self.WARNING = '\033[93m'
+        self.FAIL = '\033[91m'
+        self.ENDC = '\033[0m'
+        
+        curses.setupterm()
+        if curses.tigetnum("colors") != 256:
+            self.disable()
+            
+    def disable(self):
+        self.HEADER = ''
+        self.OKBLUE = ''
+        self.OKGREEN = ''
+        self.WARNING = ''
+        self.FAIL = ''
+        self.ENDC = ''
+
 
 def outputPassFail(gnd):
     return 'Pass: '+GREEN+str(np.sum(gnd==1))+ENDCOLOR + ' Fail: '+RED+str(np.sum(gnd==0))+ENDCOLOR
