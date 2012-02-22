@@ -24,8 +24,9 @@ THE SOFTWARE.
 import numpy as np
 import gzip, StringIO, sys, os, csv, pandas
 
-from qikify.helpers import colors, is1D
-from qikify.models.dotdict import dotdict
+from qikify.helpers import is1D
+from qikify.term_helpers import colors
+from .dotdict import dotdict
 
 class Dataset(dotdict): 
     """This class is the fundamental data structure of the Qikify framework.

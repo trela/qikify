@@ -22,47 +22,13 @@ THE SOFTWARE.
 '''
 import numpy as np
 import scipy, csv, pandas, curses
-from qikify.models import dotdict
-
-class colors(object):
-    def __init__(self):
-        self.GREEN    = '\033[0;32m'
-        self.HEADER = '\033[95m'
-        self.OKBLUE = '\033[94m'
-        self.OKGREEN = '\033[92m'
-        self.WARNING = '\033[93m'
-        self.FAIL = '\033[91m'
-        self.ENDC = '\033[0m'
-        
-        curses.setupterm()
-        if curses.tigetnum("colors") != 256:
-            self.disable()
-            
-    def disable(self):
-        self.HEADER = ''
-        self.OKBLUE = ''
-        self.OKGREEN = ''
-        self.WARNING = ''
-        self.FAIL = ''
-        self.ENDC = ''
-
-
-def outputPassFail(gnd):
-    return 'Pass: '+GREEN+str(np.sum(gnd==1))+ENDCOLOR + ' Fail: '+RED+str(np.sum(gnd==0))+ENDCOLOR
+from qikify.models.dotdict import dotdict
 
 def bool2symmetric(data):
     """
     Changes True/False data to +1/-1 symmetric.
     """
     return np.array((data-0.5)*2.0,dtype = int)
-
-def csvWriteMatrix(filename, mat):
-    """
-    Write mat to filename as a csv.
-    """
-    out = csv.writer(open(filename, 'wb'))
-    for row in np.atleast_2d(mat):
-        out.writerow(row)        
 
 
 def standardize(X, scaleDict = None, reverse = False):
