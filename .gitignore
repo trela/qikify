@@ -3,4 +3,4 @@ analysis-server/build/
 analysis-server/dist/
 analysis-server/qikify.egg-info/
 ate-simulator/Data
-
+*.*~
