@@ -1,9 +1,58 @@
 import os
+import time
 import zmq
 import csv
 import pandas
 import msgpack
-from qikify.models import gz_csv_read
+import fnmatch
+import fileinput
+from qikify.models import Chip, gz_csv_read
+
+
+class ChipDataIterator(object):
+    def __init__(self, data_dir):
+        self.data_dir = data_dir
+        file_list    = os.listdir(self.data_dir)
+        csv_files    = fnmatch.filter(file_list, '*.csv') 
+        csv_gz_files = fnmatch.filter(file_list, '*.csv.gz') 
+
+        assert len(csv_files) > 0 or len(csv_gz_files) > 0, \
+               'Error: no data found in filesystem path'
+
+        if len(csv_files) > len(csv_gz_files):
+            print 'data source: reading %d csv files...' % len(csv_files)
+            self.data  = csv_files
+        else:
+            print 'data source: reading %d csv.gz files...' % len(csv_gz_files)
+            self.data  = csv_gz_files
+
+        # this iterator points to the latest chip from the latest wafer file.
+        self.chip_iter = fileinput.input(self.data) 
+
+        self.n_files_read = 0
+
+
+    def __iter__(self):
+        return self
+
+
+    def next(self):
+        """The call to self.chip_iter.next() will raise StopIteration when done, 
+        propagating through to the caller of ChipDataIterator().next().
+        """
+        line = self.chip_iter.next().split(',')
+        if self.chip_iter.filelineno() <= 1:
+            # read header line
+            self.header = line
+            print 'reading from file', self.chip_iter.filename()
+            self.n_files_read += 1
+            return self.next()
+        else:
+            print '[ %7d ]' % (self.chip_iter.lineno() - self.n_files_read),
+            chip_dict = {k : v for k, v in zip(self.header, line) if v.strip() != ''}
+            return Chip(chip_dict, LCT_prefix = 'ORB_')
+
+                        
 
 class ATESimulator(object):    
     def __init__(self, data_src='filesystem'):
@@ -12,73 +61,53 @@ class ATESimulator(object):
 
         """
         self.data_src = data_src
-        self.data_dir = None
-        self.data     = None
 
         # ZeroMQ socket stuff
         self.context = zmq.Context()
-        self.socket  = self.context.socket(zmq.PAIR)
+        self.socket  = self.context.socket(zmq.REP)
 
     def run(self, port=5570):
         """This function runs the ATE simulator using CSV files in the current directory.
-
         Currently, we only support loading *.csv or *.csv.gz files.
         """
+
         print 'Running ATE Simulator on port %d ...' % port
 
-        if self.data_src == 'filesystem':
-            import fnmatch
-            self.data_dir = os.getcwd()
-            file_list    = os.listdir(self.data_dir)
-            csv_files    = fnmatch.filter(file_list, '*.csv') 
-            csv_gz_files = fnmatch.filter(file_list, '*.csv.gz') 
-
-            if len(csv_files) == 0 and len(csv_gz_files) == 0:
-                print 'Error: no data found in current filesystem path'
-                return
-
-            elif len(csv_files) > len(csv_gz_files):
-                print 'data source: %d csv files...' % len(csv_files)
-                self.data  = csv_files
-                self.dtype = 'csv'
-
-            else:
-                print 'data source: %d csv.gz files...' % len(csv_gz_files)
-                self.data  = csv_gz_files
-                self.dtype = 'csv.gz'
-        else:
+        if self.data_src != 'filesystem':
             print 'non-filesystem data backends are currently not supported.'
-
+            return
         
         # Run ZeroMQ server
         self.socket.bind('tcp://127.0.0.1:%d' % port)
+        packer = msgpack.Packer()
         try:
-            for fname in self.data:
-                print fname
-                if self.dtype == 'csv':
-                    with open(fname, 'r') as f:
-                        c = csv.reader(f)
-                        header = c.next()
-                        self.send_chips(header, c)
-                elif self.dtype == 'csv.gz':
-                    import gzip, StringIO
-                    with gzip.open(fname, 'r') as f:
-                        c      = csv.reader(StringIO.StringIO(f.read()))
-                        header = c.next()
-                        self.send_chips(header, c)
+            for chip in ChipDataIterator(os.getcwd()):
+                while True:
+                    msg  = self.socket.recv()
+                    print '->', chip.id, msg, 
+                    if msg == 'REQ:send_LCT':
+                        # send chip low-cost test data
+                        print 'LCT', 
+                        time.sleep(1)
+                        chip_serialized = packer.pack(chip.LCT)
+                        self.socket.send( chip_serialized )
+                    elif msg == 'REQ:send_HCT':
+                        # send chip high-cost test data
+                        print 'LCT', 
+                        time.sleep(1)
+                        chip_serialized = packer.pack(chip.HCT)
+                        self.socket.send( chip_serialized )
+                    elif msg == 'REQ:done':
+                        print 'done.'
+                        self.socket.send('RES:ack')
+                        break
+                    else:
+                        print 'invalid message---continuing to next chip.'
+                        break
+                    print '\n           ',
+
         except KeyboardInterrupt:
             print '\nterminating ATE simulator.'
-
-    def send_chips(self, header, chip_iterable):
-        packer = msgpack.Packer()
-        for c in chip_iterable:  
-            chip = {k : v for k, v in zip(header, c) if v.strip() != ''}
-            print '->', chip['WAFER_ID']
-            chip_serialized = packer.pack(chip)
-            self.socket.send( chip_serialized )
-
-
-
 
 
 

@@ -9,6 +9,7 @@ Qikify: MVC for Adaptive Test
 available subcommands:
   help    show this help message and exit
   atesim  run the ATE simulator
+  basic   run a simple machine learning-based testing system.
   tttest  run 2 tier test. ATE simulator should already be running.
 """
 
@@ -37,6 +38,11 @@ def atesim(argv):
         from qikify.recipes.atesim import ATESimulator
         ATESimulator().run()
 
+def basic(argv):
+    if argv[0] == 'run':
+        from qikify.recipes.basic_ML_testing import BasicMLTesting
+        BasicMLTesting().run()
+
 def tttest(argv):
     if argv is None or argv[0] == 'help':
         print TWO_TIER_TEST_USAGE
@@ -61,6 +67,8 @@ if __name__ == '__main__':
 
     if subcommand == 'atesim':
         atesim(argv)
+    elif subcommand == 'basic':
+        basic(argv)
     elif subcommand == 'tttest':
         tttest(argv)
     elif subcommand == 'view':
