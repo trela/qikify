@@ -28,10 +28,10 @@ class BasicMLTesting(object):
                     self.chip_buffer.append(chip)
                     print 'received chip #', self.recv_count
 
-                print 'sending done to ATE simulator ...\n'
-                self.socket.send('REQ:done')
-                assert self.socket.recv() == 'RES:ack', \
-                       'Error: invalid ack from ATE simulator'
+                    print 'sending done to ATE simulator ...\n'
+                    self.socket.send('REQ:done')
+                    assert self.socket.recv() == 'RES:ack', \
+                        'Error: invalid ack from ATE simulator'
 
         except KeyboardInterrupt:
             print '\nterminating basic ML testing.'

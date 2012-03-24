@@ -22,5 +22,9 @@ qikify/models/chip.py
 qikify/models/dataset.py
 qikify/models/dotdict.py
 qikify/models/specs.py
+qikify/recipes/__init__.py
+qikify/recipes/atesim.py
+qikify/recipes/basic_ML_testing.py
+qikify/recipes/two_tier_test.py
 qikify/views/__init__.py
 qikify/views/charts.py
