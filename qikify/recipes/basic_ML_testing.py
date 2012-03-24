@@ -32,6 +32,8 @@ class BasicMLTesting(object):
                     self.socket.send('REQ:done')
                     assert self.socket.recv() == 'RES:ack', \
                         'Error: invalid ack from ATE simulator'
+                if self.recv_count==1000:
+                    print "Training Algorithm will run on these 1000 chips"
 
         except KeyboardInterrupt:
             print '\nterminating basic ML testing.'
