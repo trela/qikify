@@ -1,3 +1,4 @@
+
 import zmq
 import msgpack
 import time
@@ -33,6 +34,7 @@ class BasicMLTesting(object):
                     assert self.socket.recv() == 'RES:ack', \
                         'Error: invalid ack from ATE simulator'
                 if self.recv_count==1000:
+                    recv_count=0
                     print "Training Algorithm will run on these 1000 chips"
 
         except KeyboardInterrupt:

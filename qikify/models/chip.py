@@ -7,12 +7,17 @@ class Chip(object):
 
         self.LCT = {}
         self.HCT = {}
+        self.gnd=0
         try:
             self.id = chip_dict['WAFER_ID'] + ':' + chip_dict['XY']
         except:
             self.id = 'unknown_chip_id'
 
+        import pdb; pdb.set_trace()
+        
         for k in chip_dict:
+            if k=="gnd":
+                self.gnd=chip_dict[k]
             if k.startswith(LCT_prefix):
                 self.LCT[k] = chip_dict[k]
             else:
