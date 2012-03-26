@@ -1,4 +1,5 @@
 *.pyc
+qikify.egg-info/*.*
 analysis-server/build/
 analysis-server/dist/
 analysis-server/qikify.egg-info/
