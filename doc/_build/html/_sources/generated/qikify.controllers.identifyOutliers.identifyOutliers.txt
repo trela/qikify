@@ -1,0 +1,6 @@
+qikify.controllers.identifyOutliers.identifyOutliers
+====================================================
+
+.. currentmodule:: qikify.controllers.identifyOutliers
+
+.. autodata:: identifyOutliers

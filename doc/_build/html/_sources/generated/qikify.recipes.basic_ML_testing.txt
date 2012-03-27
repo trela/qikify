@@ -1,0 +1,16 @@
+qikify.recipes.basic_ML_testing
+===============================
+
+.. automodule:: qikify.recipes.basic_ML_testing
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

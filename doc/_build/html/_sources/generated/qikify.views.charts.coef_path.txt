@@ -1,0 +1,6 @@
+qikify.views.charts.coef_path
+=============================
+
+.. currentmodule:: qikify.views.charts
+
+.. autodata:: coef_path

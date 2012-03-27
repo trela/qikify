@@ -1,0 +1,6 @@
+qikify.views.charts.te_and_yl
+=============================
+
+.. currentmodule:: qikify.views.charts
+
+.. autodata:: te_and_yl

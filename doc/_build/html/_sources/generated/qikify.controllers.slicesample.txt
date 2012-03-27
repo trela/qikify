@@ -1,0 +1,16 @@
+qikify.controllers.slicesample
+==============================
+
+.. automodule:: qikify.controllers.slicesample
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

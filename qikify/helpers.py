@@ -21,12 +21,52 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 '''
 import numpy as np
-import scipy, csv, pandas, curses
+import scipy, csv, pandas
 from qikify.models.dotdict import dotdict
+import logging, os
+
+
+def create_logger(logmodule):
+    # create logger with 'spam_application'
+    logger = logging.getLogger(logmodule)
+    logger.setLevel(logging.INFO)
+
+    # create file handler which logs even debug messages
+    try:
+        import ConfigParser
+        config = ConfigParser.RawConfigParser()
+        config.read(os.path.expanduser('~/.qikifyrc'))
+        logdir = config.get('Logging', 'logdir')
+    except:
+        logdir = '/tmp/qikify/test'
+
+    if not os.path.exists(logdir):
+        os.makedirs(logdir)
+    logfile = os.path.join(logdir, '%s.log' % logmodule)
+        
+    # create file log handler
+    fh = logging.FileHandler(logfile)
+    fh.setLevel(logging.INFO)
+    
+    # create console handler with a higher log level
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.INFO)
+
+    # create formatter and add it to the handlers
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    ch.setFormatter(formatter)
+
+    # add the handlers to the logger
+    logger.addHandler(fh)
+    logger.addHandler(ch)
+    
+    return logger
+
+
 
 def bool2symmetric(data):
-    """
-    Changes True/False data to +1/-1 symmetric.
+    """Changes True/False data to +1/-1 symmetric.
     """
     return np.array((data-0.5)*2.0,dtype = int)
 
@@ -102,6 +142,9 @@ def getParetoFront(data):
 
 
 def is1D(data):
+    """Determine if data is 1-dimensional.
+    
+    """
     return data.shape[0] == np.size(data)
 
 
@@ -196,7 +239,8 @@ def nmse(yhat, y, min_y=None, max_y=None):
 
 
 def computeR2(yhat, y):
-    """Compute R-squared coefficient of determination:
+    """Computes R-squared coefficient of determination.
+    
        R2 = 1 - sum((y_hat - y_test)**2) / sum((y_test - np.mean(y_test))**2)
 
     Parameters

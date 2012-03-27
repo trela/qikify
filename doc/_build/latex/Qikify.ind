@@ -1,0 +1,74 @@
+\begin{theindex}
+\def\bigletter#1{{\Large\sffamily#1}\nopagebreak\vspace{1mm}}
+
+  \bigletter B
+  \item bool2symmetric (in module qikify.helpers), \hyperpage{3}
+
+  \indexspace
+  \bigletter C
+  \item Chip (in module qikify.models.chip), \hyperpage{5}
+  \item coef\_path (in module qikify.views.charts), \hyperpage{6}
+  \item computeR2 (in module qikify.helpers), \hyperpage{5}
+  \item create\_logger (in module qikify.helpers), \hyperpage{3}
+
+  \indexspace
+  \bigletter G
+  \item getParetoFront (in module qikify.helpers), \hyperpage{4}
+
+  \indexspace
+  \bigletter H
+  \item histogram (in module qikify.views.charts), \hyperpage{6}
+
+  \indexspace
+  \bigletter I
+  \item identifyOutliers (in module qikify.controllers.identifyOutliers), \hyperpage{7}
+  \item identifyOutliersSpecs (in module qikify.controllers.identifyOutliers), \hyperpage{7}
+  \item is1D (in module qikify.helpers), \hyperpage{4}
+
+  \indexspace
+  \bigletter K
+  \item KDE (in module qikify.controllers.KDE), \hyperpage{7}
+
+  \indexspace
+  \bigletter L
+  \item laplacianScores (in module qikify.views.charts), \hyperpage{6}
+
+  \indexspace
+  \bigletter N
+  \item nmse (in module qikify.helpers), \hyperpage{5}
+
+  \indexspace
+  \bigletter P
+  \item pairs (in module qikify.views.charts), \hyperpage{6}
+  \item partition (in module qikify.helpers), \hyperpage{4}
+
+  \indexspace
+  \bigletter Q
+  \item qikify (module), \hyperpage{1}
+  \item qikify.recipes.atesim (module), \hyperpage{8}
+  \item qikify.recipes.basic\_ML\_testing (module), \hyperpage{8}
+  \item qikify.recipes.two\_tier\_test (module), \hyperpage{8}
+  \item qq (in module qikify.views.charts), \hyperpage{6}
+
+  \indexspace
+  \bigletter S
+  \item standardize (in module qikify.helpers), \hyperpage{3}
+  \item syntheticAndReal (in module qikify.views.charts), \hyperpage{6}
+
+  \indexspace
+  \bigletter T
+  \item te\_and\_yl (in module qikify.views.charts), \hyperpage{6}
+
+  \indexspace
+  \bigletter W
+  \item wafermap (in module qikify.views.charts), \hyperpage{7}
+
+  \indexspace
+  \bigletter Y
+  \item yp\_vs\_y (in module qikify.views.charts), \hyperpage{6}
+
+  \indexspace
+  \bigletter Z
+  \item zeroMatrixDiagonal (in module qikify.helpers), \hyperpage{4}
+
+\end{theindex}

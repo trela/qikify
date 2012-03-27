@@ -1,0 +1,6 @@
+qikify.helpers.standardize
+==========================
+
+.. currentmodule:: qikify.helpers
+
+.. autodata:: standardize

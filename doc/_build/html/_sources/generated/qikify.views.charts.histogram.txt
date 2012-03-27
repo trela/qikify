@@ -1,0 +1,6 @@
+qikify.views.charts.histogram
+=============================
+
+.. currentmodule:: qikify.views.charts
+
+.. autodata:: histogram

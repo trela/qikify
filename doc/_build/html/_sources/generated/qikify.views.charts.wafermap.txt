@@ -1,0 +1,6 @@
+qikify.views.charts.wafermap
+============================
+
+.. currentmodule:: qikify.views.charts
+
+.. autodata:: wafermap

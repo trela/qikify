@@ -1,0 +1,26 @@
+\indexentry{qikify (module)|hyperpage}{1}
+\indexentry{create\_logger (in module qikify.helpers)|hyperpage}{3}
+\indexentry{bool2symmetric (in module qikify.helpers)|hyperpage}{3}
+\indexentry{standardize (in module qikify.helpers)|hyperpage}{3}
+\indexentry{zeroMatrixDiagonal (in module qikify.helpers)|hyperpage}{4}
+\indexentry{getParetoFront (in module qikify.helpers)|hyperpage}{4}
+\indexentry{is1D (in module qikify.helpers)|hyperpage}{4}
+\indexentry{partition (in module qikify.helpers)|hyperpage}{4}
+\indexentry{nmse (in module qikify.helpers)|hyperpage}{5}
+\indexentry{computeR2 (in module qikify.helpers)|hyperpage}{5}
+\indexentry{Chip (in module qikify.models.chip)|hyperpage}{5}
+\indexentry{syntheticAndReal (in module qikify.views.charts)|hyperpage}{6}
+\indexentry{histogram (in module qikify.views.charts)|hyperpage}{6}
+\indexentry{yp\_vs\_y (in module qikify.views.charts)|hyperpage}{6}
+\indexentry{qq (in module qikify.views.charts)|hyperpage}{6}
+\indexentry{coef\_path (in module qikify.views.charts)|hyperpage}{6}
+\indexentry{pairs (in module qikify.views.charts)|hyperpage}{6}
+\indexentry{te\_and\_yl (in module qikify.views.charts)|hyperpage}{6}
+\indexentry{laplacianScores (in module qikify.views.charts)|hyperpage}{6}
+\indexentry{wafermap (in module qikify.views.charts)|hyperpage}{7}
+\indexentry{identifyOutliers (in module qikify.controllers.identifyOutliers)|hyperpage}{7}
+\indexentry{identifyOutliersSpecs (in module qikify.controllers.identifyOutliers)|hyperpage}{7}
+\indexentry{KDE (in module qikify.controllers.KDE)|hyperpage}{7}
+\indexentry{qikify.recipes.atesim (module)|hyperpage}{8}
+\indexentry{qikify.recipes.basic\_ML\_testing (module)|hyperpage}{8}
+\indexentry{qikify.recipes.two\_tier\_test (module)|hyperpage}{8}

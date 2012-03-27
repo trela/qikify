@@ -26,10 +26,15 @@ import numpy as np
 from scipy.special import gamma
 
 from qikify.helpers import *
-from qikify.models.Specs import Specs
+from qikify.models.specs import Specs
 from slicesample import * 
 
 class KDE(object):
+    def __init__(self):
+        """Performs non-parametric kernel density estimation. 
+        """
+        pass
+        
     def run(self, X, specs = None, nSamples = 0, counts = None, a = 0, bounds = None):
         """Primary execution point. Run either standard KDE or class-membership based KDE. If 
         any of the class-membership based KDE arguments are set, it will be run instead of 

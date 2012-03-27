@@ -1,0 +1,6 @@
+qikify.helpers.computeR2
+========================
+
+.. currentmodule:: qikify.helpers
+
+.. autodata:: computeR2

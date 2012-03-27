@@ -1,0 +1,16 @@
+qikify.models.specs
+===================
+
+.. automodule:: qikify.models.specs
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

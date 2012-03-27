@@ -1,0 +1,6 @@
+qikify.helpers.partition
+========================
+
+.. currentmodule:: qikify.helpers
+
+.. autodata:: partition

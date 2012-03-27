@@ -1,6 +1,7 @@
 *.pyc
-analysis-server/build/
-analysis-server/dist/
-analysis-server/qikify.egg-info/
-ate-simulator/Data
+build/
+dist/
+qikify.egg-info/
 *.*~
+doc/generated
+doc/_static

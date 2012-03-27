@@ -1,0 +1,6 @@
+qikify.helpers.bool2symmetric
+=============================
+
+.. currentmodule:: qikify.helpers
+
+.. autodata:: bool2symmetric

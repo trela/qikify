@@ -1,0 +1,6 @@
+qikify.helpers.zeroMatrixDiagonal
+=================================
+
+.. currentmodule:: qikify.helpers
+
+.. autodata:: zeroMatrixDiagonal

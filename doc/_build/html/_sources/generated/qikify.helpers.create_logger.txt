@@ -1,0 +1,6 @@
+qikify.helpers.create_logger
+============================
+
+.. currentmodule:: qikify.helpers
+
+.. autodata:: create_logger

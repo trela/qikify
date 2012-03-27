@@ -1,0 +1,16 @@
+qikify.views.charts
+===================
+
+.. automodule:: qikify.views.charts
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

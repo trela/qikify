@@ -1,0 +1,6 @@
+qikify.controllers.KDE.KDE.__init__
+===================================
+
+.. currentmodule:: qikify.controllers.KDE.KDE
+
+.. autodata:: __init__

@@ -2,9 +2,12 @@
 # Qikify
       
   Qikify is an MVC framework for adaptive test and semiconductor data analysis
-  built on [scikits.learn](http://scikit-learn.sourceforge.net/), and
-  [numpy](http://numpy.scipy.org/) using Python.
-
+  built on [sklearn](http://scikit-learn.sourceforge.net/) and
+  [numpy](http://numpy.scipy.org/).
+  
+  The objective of this project is to simplify the task of working with 
+  semiconductor data in production environments.
+  
 ## Known issues
 
   This software is in early pre-alpha state. There are several rounds of refactoring remaining before it approaches production quality.
@@ -14,25 +17,25 @@
 
   This project is built on and requires the following software:  
   
-  * python 2.7.2
-  * numpy 1.6.1rc1
-  * scipy 0.9.0
-  * sklearn 0.9
-  * pandas 0.5.1.dev-75026f2
+  * python 2.7.2+
+  * numpy 1.6.1+
+  * scipy 0.9.0+
+  * sklearn 0.10+
+  * pandas 0.7.3+
 
   Once the above are installed, install qikify with:
 
-     git clone git://github.com/natekupp/qikify.git
-	 cd qikify
-	 python setup.py install
+    git clone git://github.com/natekupp/qikify.git
+	  cd qikify
+	  python setup.py install
 
-  to get started.
+  to get started with the code.
 
 ## Features
 
   * Intuitive data model
   * Modular support for "controllers" to implement machine-learning analysis techniques
-  * Web-based interaction with machine-learning tasks running server-side via [node.js](http://nodejs.org)
+  * Web-based interaction with machine-learning tasks running server-side.
 
 ## Example
 TODO: Need example demonstrating usage.

@@ -28,7 +28,6 @@ class ChipDataIterator(object):
 
         # this iterator points to the latest chip from the latest wafer file.
         self.chip_iter = fileinput.input(self.data) 
-
         self.n_files_read = 0
 
 

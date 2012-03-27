@@ -1,0 +1,16 @@
+qikify.controllers.identifyOutliers
+===================================
+
+.. automodule:: qikify.controllers.identifyOutliers
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

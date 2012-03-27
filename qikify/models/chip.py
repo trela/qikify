@@ -1,5 +1,7 @@
 
 class Chip(object):
+    """Encapsulates chip-level data.
+    """
     import pandas
     def __init__(self, chip_dict, LCT_prefix = ''):
         """Expects a dictionary of chip data. A prefix indicating which 

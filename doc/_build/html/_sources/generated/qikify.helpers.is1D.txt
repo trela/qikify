@@ -1,0 +1,6 @@
+qikify.helpers.is1D
+===================
+
+.. currentmodule:: qikify.helpers
+
+.. autodata:: is1D
