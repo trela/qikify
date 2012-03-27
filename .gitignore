@@ -1,7 +1,7 @@
 *.pyc
 build/
 dist/
-qikify.egg-info/
+qikify.egg-info
 *.*~
 doc/generated
 doc/_static
