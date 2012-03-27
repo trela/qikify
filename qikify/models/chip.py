@@ -15,10 +15,11 @@ class Chip(object):
 
         import pdb; pdb.set_trace()
         
+
         for k in chip_dict:
             if k=="gnd":
                 self.gnd=chip_dict[k]
-            if k.startswith(LCT_prefix):
+            elif k.startswith(LCT_prefix):
                 self.LCT[k] = chip_dict[k]
             else:
                 self.HCT[k] = chip_dict[k]
