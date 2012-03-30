@@ -6,7 +6,8 @@ import pandas
 import msgpack
 import fnmatch
 import fileinput
-from qikify.models import Chip, gz_csv_read
+from qikify.models.chip import Chip
+from qikify.models.helpers import gz_csv_read
 
 
 class ChipDataIterator(object):
@@ -57,7 +58,6 @@ class ATESimulator(object):
     def __init__(self, data_src='filesystem'):
         """This class is for simulating ATE. It loads data from a data source specified
         by the argument data_src, and emits Chip() model tuples of data.
-
         """
         self.data_src = data_src
 
@@ -67,7 +67,7 @@ class ATESimulator(object):
 
     def run(self, port=5570):
         """This function runs the ATE simulator using CSV files in the current directory.
-        Currently, we only support loading *.csv or *.csv.gz files.
+        Currently, we only support loading .csv or .csv.gz files.
         """
 
         print 'Running ATE Simulator on port %d ...' % port

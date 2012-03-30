@@ -1,6 +1,0 @@
-qikify.controllers.identifyOutliers.identifyOutliersSpecs
-=========================================================
-
-.. currentmodule:: qikify.controllers.identifyOutliers
-
-.. autodata:: identifyOutliersSpecs

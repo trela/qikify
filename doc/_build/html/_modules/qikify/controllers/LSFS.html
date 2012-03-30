@@ -1,0 +1,209 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>qikify.controllers.LSFS &mdash; qikify  documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="qikify  documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../../np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">qikify  documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for qikify.controllers.LSFS</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial.distance</span> <span class="kn">import</span> <span class="n">pdist</span><span class="p">,</span> <span class="n">squareform</span>
+<span class="kn">from</span> <span class="nn">qikify.helpers</span> <span class="kn">import</span> <span class="n">standardize</span>
+
+<span class="c"># Laplacian score feature selection</span>
+<div class="viewcode-block" id="LSFS"><a class="viewcode-back" href="../../../qikify.controllers.html#qikify.controllers.LSFS.LSFS">[docs]</a><span class="k">class</span> <span class="nc">LSFS</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="LSFS.run"><a class="viewcode-back" href="../../../qikify.controllers.html#qikify.controllers.LSFS.LSFS.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Xin</span><span class="p">,</span> <span class="n">gnd</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run Laplacian Score Feature Selection. </span>
+<span class="sd">         </span>
+<span class="sd">        .. note:: Eventually, it&#39;d be nice to maintain col names with Xin so that we can add a plot method to plot scores vs. column names.</span>
+<span class="sd">        </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This code is based on the definition from the paper [1]_:</span>
+<span class="sd">        </span>
+<span class="sd">        .. math:: </span>
+<span class="sd">            X * \frac{\sum_{ij} (f_r^i - f_r^j) * S_{ij}}{sigma_2}</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. [1] He, X. and Cai, D. and Niyogi, P., &quot;Laplacian Score for Feature Selection&quot;, NIPS 2005.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        Xin : array_like</span>
+<span class="sd">            A numpy.ndarray or pandas.DataFrame, with rows corresponding to observations and columns to features.</span>
+<span class="sd">            </span>
+<span class="sd">        gnd : array_like</span>
+<span class="sd">            A numpy.ndarray or pandas.DataFrame pass/fail vector of the same dimension as Xin</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">Xin</span><span class="p">,</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">Xin</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">Xin</span>
+        
+        <span class="n">nSmp</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">nSmp</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">gnd</span><span class="p">):</span> 
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Data and gnd do not have matching sizes&quot;</span><span class="p">)</span>
+        
+        <span class="n">_</span><span class="p">,</span> <span class="n">X</span> <span class="o">=</span> <span class="n">standardize</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        
+        <span class="c"># Per LSFS paper, S_ij = exp(-||x_i - x_j||^2 / t). I&#39;ve found that</span>
+        <span class="c"># t = ncol(X) to be a suitable choice; anything on that order should </span>
+        <span class="c"># work just fine.</span>
+        <span class="n">S</span>          <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">constructS</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">gnd</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> 
+        <span class="n">D</span>          <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">S</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">z</span>          <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="n">X</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="n">X</span><span class="p">))</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>  
+        
+        <span class="n">DPrime</span>     <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">D</span><span class="p">))</span><span class="o">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">X</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="n">z</span>      
+        <span class="n">LPrime</span>     <span class="o">=</span> <span class="nb">sum</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">,</span><span class="n">S</span><span class="p">)</span><span class="o">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">X</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">z</span>
+        
+        
+        <span class="c"># Remove trivial solutions</span>
+        <span class="n">DPrime</span><span class="p">[</span><span class="n">DPrime</span> <span class="o">&lt;</span> <span class="mf">1e-12</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        
+        <span class="c"># Compute and retain Laplacian scores and rankings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Scores</span>    <span class="o">=</span> <span class="p">(</span><span class="n">LPrime</span><span class="o">/</span><span class="n">DPrime</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ranking</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">Scores</span><span class="p">)</span>
+        
+        <span class="k">del</span> <span class="n">S</span>  <span class="c"># Clean up to save memory</span>
+        <span class="k">return</span> <span class="bp">self</span>
+        </div>
+<div class="viewcode-block" id="LSFS.threshold"><a class="viewcode-back" href="../../../qikify.controllers.html#qikify.controllers.LSFS.LSFS.threshold">[docs]</a>    <span class="k">def</span> <span class="nf">threshold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">T_L</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subset</span>    <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Scores</span> <span class="o">&gt;</span> <span class="n">T_L</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nRetained</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subset</span><span class="p">))</span>
+        <span class="k">print</span> <span class="s">&#39;LSFS: retained&#39;</span><span class="p">,</span> <span class="n">GREEN</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nRetained</span><span class="p">)</span><span class="o">+</span><span class="n">ENDCOLOR</span><span class="p">,</span> <span class="s">&#39;parameters.&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">subset</span>
+
+    <span class="c"># Construct the W matrix used in LSFS</span></div>
+<div class="viewcode-block" id="LSFS.constructS"><a class="viewcode-back" href="../../../qikify.controllers.html#qikify.controllers.LSFS.LSFS.constructS">[docs]</a>    <span class="k">def</span> <span class="nf">constructS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">gnd</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bLDA</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">bSelfConnected</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">gnd</span><span class="p">)</span>
+        <span class="n">G</span>     <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">gnd</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">gnd</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">bLDA</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">label</span><span class="p">)):</span>
+                <span class="n">ind</span> <span class="o">=</span> <span class="p">(</span><span class="n">gnd</span><span class="o">==</span><span class="n">label</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">G</span><span class="p">[</span><span class="n">ix_</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span><span class="n">ind</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">G</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">label</span><span class="p">)):</span>
+                <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">gnd</span><span class="o">==</span><span class="n">label</span><span class="p">[</span><span class="n">i</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">D</span>   <span class="o">=</span> <span class="n">squareform</span><span class="p">(</span><span class="n">pdist</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">ind</span><span class="p">,:],</span> <span class="s">&#39;sqeuclidean&#39;</span><span class="p">))</span>  <span class="c"># D_ij = ||x_i - x_j||^2</span>
+                <span class="n">S</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">D</span><span class="o">/</span><span class="n">t</span><span class="p">)</span>                                   <span class="c"># Per LSFS paper, exp(-||x_i - x_j||^2 / t)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_setSubMat</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">ind</span><span class="p">)</span>                         
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">bSelfConnected</span><span class="p">:</span>
+                <span class="n">G</span> <span class="o">=</span> <span class="n">zeroMatrixDiagonal</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_genMaxMatrix</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="k">print</span> <span class="s">&#39;LSFS: Construction of W matrix complete.&#39;</span>
+</div>
+    <span class="k">def</span> <span class="nf">_setSubMat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">ind</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set a submatrix of X defined by the index ind to values in D. </span>
+<span class="sd">        That is:</span>
+<span class="sd">                 [0, 0, 0]</span>
+<span class="sd">             X = [0, 0, 0]   D = [1 2] ind = [0 1]</span>
+<span class="sd">                 [0, 0, 0]       [3 4]</span>
+<span class="sd">        Gives:</span>
+<span class="sd">                 [1, 2, 0]</span>
+<span class="sd">             X = [3, 4, 0]</span>
+<span class="sd">                 [0, 0, 0]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ind</span><span class="p">):</span>
+            <span class="n">X</span><span class="p">[</span><span class="n">row</span><span class="p">,</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">D</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span>
+
+    <span class="k">def</span> <span class="nf">_genMaxMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Takes a square matrix A and computes max(A, A&#39;)&quot;&quot;&quot;</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">T</span> <span class="o">-</span> <span class="n">A</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="n">A</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">A</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../../np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">qikify  documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Author.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

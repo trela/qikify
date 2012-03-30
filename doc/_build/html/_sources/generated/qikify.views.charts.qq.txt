@@ -1,6 +1,0 @@
-qikify.views.charts.qq
-======================
-
-.. currentmodule:: qikify.views.charts
-
-.. autodata:: qq

@@ -1,6 +1,0 @@
-qikify.models.chip.Chip
-=======================
-
-.. currentmodule:: qikify.models.chip
-
-.. autodata:: Chip

@@ -1,6 +1,0 @@
-qikify.views.charts.laplacianScores
-===================================
-
-.. currentmodule:: qikify.views.charts
-
-.. autodata:: laplacianScores

@@ -1,26 +1,91 @@
-\indexentry{qikify (module)|hyperpage}{1}
-\indexentry{create\_logger (in module qikify.helpers)|hyperpage}{3}
-\indexentry{bool2symmetric (in module qikify.helpers)|hyperpage}{3}
-\indexentry{standardize (in module qikify.helpers)|hyperpage}{3}
-\indexentry{zeroMatrixDiagonal (in module qikify.helpers)|hyperpage}{4}
-\indexentry{getParetoFront (in module qikify.helpers)|hyperpage}{4}
-\indexentry{is1D (in module qikify.helpers)|hyperpage}{4}
-\indexentry{partition (in module qikify.helpers)|hyperpage}{4}
-\indexentry{nmse (in module qikify.helpers)|hyperpage}{5}
-\indexentry{computeR2 (in module qikify.helpers)|hyperpage}{5}
-\indexentry{Chip (in module qikify.models.chip)|hyperpage}{5}
-\indexentry{syntheticAndReal (in module qikify.views.charts)|hyperpage}{6}
-\indexentry{histogram (in module qikify.views.charts)|hyperpage}{6}
-\indexentry{yp\_vs\_y (in module qikify.views.charts)|hyperpage}{6}
-\indexentry{qq (in module qikify.views.charts)|hyperpage}{6}
-\indexentry{coef\_path (in module qikify.views.charts)|hyperpage}{6}
-\indexentry{pairs (in module qikify.views.charts)|hyperpage}{6}
-\indexentry{te\_and\_yl (in module qikify.views.charts)|hyperpage}{6}
-\indexentry{laplacianScores (in module qikify.views.charts)|hyperpage}{6}
-\indexentry{wafermap (in module qikify.views.charts)|hyperpage}{7}
-\indexentry{identifyOutliers (in module qikify.controllers.identifyOutliers)|hyperpage}{7}
-\indexentry{identifyOutliersSpecs (in module qikify.controllers.identifyOutliers)|hyperpage}{7}
-\indexentry{KDE (in module qikify.controllers.KDE)|hyperpage}{7}
-\indexentry{qikify.recipes.atesim (module)|hyperpage}{8}
-\indexentry{qikify.recipes.basic\_ML\_testing (module)|hyperpage}{8}
-\indexentry{qikify.recipes.two\_tier\_test (module)|hyperpage}{8}
+\indexentry{qikify.\_\_init\_\_ (module)|hyperpage}{3}
+\indexentry{qikify.helpers (module)|hyperpage}{3}
+\indexentry{bool2symmetric() (in module qikify.helpers)|hyperpage}{3}
+\indexentry{computeR2() (in module qikify.helpers)|hyperpage}{3}
+\indexentry{create\_logger() (in module qikify.helpers)|hyperpage}{3}
+\indexentry{getParetoFront() (in module qikify.helpers)|hyperpage}{3}
+\indexentry{is1D() (in module qikify.helpers)|hyperpage}{3}
+\indexentry{nmse() (in module qikify.helpers)|hyperpage}{3}
+\indexentry{partition() (in module qikify.helpers)|hyperpage}{4}
+\indexentry{standardize() (in module qikify.helpers)|hyperpage}{4}
+\indexentry{zeroMatrixDiagonal() (in module qikify.helpers)|hyperpage}{4}
+\indexentry{qikify.term\_helpers (module)|hyperpage}{5}
+\indexentry{colors (class in qikify.term\_helpers)|hyperpage}{5}
+\indexentry{disable() (qikify.term\_helpers.colors method)|hyperpage}{5}
+\indexentry{outputPassFail() (in module qikify.term\_helpers)|hyperpage}{5}
+\indexentry{qikify.controllers.KDE (module)|hyperpage}{5}
+\indexentry{KDE (class in qikify.controllers.KDE)|hyperpage}{5}
+\indexentry{run() (qikify.controllers.KDE.KDE method)|hyperpage}{5}
+\indexentry{qikify.controllers.LSFS (module)|hyperpage}{6}
+\indexentry{LSFS (class in qikify.controllers.LSFS)|hyperpage}{6}
+\indexentry{constructS() (qikify.controllers.LSFS.LSFS method)|hyperpage}{6}
+\indexentry{run() (qikify.controllers.LSFS.LSFS method)|hyperpage}{6}
+\indexentry{threshold() (qikify.controllers.LSFS.LSFS method)|hyperpage}{6}
+\indexentry{qikify.controllers.OLS (module)|hyperpage}{6}
+\indexentry{OLS (class in qikify.controllers.OLS)|hyperpage}{6}
+\indexentry{JB() (qikify.controllers.OLS.OLS method)|hyperpage}{7}
+\indexentry{computeStatistics() (qikify.controllers.OLS.OLS method)|hyperpage}{7}
+\indexentry{dw() (qikify.controllers.OLS.OLS method)|hyperpage}{7}
+\indexentry{ll() (qikify.controllers.OLS.OLS method)|hyperpage}{7}
+\indexentry{omni() (qikify.controllers.OLS.OLS method)|hyperpage}{7}
+\indexentry{train() (qikify.controllers.OLS.OLS method)|hyperpage}{7}
+\indexentry{qikify.controllers.QFFS (module)|hyperpage}{7}
+\indexentry{QFFS (class in qikify.controllers.QFFS)|hyperpage}{7}
+\indexentry{computeCorrCoefs() (qikify.controllers.QFFS.QFFS method)|hyperpage}{7}
+\indexentry{run() (qikify.controllers.QFFS.QFFS method)|hyperpage}{7}
+\indexentry{qikify.controllers.SVM (module)|hyperpage}{8}
+\indexentry{SVM (class in qikify.controllers.SVM)|hyperpage}{8}
+\indexentry{getTEYL() (qikify.controllers.SVM.SVM method)|hyperpage}{8}
+\indexentry{predict() (qikify.controllers.SVM.SVM method)|hyperpage}{8}
+\indexentry{train() (qikify.controllers.SVM.SVM method)|hyperpage}{8}
+\indexentry{qikify.controllers.identifyOutliers (module)|hyperpage}{8}
+\indexentry{identifyOutliers() (in module qikify.controllers.identifyOutliers)|hyperpage}{8}
+\indexentry{identifyOutliersSpecs() (in module qikify.controllers.identifyOutliers)|hyperpage}{8}
+\indexentry{qikify.controllers.interpolate (module)|hyperpage}{9}
+\indexentry{bilinear\_interp() (in module qikify.controllers.interpolate)|hyperpage}{9}
+\indexentry{cart2polar() (in module qikify.controllers.interpolate)|hyperpage}{9}
+\indexentry{cart2polar\_recenter() (in module qikify.controllers.interpolate)|hyperpage}{9}
+\indexentry{lerp() (in module qikify.controllers.interpolate)|hyperpage}{9}
+\indexentry{polar2cart() (in module qikify.controllers.interpolate)|hyperpage}{9}
+\indexentry{polar2cart\_recenter() (in module qikify.controllers.interpolate)|hyperpage}{9}
+\indexentry{qikify.controllers.slicesample (module)|hyperpage}{9}
+\indexentry{inside() (in module qikify.controllers.slicesample)|hyperpage}{9}
+\indexentry{logpdf() (in module qikify.controllers.slicesample)|hyperpage}{9}
+\indexentry{outside() (in module qikify.controllers.slicesample)|hyperpage}{9}
+\indexentry{slicesample() (in module qikify.controllers.slicesample)|hyperpage}{9}
+\indexentry{qikify.models.chip (module)|hyperpage}{9}
+\indexentry{Chip (class in qikify.models.chip)|hyperpage}{9}
+\indexentry{qikify.models.dataset (module)|hyperpage}{9}
+\indexentry{Dataset (class in qikify.models.dataset)|hyperpage}{9}
+\indexentry{qikify.models.dotdict (module)|hyperpage}{10}
+\indexentry{dotdict (class in qikify.models.dotdict)|hyperpage}{10}
+\indexentry{mdotmap (class in qikify.models.dotdict)|hyperpage}{10}
+\indexentry{qikify.models.helpers (module)|hyperpage}{11}
+\indexentry{gz\_csv\_read() (in module qikify.models.helpers)|hyperpage}{11}
+\indexentry{gz\_csv\_write() (in module qikify.models.helpers)|hyperpage}{11}
+\indexentry{qikify.models.specs (module)|hyperpage}{11}
+\indexentry{Specs (class in qikify.models.specs)|hyperpage}{11}
+\indexentry{computePassFail() (qikify.models.specs.Specs method)|hyperpage}{11}
+\indexentry{genCriticalRegion() (qikify.models.specs.Specs method)|hyperpage}{11}
+\indexentry{qikify.recipes.atesim (module)|hyperpage}{11}
+\indexentry{ATESimulator (class in qikify.recipes.atesim)|hyperpage}{11}
+\indexentry{run() (qikify.recipes.atesim.ATESimulator method)|hyperpage}{12}
+\indexentry{ChipDataIterator (class in qikify.recipes.atesim)|hyperpage}{12}
+\indexentry{next() (qikify.recipes.atesim.ChipDataIterator method)|hyperpage}{12}
+\indexentry{qikify.recipes.basic\_ML\_testing (module)|hyperpage}{12}
+\indexentry{BasicMLTesting (class in qikify.recipes.basic\_ML\_testing)|hyperpage}{12}
+\indexentry{run() (qikify.recipes.basic\_ML\_testing.BasicMLTesting method)|hyperpage}{12}
+\indexentry{qikify.recipes.two\_tier\_test (module)|hyperpage}{12}
+\indexentry{TwoTierTest (class in qikify.recipes.two\_tier\_test)|hyperpage}{12}
+\indexentry{run() (qikify.recipes.two\_tier\_test.TwoTierTest method)|hyperpage}{12}
+\indexentry{qikify.views.charts (module)|hyperpage}{13}
+\indexentry{coef\_path() (in module qikify.views.charts)|hyperpage}{13}
+\indexentry{histogram() (in module qikify.views.charts)|hyperpage}{13}
+\indexentry{laplacianScores() (in module qikify.views.charts)|hyperpage}{13}
+\indexentry{pairs() (in module qikify.views.charts)|hyperpage}{13}
+\indexentry{percentFormatter() (in module qikify.views.charts)|hyperpage}{13}
+\indexentry{qq() (in module qikify.views.charts)|hyperpage}{13}
+\indexentry{syntheticAndReal() (in module qikify.views.charts)|hyperpage}{13}
+\indexentry{te\_and\_yl() (in module qikify.views.charts)|hyperpage}{13}
+\indexentry{wafermap() (in module qikify.views.charts)|hyperpage}{13}
+\indexentry{yp\_vs\_y() (in module qikify.views.charts)|hyperpage}{13}

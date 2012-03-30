@@ -1,17 +1,14 @@
-#!/usr/bin/python
-'''
-
-Loosely based on slicesample() from MATLAB.
- 
-'''
-from numpy import *
+import numpy as np
 
 def slicesample(x0, nsamples, pdf, width = 10, maxiter = 200):
-    dim = size(x0)
-    rnd = zeros((nsamples,dim))
-    e   = random.exponential(1,nsamples) # needed for the vertical position of the slice.
-    RW  = random.rand(nsamples,dim) # factors of randomizing the width
-    RD  = random.rand(nsamples,dim) # uniformly draw the point within the slice
+    """Loosely based on slicesample() from MATLAB.
+    """
+    
+    dim = np.size(x0)
+    rnd = np.zeros((nsamples,dim))
+    e   = np.random.exponential(1,nsamples) # needed for the vertical position of the slice.
+    RW  = np.random.rand(nsamples,dim) # factors of randomizing the width
+    RD  = np.random.rand(nsamples,dim) # uniformly draw the point within the slice
     
     for i in xrange(nsamples):
         # A vertical level is drawn uniformly from (0,f(x0)) and used to define
@@ -49,14 +46,14 @@ def slicesample(x0, nsamples, pdf, width = 10, maxiter = 200):
             lshrink = ~rshrink
             xr[rshrink] = xp[rshrink]
             xl[lshrink] = xp[lshrink]
-            xp = (random.rand(1,dim) * (xr-xl))[0] + xl # draw again
+            xp = (np.random.rand(1,dim) * (xr-xl))[0] + xl # draw again
             iteration += 1
         rnd[i,:] = x0 = xp # update the current value 
     return (rnd[0,:] if nsamples == 1 else rnd)
 
 def logpdf(x, pdf):
     fx = pdf(x)
-    return log(fx) if fx > 0 else -inf
+    return np.log(fx) if fx > 0 else -np.inf
 
 def inside(x,th, pdf):
     return logpdf(x, pdf) > th

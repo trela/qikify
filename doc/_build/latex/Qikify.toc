@@ -1,45 +1,54 @@
 \select@language {english}
-\contentsline {chapter}{\numberline {1}API Reference}{3}{chapter.1}
-\contentsline {section}{\numberline {1.1}General functions}{3}{section.1.1}
-\contentsline {subsection}{\numberline {1.1.1}Helper Functions}{3}{subsection.1.1.1}
-\contentsline {subsubsection}{qikify.helpers.create\_logger}{3}{subsubsection*.4}
-\contentsline {subsubsection}{qikify.helpers.bool2symmetric}{3}{subsubsection*.6}
-\contentsline {subsubsection}{qikify.helpers.standardize}{3}{subsubsection*.8}
-\contentsline {paragraph}{Examples}{4}{paragraph*.10}
-\contentsline {subsubsection}{qikify.helpers.zeroMatrixDiagonal}{4}{subsubsection*.11}
-\contentsline {paragraph}{Examples}{4}{paragraph*.13}
-\contentsline {subsubsection}{qikify.helpers.getParetoFront}{4}{subsubsection*.14}
+\contentsline {chapter}{\numberline {1}qikify Package}{3}{chapter.1}
+\contentsline {section}{\numberline {1.1}\texttt {qikify} Package}{3}{section.1.1}
+\contentsline {section}{\numberline {1.2}\texttt {helpers} Module}{3}{section.1.2}
+\contentsline {paragraph}{Examples}{3}{paragraph*.6}
+\contentsline {paragraph}{Examples}{3}{paragraph*.9}
+\contentsline {paragraph}{Examples}{4}{paragraph*.12}
+\contentsline {paragraph}{Examples}{4}{paragraph*.14}
 \contentsline {paragraph}{Examples}{4}{paragraph*.16}
-\contentsline {subsubsection}{qikify.helpers.is1D}{4}{subsubsection*.17}
-\contentsline {subsubsection}{qikify.helpers.partition}{4}{subsubsection*.19}
-\contentsline {paragraph}{Examples}{5}{paragraph*.21}
-\contentsline {subsubsection}{qikify.helpers.nmse}{5}{subsubsection*.22}
-\contentsline {paragraph}{Examples}{5}{paragraph*.24}
-\contentsline {subsubsection}{qikify.helpers.computeR2}{5}{subsubsection*.25}
-\contentsline {paragraph}{Examples}{5}{paragraph*.27}
-\contentsline {section}{\numberline {1.2}Models}{5}{section.1.2}
-\contentsline {subsection}{\numberline {1.2.1}Chip}{5}{subsection.1.2.1}
-\contentsline {subsubsection}{qikify.models.chip.Chip}{5}{subsubsection*.28}
-\contentsline {section}{\numberline {1.3}Views}{6}{section.1.3}
-\contentsline {subsection}{\numberline {1.3.1}qikify.views.charts.syntheticAndReal}{6}{subsection.1.3.1}
-\contentsline {subsection}{\numberline {1.3.2}qikify.views.charts.histogram}{6}{subsection.1.3.2}
-\contentsline {subsection}{\numberline {1.3.3}qikify.views.charts.yp\_vs\_y}{6}{subsection.1.3.3}
-\contentsline {subsection}{\numberline {1.3.4}qikify.views.charts.qq}{6}{subsection.1.3.4}
-\contentsline {subsection}{\numberline {1.3.5}qikify.views.charts.coef\_path}{6}{subsection.1.3.5}
-\contentsline {subsection}{\numberline {1.3.6}qikify.views.charts.pairs}{6}{subsection.1.3.6}
-\contentsline {subsection}{\numberline {1.3.7}qikify.views.charts.te\_and\_yl}{6}{subsection.1.3.7}
-\contentsline {subsection}{\numberline {1.3.8}qikify.views.charts.laplacianScores}{6}{subsection.1.3.8}
-\contentsline {subsection}{\numberline {1.3.9}qikify.views.charts.wafermap}{7}{subsection.1.3.9}
-\contentsline {section}{\numberline {1.4}Controllers}{7}{section.1.4}
-\contentsline {subsection}{\numberline {1.4.1}qikify.controllers.identifyOutliers.identifyOutliers}{7}{subsection.1.4.1}
-\contentsline {subsection}{\numberline {1.4.2}qikify.controllers.identifyOutliers.identifyOutliersSpecs}{7}{subsection.1.4.2}
-\contentsline {subsection}{\numberline {1.4.3}KDE}{7}{subsection.1.4.3}
-\contentsline {subsubsection}{qikify.controllers.KDE.KDE}{7}{subsubsection*.41}
-\contentsline {subsubsection}{qikify.controllers.KDE.KDE.\_\_init\_\_}{7}{subsubsection*.43}
-\contentsline {subsubsection}{qikify.controllers.KDE.KDE.run}{7}{subsubsection*.44}
-\contentsline {subsection}{\numberline {1.4.4}Recipes}{7}{subsection.1.4.4}
-\contentsline {subsubsection}{qikify.recipes.atesim}{8}{subsubsection*.45}
-\contentsline {subsubsection}{qikify.recipes.basic\_ML\_testing}{8}{subsubsection*.46}
-\contentsline {subsubsection}{qikify.recipes.two\_tier\_test}{8}{subsubsection*.47}
-\contentsline {chapter}{Python Module Index}{9}{section*.48}
-\contentsline {chapter}{Index}{11}{section*.49}
+\contentsline {paragraph}{Examples}{5}{paragraph*.18}
+\contentsline {section}{\numberline {1.3}\texttt {term\_helpers} Module}{5}{section.1.3}
+\contentsline {paragraph}{Methods}{5}{paragraph*.20}
+\contentsline {section}{\numberline {1.4}Subpackages}{5}{section.1.4}
+\contentsline {subsection}{\numberline {1.4.1}controllers Package}{5}{subsection.1.4.1}
+\contentsline {subsubsection}{\texttt {KDE} Module}{5}{subsubsection*.23}
+\contentsline {paragraph}{Methods}{5}{paragraph*.25}
+\contentsline {subsubsection}{\texttt {LSFS} Module}{6}{subsubsection*.27}
+\contentsline {paragraph}{Methods}{6}{paragraph*.29}
+\contentsline {paragraph}{Notes}{6}{paragraph*.32}
+\contentsline {subsubsection}{\texttt {OLS} Module}{6}{subsubsection*.34}
+\contentsline {paragraph}{Methods}{6}{paragraph*.36}
+\contentsline {subsubsection}{\texttt {QFFS} Module}{7}{subsubsection*.43}
+\contentsline {paragraph}{Methods}{7}{paragraph*.45}
+\contentsline {paragraph}{Notes}{8}{paragraph*.48}
+\contentsline {subsubsection}{\texttt {SVM} Module}{8}{subsubsection*.49}
+\contentsline {paragraph}{Methods}{8}{paragraph*.51}
+\contentsline {subsubsection}{\texttt {identifyOutliers} Module}{8}{subsubsection*.55}
+\contentsline {subsubsection}{\texttt {interpolate} Module}{9}{subsubsection*.58}
+\contentsline {subsubsection}{\texttt {slicesample} Module}{9}{subsubsection*.65}
+\contentsline {subsection}{\numberline {1.4.2}models Package}{9}{subsection.1.4.2}
+\contentsline {subsubsection}{\texttt {chip} Module}{9}{subsubsection*.70}
+\contentsline {subsubsection}{\texttt {dataset} Module}{9}{subsubsection*.72}
+\contentsline {paragraph}{Methods}{9}{paragraph*.74}
+\contentsline {subsubsection}{\texttt {dotdict} Module}{10}{subsubsection*.75}
+\contentsline {paragraph}{Methods}{10}{paragraph*.77}
+\contentsline {paragraph}{Methods}{11}{paragraph*.79}
+\contentsline {subsubsection}{\texttt {helpers} Module}{11}{subsubsection*.80}
+\contentsline {subsubsection}{\texttt {specs} Module}{11}{subsubsection*.83}
+\contentsline {paragraph}{Methods}{11}{paragraph*.85}
+\contentsline {subsection}{\numberline {1.4.3}recipes Package}{11}{subsection.1.4.3}
+\contentsline {subsubsection}{\texttt {atesim} Module}{11}{subsubsection*.88}
+\contentsline {paragraph}{Methods}{12}{paragraph*.90}
+\contentsline {paragraph}{Methods}{12}{paragraph*.93}
+\contentsline {subsubsection}{\texttt {basic\_ML\_testing} Module}{12}{subsubsection*.95}
+\contentsline {paragraph}{Methods}{12}{paragraph*.97}
+\contentsline {subsubsection}{\texttt {two\_tier\_test} Module}{12}{subsubsection*.99}
+\contentsline {paragraph}{Methods}{12}{paragraph*.101}
+\contentsline {subsection}{\numberline {1.4.4}views Package}{13}{subsection.1.4.4}
+\contentsline {subsubsection}{\texttt {charts} Module}{13}{subsubsection*.103}
+\contentsline {chapter}{\numberline {2}Indices and tables}{15}{chapter.2}
+\contentsline {chapter}{Bibliography}{17}{chapter*.115}
+\contentsline {chapter}{Python Module Index}{19}{section*.117}
+\contentsline {chapter}{Python Module Index}{21}{section*.118}
+\contentsline {chapter}{Index}{23}{section*.119}

@@ -1,34 +1,11 @@
-#!/usr/bin/python
-'''
-Copyright (c) 2011 Nathan Kupp, Yale University.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-'''
-from numpy import *
+import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.font_manager
+from matplotlib import cm
 from matplotlib.ticker import FuncFormatter
 import scipy.stats as st 
 import pylab
 
-###############################################################################
-# Charting views on data
 
 
 def percentFormatter(x, pos=0):
@@ -171,19 +148,26 @@ def laplacianScores(filename, Scores, Ranking):
         plt.savefig(filename, dpi = 150, format='pdf')
     plt.close()
 
-    
-def wafermap(x, y, val, filename=None):
-    xmax, ymax = max(x), max(y)
-    colMap = np.zeros((xmax, ymax))
-    for i in range(len(x)):
-        x, y, C = xy_coords.ix[i,0], xy_coords.ix[i,1], val[i]
-        colMap[x-1,y-1] = C
 
-    plt.imshow(colMap, cm.RdYlGn, interpolation='nearest')
+ 
+def wafermap(x, y, val, filename=None):
+    """Plots a heatmap of argument val over wafer coordinates.
+    """
+    x = np.array(x, dtype=int)
+    y = np.array(y, dtype=int)
+
+    xmax, ymax = max(x), max(y)
+    wafer_map = np.ones((xmax, ymax)) * np.nan
+    for i in range(len(x)):
+        xc, yc, C = x[i], y[i], val[i]
+        wafer_map[xc-1,yc-1] = C
+
+    fig  = plt.figure()
+    ax1  = fig.add_subplot(111)
+    cax  = ax1.imshow(wafer_map, cm.RdYlGn, vmin=val.min(), vmax=val.max(), interpolation='nearest')
+    cbar = fig.colorbar(cax)
+
     if filename==None:
         plt.show()
     else:
         plt.savefig(filename, dpi = 150, format='pdf')
-    
-    
-        

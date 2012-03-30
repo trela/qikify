@@ -1,0 +1,228 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>recipes Package &mdash; qikify  documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="qikify  documentation" href="index.html" />
+    <link rel="up" title="qikify Package" href="qikify.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">qikify  documentation</a> &raquo;</li>
+          <li><a href="qikify.html" accesskey="U">qikify Package</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="recipes-package">
+<h1>recipes Package<a class="headerlink" href="#recipes-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-qikify.recipes.atesim">
+<span id="atesim-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">atesim</span></tt> Module<a class="headerlink" href="#module-qikify.recipes.atesim" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="qikify.recipes.atesim.ATESimulator">
+<em class="property">class </em><tt class="descclassname">qikify.recipes.atesim.</tt><tt class="descname">ATESimulator</tt><big>(</big><em>data_src='filesystem'</em><big>)</big><a class="reference internal" href="_modules/qikify/recipes/atesim.html#ATESimulator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.recipes.atesim.ATESimulator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#qikify.recipes.atesim.ATESimulator.run" title="qikify.recipes.atesim.ATESimulator.run"><tt class="xref py py-obj docutils literal"><span class="pre">run</span></tt></a>([port])</td>
+<td>This function runs the ATE simulator using CSV files in the current directory.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="qikify.recipes.atesim.ATESimulator.run">
+<tt class="descname">run</tt><big>(</big><em>port=5570</em><big>)</big><a class="reference internal" href="_modules/qikify/recipes/atesim.html#ATESimulator.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.recipes.atesim.ATESimulator.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function runs the ATE simulator using CSV files in the current directory.
+Currently, we only support loading .csv or .csv.gz files.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="qikify.recipes.atesim.ChipDataIterator">
+<em class="property">class </em><tt class="descclassname">qikify.recipes.atesim.</tt><tt class="descname">ChipDataIterator</tt><big>(</big><em>data_dir</em><big>)</big><a class="reference internal" href="_modules/qikify/recipes/atesim.html#ChipDataIterator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.recipes.atesim.ChipDataIterator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#qikify.recipes.atesim.ChipDataIterator.next" title="qikify.recipes.atesim.ChipDataIterator.next"><tt class="xref py py-obj docutils literal"><span class="pre">next</span></tt></a>()</td>
+<td>The call to self.chip_iter.next() will raise StopIteration when done,</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="qikify.recipes.atesim.ChipDataIterator.next">
+<tt class="descname">next</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qikify/recipes/atesim.html#ChipDataIterator.next"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.recipes.atesim.ChipDataIterator.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>The call to self.chip_iter.next() will raise StopIteration when done, 
+propagating through to the caller of ChipDataIterator().next().</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-qikify.recipes.basic_ML_testing">
+<span id="basic-ml-testing-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">basic_ML_testing</span></tt> Module<a class="headerlink" href="#module-qikify.recipes.basic_ML_testing" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="qikify.recipes.basic_ML_testing.BasicMLTesting">
+<em class="property">class </em><tt class="descclassname">qikify.recipes.basic_ML_testing.</tt><tt class="descname">BasicMLTesting</tt><a class="reference internal" href="_modules/qikify/recipes/basic_ML_testing.html#BasicMLTesting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.recipes.basic_ML_testing.BasicMLTesting" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#qikify.recipes.basic_ML_testing.BasicMLTesting.run" title="qikify.recipes.basic_ML_testing.BasicMLTesting.run"><tt class="xref py py-obj docutils literal"><span class="pre">run</span></tt></a>([port])</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="qikify.recipes.basic_ML_testing.BasicMLTesting.run">
+<tt class="descname">run</tt><big>(</big><em>port=5570</em><big>)</big><a class="reference internal" href="_modules/qikify/recipes/basic_ML_testing.html#BasicMLTesting.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.recipes.basic_ML_testing.BasicMLTesting.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-qikify.recipes.two_tier_test">
+<span id="two-tier-test-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">two_tier_test</span></tt> Module<a class="headerlink" href="#module-qikify.recipes.two_tier_test" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="qikify.recipes.two_tier_test.TwoTierTest">
+<em class="property">class </em><tt class="descclassname">qikify.recipes.two_tier_test.</tt><tt class="descname">TwoTierTest</tt><a class="reference internal" href="_modules/qikify/recipes/two_tier_test.html#TwoTierTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.recipes.two_tier_test.TwoTierTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#qikify.recipes.two_tier_test.TwoTierTest.run" title="qikify.recipes.two_tier_test.TwoTierTest.run"><tt class="xref py py-obj docutils literal"><span class="pre">run</span></tt></a>([port])</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="qikify.recipes.two_tier_test.TwoTierTest.run">
+<tt class="descname">run</tt><big>(</big><em>port=5570</em><big>)</big><a class="reference internal" href="_modules/qikify/recipes/two_tier_test.html#TwoTierTest.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.recipes.two_tier_test.TwoTierTest.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">recipes Package</a><ul>
+<li><a class="reference internal" href="#module-qikify.recipes.atesim"><tt class="docutils literal"><span class="pre">atesim</span></tt> Module</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-qikify.recipes.basic_ML_testing"><tt class="docutils literal"><span class="pre">basic_ML_testing</span></tt> Module</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-qikify.recipes.two_tier_test"><tt class="docutils literal"><span class="pre">two_tier_test</span></tt> Module</a><ul>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/qikify.recipes.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">qikify  documentation</a> &raquo;</li>
+          <li><a href="qikify.html" >qikify Package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Author.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

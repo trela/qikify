@@ -1,6 +1,0 @@
-qikify.views.charts.yp_vs_y
-===========================
-
-.. currentmodule:: qikify.views.charts
-
-.. autodata:: yp_vs_y

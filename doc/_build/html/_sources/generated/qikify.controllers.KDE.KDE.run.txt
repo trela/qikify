@@ -1,6 +1,0 @@
-qikify.controllers.KDE.KDE.run
-==============================
-
-.. currentmodule:: qikify.controllers.KDE.KDE
-
-.. autodata:: run

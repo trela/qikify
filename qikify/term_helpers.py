@@ -9,11 +9,9 @@ class colors(object):
         self.WARNING = '\033[93m'
         self.FAIL = '\033[91m'
         self.ENDC = '\033[0m'
-
         curses.setupterm()
         if curses.tigetnum("colors") != 256:
             self.disable()
-
     def disable(self):
         self.HEADER = ''
         self.OKBLUE = ''

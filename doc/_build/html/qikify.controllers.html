@@ -1,0 +1,561 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>controllers Package &mdash; qikify  documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="qikify  documentation" href="index.html" />
+    <link rel="up" title="qikify Package" href="qikify.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">qikify  documentation</a> &raquo;</li>
+          <li><a href="qikify.html" accesskey="U">qikify Package</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="controllers-package">
+<h1>controllers Package<a class="headerlink" href="#controllers-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-qikify.controllers.KDE">
+<span id="kde-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">KDE</span></tt> Module<a class="headerlink" href="#module-qikify.controllers.KDE" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="qikify.controllers.KDE.KDE">
+<em class="property">class </em><tt class="descclassname">qikify.controllers.KDE.</tt><tt class="descname">KDE</tt><a class="reference internal" href="_modules/qikify/controllers/KDE.html#KDE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.KDE.KDE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>This class implements non-parametric kernel density estimation.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#qikify.controllers.KDE.KDE.run" title="qikify.controllers.KDE.KDE.run"><tt class="xref py py-obj docutils literal"><span class="pre">run</span></tt></a>(X[,&nbsp;specs,&nbsp;nSamples,&nbsp;counts,&nbsp;a,&nbsp;bounds])</td>
+<td>Primary execution point.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="qikify.controllers.KDE.KDE.run">
+<tt class="descname">run</tt><big>(</big><em>X</em>, <em>specs=None</em>, <em>nSamples=0</em>, <em>counts=None</em>, <em>a=0</em>, <em>bounds=None</em><big>)</big><a class="reference internal" href="_modules/qikify/controllers/KDE.html#KDE.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.KDE.KDE.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Primary execution point. Run either standard KDE or class-membership based KDE. If 
+any of the class-membership based KDE arguments are set, it will be run instead of 
+standard KDE.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>X</strong> : array_like</p>
+<blockquote>
+<div><p>Contains data stored in a pandas.DataFrame.</p>
+</div></blockquote>
+<p><strong>nSamples</strong> : int</p>
+<blockquote>
+<div><p>The number of samples to generate.</p>
+</div></blockquote>
+<p><strong>specs</strong> : qikify.models.Specs, optional</p>
+<blockquote>
+<div><p>If using partitioned sampling, boundaries defining pass/critical/fail subspaces must be provided.</p>
+</div></blockquote>
+<p><strong>counts</strong> : dict, optional</p>
+<blockquote class="last">
+<div><p>If using partitioned sampling, counts dictionary must be provided, with three keys: nGood, nCritical, nFail.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-qikify.controllers.LSFS">
+<span id="lsfs-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">LSFS</span></tt> Module<a class="headerlink" href="#module-qikify.controllers.LSFS" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="qikify.controllers.LSFS.LSFS">
+<em class="property">class </em><tt class="descclassname">qikify.controllers.LSFS.</tt><tt class="descname">LSFS</tt><a class="reference internal" href="_modules/qikify/controllers/LSFS.html#LSFS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.LSFS.LSFS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#qikify.controllers.LSFS.LSFS.constructS" title="qikify.controllers.LSFS.LSFS.constructS"><tt class="xref py py-obj docutils literal"><span class="pre">constructS</span></tt></a>(X,&nbsp;gnd[,&nbsp;k,&nbsp;t,&nbsp;bLDA,&nbsp;bSelfConnected])</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#qikify.controllers.LSFS.LSFS.run" title="qikify.controllers.LSFS.LSFS.run"><tt class="xref py py-obj docutils literal"><span class="pre">run</span></tt></a>(Xin,&nbsp;gnd)</td>
+<td>Run Laplacian Score Feature Selection.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#qikify.controllers.LSFS.LSFS.threshold" title="qikify.controllers.LSFS.LSFS.threshold"><tt class="xref py py-obj docutils literal"><span class="pre">threshold</span></tt></a>(T_L)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="qikify.controllers.LSFS.LSFS.constructS">
+<tt class="descname">constructS</tt><big>(</big><em>X</em>, <em>gnd</em>, <em>k=0</em>, <em>t=1</em>, <em>bLDA=False</em>, <em>bSelfConnected=True</em><big>)</big><a class="reference internal" href="_modules/qikify/controllers/LSFS.html#LSFS.constructS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.LSFS.LSFS.constructS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qikify.controllers.LSFS.LSFS.run">
+<tt class="descname">run</tt><big>(</big><em>Xin</em>, <em>gnd</em><big>)</big><a class="reference internal" href="_modules/qikify/controllers/LSFS.html#LSFS.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.LSFS.LSFS.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run Laplacian Score Feature Selection.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Eventually, it&#8217;d be nice to maintain col names with Xin so that we can add a plot method to plot scores vs. column names.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>Xin</strong> : array_like</p>
+<blockquote>
+<div><p>A numpy.ndarray or pandas.DataFrame, with rows corresponding to observations and columns to features.</p>
+</div></blockquote>
+<p><strong>gnd</strong> : array_like</p>
+<blockquote class="last">
+<div><p>A numpy.ndarray or pandas.DataFrame pass/fail vector of the same dimension as Xin</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This code is based on the definition from the paper <a class="reference internal" href="#r1">[R1]</a>:</p>
+<table class="docutils citation" frame="void" id="r1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[R1]</a></td><td>He, X. and Cai, D. and Niyogi, P., &#8220;Laplacian Score for Feature Selection&#8221;, NIPS 2005.</td></tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="qikify.controllers.LSFS.LSFS.threshold">
+<tt class="descname">threshold</tt><big>(</big><em>T_L</em><big>)</big><a class="reference internal" href="_modules/qikify/controllers/LSFS.html#LSFS.threshold"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.LSFS.LSFS.threshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-qikify.controllers.OLS">
+<span id="ols-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">OLS</span></tt> Module<a class="headerlink" href="#module-qikify.controllers.OLS" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="qikify.controllers.OLS.OLS">
+<em class="property">class </em><tt class="descclassname">qikify.controllers.OLS.</tt><tt class="descname">OLS</tt><a class="reference internal" href="_modules/qikify/controllers/OLS.html#OLS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.OLS.OLS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Ordinary least squares multivariate regression.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#qikify.controllers.OLS.OLS.JB" title="qikify.controllers.OLS.OLS.JB"><tt class="xref py py-obj docutils literal"><span class="pre">JB</span></tt></a>()</td>
+<td>Calculate residual skewness, kurtosis, and do the JB test for normality</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#qikify.controllers.OLS.OLS.computeStatistics" title="qikify.controllers.OLS.OLS.computeStatistics"><tt class="xref py py-obj docutils literal"><span class="pre">computeStatistics</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#qikify.controllers.OLS.OLS.dw" title="qikify.controllers.OLS.OLS.dw"><tt class="xref py py-obj docutils literal"><span class="pre">dw</span></tt></a>()</td>
+<td>Calculates the Durbin-Waston statistic</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#qikify.controllers.OLS.OLS.ll" title="qikify.controllers.OLS.OLS.ll"><tt class="xref py py-obj docutils literal"><span class="pre">ll</span></tt></a>()</td>
+<td>Calculate model log-likelihood and two information criteria</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#qikify.controllers.OLS.OLS.omni" title="qikify.controllers.OLS.OLS.omni"><tt class="xref py py-obj docutils literal"><span class="pre">omni</span></tt></a>()</td>
+<td>Omnibus test for normality</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#qikify.controllers.OLS.OLS.train" title="qikify.controllers.OLS.OLS.train"><tt class="xref py py-obj docutils literal"><span class="pre">train</span></tt></a>(X,&nbsp;y[,&nbsp;useQR,&nbsp;addConstant])</td>
+<td>Solve y = Xb.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="qikify.controllers.OLS.OLS.JB">
+<tt class="descname">JB</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qikify/controllers/OLS.html#OLS.JB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.OLS.OLS.JB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate residual skewness, kurtosis, and do the JB test for normality</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="qikify.controllers.OLS.OLS.computeStatistics">
+<tt class="descname">computeStatistics</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qikify/controllers/OLS.html#OLS.computeStatistics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.OLS.OLS.computeStatistics" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qikify.controllers.OLS.OLS.dw">
+<tt class="descname">dw</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qikify/controllers/OLS.html#OLS.dw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.OLS.OLS.dw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the Durbin-Waston statistic</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="qikify.controllers.OLS.OLS.ll">
+<tt class="descname">ll</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qikify/controllers/OLS.html#OLS.ll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.OLS.OLS.ll" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate model log-likelihood and two information criteria</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="qikify.controllers.OLS.OLS.omni">
+<tt class="descname">omni</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qikify/controllers/OLS.html#OLS.omni"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.OLS.OLS.omni" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omnibus test for normality</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="qikify.controllers.OLS.OLS.train">
+<tt class="descname">train</tt><big>(</big><em>X</em>, <em>y</em>, <em>useQR=True</em>, <em>addConstant=True</em><big>)</big><a class="reference internal" href="_modules/qikify/controllers/OLS.html#OLS.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.OLS.OLS.train" title="Permalink to this definition">¶</a></dt>
+<dd><p>Solve y = Xb.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>x</strong> : array, shape (M, N)</p>
+<p><strong>y</strong> : array, shape (M,)</p>
+<p><strong>useQR</strong> : boolean</p>
+<blockquote>
+<div><p>Whether or not to use QR decomposition to fit regression line.</p>
+</div></blockquote>
+<p><strong>addConstant: boolean</strong> :</p>
+<blockquote class="last">
+<div><p>Whether or not to add a constant column to X</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-qikify.controllers.QFFS">
+<span id="qffs-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">QFFS</span></tt> Module<a class="headerlink" href="#module-qikify.controllers.QFFS" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="qikify.controllers.QFFS.QFFS">
+<em class="property">class </em><tt class="descclassname">qikify.controllers.QFFS.</tt><tt class="descname">QFFS</tt><a class="reference internal" href="_modules/qikify/controllers/QFFS.html#QFFS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.QFFS.QFFS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Qikify feature selection library. Doesn&#8217;t do much yet; right now only implements
+correlation coefficient-based feature selection.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#qikify.controllers.QFFS.QFFS.computeCorrCoefs" title="qikify.controllers.QFFS.QFFS.computeCorrCoefs"><tt class="xref py py-obj docutils literal"><span class="pre">computeCorrCoefs</span></tt></a>(X,&nbsp;y)</td>
+<td>Returns the correlation coefficients between X and y,</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#qikify.controllers.QFFS.QFFS.run" title="qikify.controllers.QFFS.QFFS.run"><tt class="xref py py-obj docutils literal"><span class="pre">run</span></tt></a>(X,&nbsp;y[,&nbsp;n_features,&nbsp;intercept,&nbsp;method])</td>
+<td>Do feature selection on the basis of correlation coefficients.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="qikify.controllers.QFFS.QFFS.computeCorrCoefs">
+<tt class="descname">computeCorrCoefs</tt><big>(</big><em>X</em>, <em>y</em><big>)</big><a class="reference internal" href="_modules/qikify/controllers/QFFS.html#QFFS.computeCorrCoefs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.QFFS.QFFS.computeCorrCoefs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the correlation coefficients between X and y, 
+along with the arg-sorted indices of ranked most-correlated X-to-y vars.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="qikify.controllers.QFFS.QFFS.run">
+<tt class="descname">run</tt><big>(</big><em>X</em>, <em>y</em>, <em>n_features=10</em>, <em>intercept=True</em>, <em>method='corrcoef'</em><big>)</big><a class="reference internal" href="_modules/qikify/controllers/QFFS.html#QFFS.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.QFFS.QFFS.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do feature selection on the basis of correlation coefficients.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>X</strong> : numpy array of shape [n_samples,n_features]</p>
+<blockquote>
+<div><p>Training data</p>
+</div></blockquote>
+<p><strong>y</strong> : numpy array of shape [n_samples]</p>
+<blockquote>
+<div><p>Target values</p>
+</div></blockquote>
+<p><strong>n_features</strong> : int, optional</p>
+<blockquote>
+<div><p>Number of features to retain</p>
+</div></blockquote>
+<p><strong>intercept</strong> : bool, optional</p>
+<blockquote>
+<div><p>Whether the first column is an all-constant intercept and 
+should be excluded</p>
+</div></blockquote>
+<p><strong>method</strong> : string, optional</p>
+<blockquote>
+<div><p>Determines the feature selection method to use.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first last"><strong>features</strong> : The X column indices to retain.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>We typically exclude the first column since it is the intercept
+all-constant column.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-qikify.controllers.SVM">
+<span id="svm-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">SVM</span></tt> Module<a class="headerlink" href="#module-qikify.controllers.SVM" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="qikify.controllers.SVM.SVM">
+<em class="property">class </em><tt class="descclassname">qikify.controllers.SVM.</tt><tt class="descname">SVM</tt><a class="reference internal" href="_modules/qikify/controllers/SVM.html#SVM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.SVM.SVM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#qikify.controllers.SVM.SVM.getTEYL" title="qikify.controllers.SVM.SVM.getTEYL"><tt class="xref py py-obj docutils literal"><span class="pre">getTEYL</span></tt></a>(gnd,&nbsp;predicted)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#qikify.controllers.SVM.SVM.predict" title="qikify.controllers.SVM.SVM.predict"><tt class="xref py py-obj docutils literal"><span class="pre">predict</span></tt></a>(X)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#qikify.controllers.SVM.SVM.train" title="qikify.controllers.SVM.SVM.train"><tt class="xref py py-obj docutils literal"><span class="pre">train</span></tt></a>(X,&nbsp;gnd[,&nbsp;gridSearch])</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="qikify.controllers.SVM.SVM.getTEYL">
+<tt class="descname">getTEYL</tt><big>(</big><em>gnd</em>, <em>predicted</em><big>)</big><a class="reference internal" href="_modules/qikify/controllers/SVM.html#SVM.getTEYL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.SVM.SVM.getTEYL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qikify.controllers.SVM.SVM.predict">
+<tt class="descname">predict</tt><big>(</big><em>X</em><big>)</big><a class="reference internal" href="_modules/qikify/controllers/SVM.html#SVM.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.SVM.SVM.predict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qikify.controllers.SVM.SVM.train">
+<tt class="descname">train</tt><big>(</big><em>X</em>, <em>gnd</em>, <em>gridSearch=False</em><big>)</big><a class="reference internal" href="_modules/qikify/controllers/SVM.html#SVM.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.SVM.SVM.train" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-qikify.controllers.identifyOutliers">
+<span id="identifyoutliers-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">identifyOutliers</span></tt> Module<a class="headerlink" href="#module-qikify.controllers.identifyOutliers" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="qikify.controllers.identifyOutliers.identifyOutliers">
+<tt class="descclassname">qikify.controllers.identifyOutliers.</tt><tt class="descname">identifyOutliers</tt><big>(</big><em>data</em>, <em>k=3</em><big>)</big><a class="reference internal" href="_modules/qikify/controllers/identifyOutliers.html#identifyOutliers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.identifyOutliers.identifyOutliers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compare a dataset against mu +/- k*sigma limits, and
+return a boolean vector with False elements denoting outliers.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><strong>data</strong> : Contains data stored in a pandas DataFrame or Series.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="qikify.controllers.identifyOutliers.identifyOutliersSpecs">
+<tt class="descclassname">qikify.controllers.identifyOutliers.</tt><tt class="descname">identifyOutliersSpecs</tt><big>(</big><em>data</em>, <em>specs</em>, <em>ind</em>, <em>k=3</em><big>)</big><a class="reference internal" href="_modules/qikify/controllers/identifyOutliers.html#identifyOutliersSpecs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.identifyOutliers.identifyOutliersSpecs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compare a dataset against expanded spec limits, and
+return a boolean vector with False elements denoting outliers.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><strong>data</strong> : Contains data stored in a pandas DataFrame or Series.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-qikify.controllers.interpolate">
+<span id="interpolate-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">interpolate</span></tt> Module<a class="headerlink" href="#module-qikify.controllers.interpolate" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="qikify.controllers.interpolate.bilinear_interp">
+<tt class="descclassname">qikify.controllers.interpolate.</tt><tt class="descname">bilinear_interp</tt><big>(</big><em>x</em>, <em>y</em>, <em>xlim</em>, <em>ylim</em>, <em>Q</em><big>)</big><a class="reference internal" href="_modules/qikify/controllers/interpolate.html#bilinear_interp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.interpolate.bilinear_interp" title="Permalink to this definition">¶</a></dt>
+<dd><p>bilinear interpolation of z over 2d surface {x,y}</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="qikify.controllers.interpolate.cart2polar">
+<tt class="descclassname">qikify.controllers.interpolate.</tt><tt class="descname">cart2polar</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="reference internal" href="_modules/qikify/controllers/interpolate.html#cart2polar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.interpolate.cart2polar" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="qikify.controllers.interpolate.cart2polar_recenter">
+<tt class="descclassname">qikify.controllers.interpolate.</tt><tt class="descname">cart2polar_recenter</tt><big>(</big><em>x</em>, <em>y</em>, <em>xmax</em>, <em>ymax</em><big>)</big><a class="reference internal" href="_modules/qikify/controllers/interpolate.html#cart2polar_recenter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.interpolate.cart2polar_recenter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="qikify.controllers.interpolate.lerp">
+<tt class="descclassname">qikify.controllers.interpolate.</tt><tt class="descname">lerp</tt><big>(</big><em>x</em>, <em>xlim</em>, <em>ylim</em><big>)</big><a class="reference internal" href="_modules/qikify/controllers/interpolate.html#lerp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.interpolate.lerp" title="Permalink to this definition">¶</a></dt>
+<dd><p>linearly interpolate a value of y given ranges for x, y.</p>
+<dl class="docutils">
+<dt>arguments:</dt>
+<dd>x: scalar
+xlim: array with xmin, xmax
+ylim: array with ymin, ymax</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="qikify.controllers.interpolate.polar2cart">
+<tt class="descclassname">qikify.controllers.interpolate.</tt><tt class="descname">polar2cart</tt><big>(</big><em>r</em>, <em>theta</em><big>)</big><a class="reference internal" href="_modules/qikify/controllers/interpolate.html#polar2cart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.interpolate.polar2cart" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="qikify.controllers.interpolate.polar2cart_recenter">
+<tt class="descclassname">qikify.controllers.interpolate.</tt><tt class="descname">polar2cart_recenter</tt><big>(</big><em>r</em>, <em>theta</em>, <em>xmax</em>, <em>ymax</em><big>)</big><a class="reference internal" href="_modules/qikify/controllers/interpolate.html#polar2cart_recenter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.interpolate.polar2cart_recenter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-qikify.controllers.slicesample">
+<span id="slicesample-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">slicesample</span></tt> Module<a class="headerlink" href="#module-qikify.controllers.slicesample" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="qikify.controllers.slicesample.inside">
+<tt class="descclassname">qikify.controllers.slicesample.</tt><tt class="descname">inside</tt><big>(</big><em>x</em>, <em>th</em>, <em>pdf</em><big>)</big><a class="reference internal" href="_modules/qikify/controllers/slicesample.html#inside"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.slicesample.inside" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="qikify.controllers.slicesample.logpdf">
+<tt class="descclassname">qikify.controllers.slicesample.</tt><tt class="descname">logpdf</tt><big>(</big><em>x</em>, <em>pdf</em><big>)</big><a class="reference internal" href="_modules/qikify/controllers/slicesample.html#logpdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.slicesample.logpdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="qikify.controllers.slicesample.outside">
+<tt class="descclassname">qikify.controllers.slicesample.</tt><tt class="descname">outside</tt><big>(</big><em>x</em>, <em>th</em>, <em>pdf</em><big>)</big><a class="reference internal" href="_modules/qikify/controllers/slicesample.html#outside"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.slicesample.outside" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="qikify.controllers.slicesample.slicesample">
+<tt class="descclassname">qikify.controllers.slicesample.</tt><tt class="descname">slicesample</tt><big>(</big><em>x0</em>, <em>nsamples</em>, <em>pdf</em>, <em>width=10</em>, <em>maxiter=200</em><big>)</big><a class="reference internal" href="_modules/qikify/controllers/slicesample.html#slicesample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qikify.controllers.slicesample.slicesample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loosely based on slicesample() from MATLAB.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">controllers Package</a><ul>
+<li><a class="reference internal" href="#module-qikify.controllers.KDE"><tt class="docutils literal"><span class="pre">KDE</span></tt> Module</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-qikify.controllers.LSFS"><tt class="docutils literal"><span class="pre">LSFS</span></tt> Module</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-qikify.controllers.OLS"><tt class="docutils literal"><span class="pre">OLS</span></tt> Module</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-qikify.controllers.QFFS"><tt class="docutils literal"><span class="pre">QFFS</span></tt> Module</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-qikify.controllers.SVM"><tt class="docutils literal"><span class="pre">SVM</span></tt> Module</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-qikify.controllers.identifyOutliers"><tt class="docutils literal"><span class="pre">identifyOutliers</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-qikify.controllers.interpolate"><tt class="docutils literal"><span class="pre">interpolate</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-qikify.controllers.slicesample"><tt class="docutils literal"><span class="pre">slicesample</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/qikify.controllers.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">qikify  documentation</a> &raquo;</li>
+          <li><a href="qikify.html" >qikify Package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Author.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

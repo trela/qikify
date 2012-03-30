@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.1415926-1.40.11 (TeX Live 2010) (format=pdflatex 2010.7.21)  27 MAR 2012 10:26
+This is pdfTeX, Version 3.1415926-1.40.11 (TeX Live 2010) (format=pdflatex 2010.7.21)  29 MAR 2012 18:51
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**Qikify.tex
-(./Qikify.tex
+**qikify.tex
+(./qikify.tex
 LaTeX2e <2009/09/24>
 Babel <v3.8l> and hyphenation patterns for english, dumylang, nohyphenation, ge
 rman-x-2009-06-19, ngerman-x-2009-06-19, ancientgreek, ibycus, arabic, armenian
@@ -791,35 +791,35 @@ Package: hypcap 2008/09/08 v1.10 Adjusting anchors of captions (HO)
 \bigstrutjot=\dimen139
 )
 \@indexfile=\write5
-\openout5 = `Qikify.idx'.
+\openout5 = `qikify.idx'.
 
 
-Writing index file Qikify.idx
-(./Qikify.aux)
-\openout1 = `Qikify.aux'.
+Writing index file qikify.idx
+(./qikify.aux)
+\openout1 = `qikify.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 110.
-LaTeX Font Info:    ... okay on input line 110.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 110.
-LaTeX Font Info:    ... okay on input line 110.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 110.
-LaTeX Font Info:    ... okay on input line 110.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 110.
-LaTeX Font Info:    ... okay on input line 110.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 110.
-LaTeX Font Info:    ... okay on input line 110.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 110.
-LaTeX Font Info:    ... okay on input line 110.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 110.
-LaTeX Font Info:    Try loading font information for TS1+cmr on input line 110.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 113.
+LaTeX Font Info:    ... okay on input line 113.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 113.
+LaTeX Font Info:    ... okay on input line 113.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 113.
+LaTeX Font Info:    ... okay on input line 113.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 113.
+LaTeX Font Info:    ... okay on input line 113.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 113.
+LaTeX Font Info:    ... okay on input line 113.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 113.
+LaTeX Font Info:    ... okay on input line 113.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 113.
+LaTeX Font Info:    Try loading font information for TS1+cmr on input line 113.
 
  (/usr/local/texlive/2010/texmf-dist/tex/latex/base/ts1cmr.fd
 File: ts1cmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    ... okay on input line 110.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 110.
-LaTeX Font Info:    ... okay on input line 110.
-LaTeX Font Info:    Try loading font information for T1+ptm on input line 110.
+LaTeX Font Info:    ... okay on input line 113.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 113.
+LaTeX Font Info:    ... okay on input line 113.
+LaTeX Font Info:    Try loading font information for T1+ptm on input line 113.
 
 (/usr/local/texlive/2010/texmf-dist/tex/latex/psnfss/t1ptm.fd
 File: t1ptm.fd 2001/06/04 font definitions for T1/ptm.
@@ -852,7 +852,7 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
 \AtBeginShipoutBox=\box41
-Package hyperref Info: Link coloring ON on input line 110.
+Package hyperref Info: Link coloring ON on input line 113.
 
 (/usr/local/texlive/2010/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2010/04/30 v2.40 Cross-referencing by name of section
@@ -865,60 +865,64 @@ Package: gettitlestring 2009/12/18 v1.3 Cleanup title references (HO)
 )
 \c@section@level=\count127
 )
-LaTeX Info: Redefining \ref on input line 110.
-LaTeX Info: Redefining \pageref on input line 110.
-LaTeX Info: Redefining \nameref on input line 110.
+LaTeX Info: Redefining \ref on input line 113.
+LaTeX Info: Redefining \pageref on input line 113.
+LaTeX Info: Redefining \nameref on input line 113.
 
-(./Qikify.out) (./Qikify.out)
+(./qikify.out) (./qikify.out)
 \@outlinefile=\write6
-\openout6 = `Qikify.out'.
+\openout6 = `qikify.out'.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 113--113
+Underfull \hbox (badness 10000) in paragraph at lines 116--116
 
  []
 
-LaTeX Font Info:    Try loading font information for T1+phv on input line 113.
+LaTeX Font Info:    Try loading font information for T1+phv on input line 116.
 (/usr/local/texlive/2010/texmf-dist/tex/latex/psnfss/t1phv.fd
 File: t1phv.fd 2001/06/04 scalable font definitions for T1/phv.
 )
 LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <24.88> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 113.
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 116.
 LaTeX Font Info:    Font shape `T1/phv/m/it' in size <17.28> not available
-(Font)              Font shape `T1/phv/m/sl' tried instead on input line 113.
+(Font)              Font shape `T1/phv/m/sl' tried instead on input line 116.
 LaTeX Font Info:    Font shape `T1/phv/bx/it' in size <17.28> not available
-(Font)              Font shape `T1/phv/b/it' tried instead on input line 113.
+(Font)              Font shape `T1/phv/b/it' tried instead on input line 116.
 LaTeX Font Info:    Font shape `T1/phv/b/it' in size <17.28> not available
-(Font)              Font shape `T1/phv/b/sl' tried instead on input line 113.
+(Font)              Font shape `T1/phv/b/sl' tried instead on input line 116.
 LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <17.28> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 113.
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 116.
  [1
 
 {/usr/local/texlive/2010/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2
 
-] (./Qikify.toc
+] (./qikify.toc
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <10> not available
 (Font)              Font shape `T1/ptm/b/n' tried instead on input line 2.
-)
+LaTeX Font Info:    Try loading font information for T1+pcr on input line 3.
+
+(/usr/local/texlive/2010/texmf-dist/tex/latex/psnfss/t1pcr.fd
+File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
+))
 \tf@toc=\write7
-\openout7 = `Qikify.toc'.
+\openout7 = `qikify.toc'.
 
 
 Adding blank page after the table of contents.
 LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <10> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 113.
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 116.
 pdfTeX warning (ext4): destination with the same identifier (name{page.i}) has 
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.113 \tableofcontents
+l.116 \tableofcontents
                        [1
 
 ]pdfTeX warning (ext4): destination with the same identifier (name{page.ii}) ha
 s been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.113 \tableofcontents
+l.116 \tableofcontents
                        [2] [1
 
 ] [2
@@ -926,127 +930,181 @@ l.113 \tableofcontents
 ]
 Chapter 1.
 LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <14.4> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 134.
-LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <12> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 140.
-
-Overfull \hbox (89.37978pt too wide) in alignment at lines 142--144
- [] [] 
- []
-
-
-Overfull \hbox (89.37978pt too wide) in alignment at lines 144--149
- [] [] 
- []
-
-
-Overfull \hbox (89.37978pt too wide) in alignment at lines 149--152
- [] [] 
- []
-
-
-Overfull \hbox (89.37978pt too wide) in alignment at lines 152--155
- [] [] 
- []
-
-LaTeX Font Info:    Try loading font information for T1+pcr on input line 158.
-(/usr/local/texlive/2010/texmf-dist/tex/latex/psnfss/t1pcr.fd
-File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
-)
-Overfull \hbox (89.37978pt too wide) in alignment at lines 155--202
- [] [] 
- []
-
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 123.
+LaTeX Font Info:    Font shape `T1/pcr/bx/n' in size <14.4> not available
+(Font)              Font shape `T1/pcr/b/n' tried instead on input line 126.
 LaTeX Font Info:    Font shape `T1/pcr/bx/n' in size <10> not available
-(Font)              Font shape `T1/pcr/b/n' tried instead on input line 210.
-[3]
+(Font)              Font shape `T1/pcr/b/n' tried instead on input line 133.
 LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <9> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 257.
- [4]
-Overfull \hbox (3.82094pt too wide) in alignment at lines 455--457
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 154.
+[3] [4]
+LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <12> not available
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 362.
+ [5] [6] [7] [8]
+Overfull \hbox (37.2012pt too wide) in alignment at lines 957--959
  [] [] 
  []
 
 
-Overfull \hbox (3.82094pt too wide) in alignment at lines 457--462
+Overfull \hbox (37.2012pt too wide) in alignment at lines 959--964
  [] [] 
  []
 
 
-Overfull \hbox (3.82094pt too wide) in alignment at lines 462--465
+Overfull \hbox (37.2012pt too wide) in alignment at lines 964--967
  [] [] 
  []
 
 
-Overfull \hbox (3.82094pt too wide) in alignment at lines 465--468
+Overfull \hbox (37.2012pt too wide) in alignment at lines 967--970
  [] [] 
  []
 
 
-Overfull \hbox (3.82094pt too wide) in alignment at lines 468--515
+Overfull \hbox (37.2012pt too wide) in alignment at lines 970--1062
  [] [] 
  []
 
-[5] [6]
-Overfull \hbox (33.36197pt too wide) in alignment at lines 608--610
- [] [] 
- []
-
-
-Overfull \hbox (33.36197pt too wide) in alignment at lines 610--615
+[9]
+Overfull \hbox (37.2012pt too wide) in alignment at lines 1081--1083
  [] [] 
  []
 
 
-Overfull \hbox (33.36197pt too wide) in alignment at lines 615--618
+Overfull \hbox (37.2012pt too wide) in alignment at lines 1083--1088
  [] [] 
  []
 
 
-Overfull \hbox (33.36197pt too wide) in alignment at lines 618--621
+Overfull \hbox (37.2012pt too wide) in alignment at lines 1088--1091
  [] [] 
  []
 
 
-Overfull \hbox (33.36197pt too wide) in alignment at lines 621--633
+Overfull \hbox (37.2012pt too wide) in alignment at lines 1091--1094
  [] [] 
  []
 
-[7] [8] [9
+
+Overfull \hbox (37.2012pt too wide) in alignment at lines 1094--1186
+ [] [] 
+ []
+
+[10]
+Overfull \hbox (65.86134pt too wide) in alignment at lines 1309--1311
+ [] [] 
+ []
 
 
+Overfull \hbox (65.86134pt too wide) in alignment at lines 1311--1316
+ [] [] 
+ []
 
-] (./Qikify.ind [10
+
+Overfull \hbox (65.86134pt too wide) in alignment at lines 1316--1319
+ [] [] 
+ []
+
+
+Overfull \hbox (65.86134pt too wide) in alignment at lines 1319--1322
+ [] [] 
+ []
+
+
+Overfull \hbox (65.86134pt too wide) in alignment at lines 1322--1334
+ [] [] 
+ []
+
+[11] [12] [13] [14
+
+]
+Chapter 2.
+LaTeX Font Info:    Try loading font information for TS1+ptm on input line 1617
+.
+(/usr/local/texlive/2010/texmf-dist/tex/latex/psnfss/ts1ptm.fd
+File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
+) [15] [16
+
+]
+[17
+
+] [18
+
+] [19
+
+
+] [20
+
+
+] [21
+
+
+] (./qikify.ind [22
 
 
 ]
+Underfull \hbox (badness 10000) in paragraph at lines 9--10
+[]\T1/ptm/m/n/10 BasicMLTesting (class in qik-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 10--11
+[]\T1/ptm/m/n/10 bilinear_interp() (in mod-ule qik-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 16--17
+[]\T1/ptm/m/n/10 cart2polar_recenter() (in mod-ule qik-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 21--22
+[]\T1/ptm/m/n/10 computeCorrCoefs() (qik-ify.controllers.QFFS.QFFS
+ []
+
+
 Underfull \hbox (badness 10000) in paragraph at lines 24--25
-[]\T1/ptm/m/n/10 identifyOutliers (in mod-ule qik-
+[]\T1/ptm/m/n/10 computeStatistics() (qik-ify.controllers.OLS.OLS
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 25--26
-[]\T1/ptm/m/n/10 identifyOutliersSpecs (in mod-ule qik-
+Underfull \hbox (badness 10000) in paragraph at lines 49--50
+[]\T1/ptm/m/n/10 identifyOutliers() (in mod-ule qik-
  []
 
-[11
 
-])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 779.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 779.
- (./Qikify.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 779.
-Package rerunfilecheck Info: File `Qikify.out' has not changed.
-(rerunfilecheck)             Checksum: A41EBC6FF354346711E665C105757D01;369.
+Underfull \hbox (badness 10000) in paragraph at lines 50--51
+[]\T1/ptm/m/n/10 identifyOutliersSpecs() (in mod-ule qik-
+ []
+
+[23
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 92--93
+[]\T1/ptm/m/n/10 polar2cart_recenter() (in mod-ule qik-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 126--127
+[]\T1/ptm/m/n/10 run() (qik-ify.recipes.basic_ML_testing.BasicMLTesting
+ []
+
+[24])
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1688.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1688.
+ (./qikify.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1688.
+Package rerunfilecheck Info: File `qikify.out' has not changed.
+(rerunfilecheck)             Checksum: E7E32560910E78D8FA4169C4761A6E9D;555.
  ) 
 Here is how much of TeX's memory you used:
- 8608 strings out of 493747
- 124360 string characters out of 3143546
- 214922 words of memory out of 3000000
- 11590 multiletter control sequences out of 15000+200000
- 59226 words of font info for 63 fonts, out of 3000000 for 9000
+ 8767 strings out of 493747
+ 126049 string characters out of 3143546
+ 227742 words of memory out of 3000000
+ 11661 multiletter control sequences out of 15000+200000
+ 61297 words of font info for 67 fonts, out of 3000000 for 9000
  715 hyphenation exceptions out of 8191
- 38i,11n,45p,392b,560s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 38i,12n,45p,276b,657s stack positions out of 5000i,500n,10000p,200000b,50000s
 {/usr/local/texlive/2010/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
 exlive/2010/texmf-dist/fonts/type1/urw/courier/ucrb8a.pfb></usr/local/texlive/2
 010/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/local/texlive/2010/texm
@@ -1054,11 +1112,12 @@ f-dist/fonts/type1/urw/helvetic/uhvb8a.pfb></usr/local/texlive/2010/texmf-dist/
 fonts/type1/urw/helvetic/uhvbo8a.pfb></usr/local/texlive/2010/texmf-dist/fonts/
 type1/urw/helvetic/uhvr8a.pfb></usr/local/texlive/2010/texmf-dist/fonts/type1/u
 rw/times/utmb8a.pfb></usr/local/texlive/2010/texmf-dist/fonts/type1/urw/times/u
-tmr8a.pfb>
-Output written on Qikify.pdf (15 pages, 99836 bytes).
+tmr8a.pfb></usr/local/texlive/2010/texmf-dist/fonts/type1/urw/times/utmri8a.pfb
+>
+Output written on qikify.pdf (28 pages, 137737 bytes).
 PDF statistics:
- 281 PDF objects out of 1000 (max. 8388607)
- 254 compressed objects within 3 object streams
- 89 named destinations out of 1000 (max. 500000)
- 57 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 535 PDF objects out of 1000 (max. 8388607)
+ 492 compressed objects within 5 object streams
+ 171 named destinations out of 1000 (max. 500000)
+ 81 words of extra memory for PDF output out of 10000 (max. 10000000)
 

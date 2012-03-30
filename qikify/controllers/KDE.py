@@ -1,39 +1,13 @@
-#!/usr/bin/python
-'''
-Copyright (c) 2011 Nathan Kupp, Yale University.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-'''
-
 import sys, os, random, pandas
 import numpy as np
 from scipy.special import gamma
-
-from qikify.helpers import *
+from qikify.helpers import standardize
 from qikify.models.specs import Specs
-from slicesample import * 
+from qikify.controllers.slicesample import slicesample
 
 class KDE(object):
-    def __init__(self):
-        """Performs non-parametric kernel density estimation. 
-        """
-        pass
+    """This class implements non-parametric kernel density estimation.
+    """
         
     def run(self, X, specs = None, nSamples = 0, counts = None, a = 0, bounds = None):
         """Primary execution point. Run either standard KDE or class-membership based KDE. If 
@@ -42,12 +16,17 @@ class KDE(object):
                 
         Parameters
         ----------
-        X : Contains data stored in a pandas DataFrame.
-        nSamples : The number of samples to generate.
-        specs  : (optional) If using partitioned sampling, boundaries defining pass/critical/fail
-                 subspaces must be provided.
-        counts : (optional) If using partitioned sampling, counts dictionary must be provided, with
-                 three keys: nGood, nCritical, nFail.
+        X : array_like
+            Contains data stored in a pandas.DataFrame.
+        
+        nSamples : int
+            The number of samples to generate.
+        
+        specs  : qikify.models.Specs, optional
+            If using partitioned sampling, boundaries defining pass/critical/fail subspaces must be provided.
+        
+        counts : dict, optional
+            If using partitioned sampling, counts dictionary must be provided, with three keys: nGood, nCritical, nFail.
                  
         """
         self.n, self.d = X.shape
@@ -78,16 +57,17 @@ class KDE(object):
     # =============== Private class methods =============== 
     # Default method of generating device samples
     def _genSpecLimits(self, X, specs):
-        """We convert spec lims to arrays so spec compare during device sample generation is fast."""
-        self.inner = zeros((2,X.shape[1]))
-        self.outer = zeros((2,X.shape[1]))
+        """We convert spec lims to arrays so spec compare during device sample generation is fast.
+        """
+        self.inner = np.zeros((2,X.shape[1]))
+        self.outer = np.zeros((2,X.shape[1]))
         for i, name in enumerate(X.columns):
             self.inner[:,i] = self.specs.inner[name] if name in self.specs.inner.keys() else [-np.inf, np.inf]
             self.outer[:,i] = self.specs.outer[name] if name in self.specs.outer.keys() else [-np.inf, np.inf]
 
     def _genSamples(self, nSamples):
         """Generate KDE samples."""
-        Sn = vstack([ self._genSample() for _ in xrange(nSamples) ])
+        Sn = np.vstack([ self._genSample() for _ in xrange(nSamples) ])
         return pandas.DataFrame(standardize(Sn, self.scaleFactors, reverse = True), columns = self.columns)
       
     def _genPartitionedSamples(self, counts):
@@ -95,19 +75,19 @@ class KDE(object):
         with each region defined by specs.inner / specs.outer."""
 
         # Initialize arrays for speed
-        Sg, Sc, Sf = zeros((counts.nGood, self.d)), zeros((counts.nCritical, self.d)), zeros((counts.nFail, self.d))
+        Sg, Sc, Sf = np.zeros((counts.nGood, self.d)), np.zeros((counts.nCritical, self.d)), np.zeros((counts.nFail, self.d))
         ng, nc, nf = 0, 0, 0
         
         thresh = 0.02
         while ( ng+nc+nf < sum(counts.values()) ):
             sample = standardize(self._genSample(), self.scaleFactors, reverse = True)
-            if self.isGood(sample) and ng < counts.nGood:
+            if self._isGood(sample) and ng < counts.nGood:
                 Sg[ng,:] = sample
                 ng += 1
-            if self.isFailing(sample) and nf < counts.nFail:
+            if self._isFailing(sample) and nf < counts.nFail:
                 Sf[nf,:] = sample
                 nf += 1
-            if self.isCritical(sample) and nc < counts.nCritical:
+            if self._isCritical(sample) and nc < counts.nCritical:
                 Sc[nc,:] = sample
                 nc += 1      
             
@@ -116,13 +96,13 @@ class KDE(object):
                 print 'Ng:%i/%i Nc:%i/%i Nf:%i/%i' % (ng,counts.nGood,nc,counts.nCritical,nf,counts.nFail)
                 thresh += 0.02
         print 'Non-parametric density estimation sampling complete.'
-        return pandas.DataFrame(vstack((Sc,Sg,Sf)), columns=self.columns)
+        return pandas.DataFrame(np.vstack((Sc,Sg,Sf)), columns=self.columns)
 
 
     def _genSample(self):
         """Generate a single sample using algorithm in Silverman, p. 143"""
-        j = random.randint(self.n)
-        e = slicesample(zeros(self.d), 1, self.K_e)
+        j = np.random.randint(self.n)
+        e = slicesample(np.zeros(self.d), 1, self._K_e)
         s = self.Xn.ix[j,:] + self.h * self.lambdas[j] * e
 
         # Use mirroring technique to deal with boundary conditions.
@@ -136,32 +116,32 @@ class KDE(object):
 
     def _setBandwithFactors(self, a):
         """Estimate local bandwidth factors lambda"""
-        self.lambdas = ones(self.n)
+        self.lambdas = np.ones(self.n)
         if (a > 0):
-            B = [log10(self.f_pilot(self.Xn.ix[i,:], self.Xn)) for i in xrange(self.n)] 
+            B = [log10(self._f_pilot(self.Xn.ix[i,:], self.Xn)) for i in xrange(self.n)] 
             g = pow(10,sum(B)/self.n)
-            self.lambdas = [pow(self.f_pilot(self.Xn.ix[i,:], self.Xn)/g,-a) for i in xrange(self.n)]
+            self.lambdas = [pow(self._f_pilot(self.Xn.ix[i,:], self.Xn)/g,-a) for i in xrange(self.n)]
 
     def _compute_h(self, n, d, c_d, b):
         """Computed here seperately to preserve readability of the equation."""
-        return b * pow( (8/c_d*(d+4) * pow(2*sqrt(np.pi),d) ), (1.0/(d+4))) * pow(n,-1.0/(d+4))
+        return b * pow( (8/c_d*(d+4) * pow(2*np.sqrt(np.pi),d) ), (1.0/(d+4))) * pow(n,-1.0/(d+4))
 
-    def K_e(self, t):
+    def _K_e(self, t):
         """Epanechnikov kernel"""
-        return (self.d+2)/self.c_d*(1-dot(t,t))/2 if dot(t,t) < 1 else 0
+        return (self.d+2)/self.c_d*(1-np.dot(t,t))/2 if np.dot(t,t) < 1 else 0
 
-    def f_pilot(self, x, Xn):
+    def _f_pilot(self, x, Xn):
         """Compute pilot density point estimate f(x)"""
-        A = [self.K_e((x-Xn.ix[i,:])/self.h) for i in xrange(n)]
+        A = [self._K_e((x-Xn.ix[i,:])/self.h) for i in xrange(n)]
         return (pow(self.h,-d)*sum(A))/n
 
     # =============== Partitioned Sampling Methods =============== 
-    def isGood(self, sample):
+    def _isGood(self, sample):
         return all(sample > self.inner[0,:]) and all(sample < self.inner[1,:])
 
-    def isCritical(self, sample):
-        return not (self.isGood(sample) or self.isFailing(sample))
+    def _isCritical(self, sample):
+        return not (self._isGood(sample) or self._isFailing(sample))
 
-    def isFailing(self, sample):
+    def _isFailing(self, sample):
         return (any(sample < self.outer[0,:]) or any(sample > self.outer[1,:]))
 

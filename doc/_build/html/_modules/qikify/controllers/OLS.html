@@ -1,0 +1,231 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>qikify.controllers.OLS &mdash; qikify  documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="qikify  documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../../np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">qikify  documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for qikify.controllers.OLS</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">c_</span><span class="p">,</span> <span class="n">ones</span><span class="p">,</span> <span class="n">dot</span><span class="p">,</span> <span class="n">stats</span><span class="p">,</span> <span class="n">diff</span>
+<span class="kn">import</span> <span class="nn">scipy.linalg</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">log</span><span class="p">,</span> <span class="n">pi</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">square</span><span class="p">,</span> <span class="n">diagonal</span>
+
+<div class="viewcode-block" id="OLS"><a class="viewcode-back" href="../../../qikify.controllers.html#qikify.controllers.OLS.OLS">[docs]</a><span class="k">class</span> <span class="nc">OLS</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Ordinary least squares multivariate regression.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initializing the OLS class. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+        
+<div class="viewcode-block" id="OLS.train"><a class="viewcode-back" href="../../../qikify.controllers.html#qikify.controllers.OLS.OLS.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">X</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">useQR</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">addConstant</span> <span class="o">=</span> <span class="bp">True</span><span class="p">):</span>    
+        <span class="sd">&#39;&#39;&#39;Solve y = Xb.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : array, shape (M, N)</span>
+<span class="sd">        y : array, shape (M,)</span>
+<span class="sd">        useQR : boolean</span>
+<span class="sd">            Whether or not to use QR decomposition to fit regression line.</span>
+<span class="sd">        addConstant: boolean</span>
+<span class="sd">            Whether or not to add a constant column to X</span>
+<span class="sd">        &#39;&#39;&#39;</span>        
+        <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;incompatible dimensions&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">addConstant</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">X</span>       <span class="o">=</span> <span class="n">c_</span><span class="p">[</span><span class="n">ones</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">X</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span>       <span class="o">=</span> <span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X_columns</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="s">&#39;columns&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_columns</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="s">&#39;columns&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">useQR</span><span class="p">:</span>
+            <span class="c"># TODO: Ehh, this is broken. Need to fix.</span>
+            <span class="n">Q</span><span class="p">,</span><span class="n">R</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>
+            <span class="n">Qty</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">Q</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">R</span><span class="p">,</span><span class="n">Qty</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inv_xx</span> <span class="o">=</span> <span class="n">inv</span><span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">))</span>
+            <span class="n">xy</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inv_xx</span><span class="p">,</span><span class="n">xy</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">computeStatistics</span><span class="p">()</span>
+        
+        </div>
+<div class="viewcode-block" id="OLS.computeStatistics"><a class="viewcode-back" href="../../../qikify.controllers.html#qikify.controllers.OLS.OLS.computeStatistics">[docs]</a>    <span class="k">def</span> <span class="nf">computeStatistics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">nobs</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>                     <span class="c"># number of observations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ncoef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>                    <span class="c"># number of coef.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_e</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nobs</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncoef</span>              <span class="c"># degrees of freedom, error </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_r</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncoef</span> <span class="o">-</span> <span class="mi">1</span>                      <span class="c"># degrees of freedom, regression </span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">)</span>            <span class="c"># residuals</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sse</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">)</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">df_e</span>         <span class="c"># SSE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">se</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">diagonal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sse</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">inv_xx</span><span class="p">))</span>  <span class="c"># coef. standard errors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">se</span>                       <span class="c"># coef. t-statistics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">stats</span><span class="o">.</span><span class="n">t</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_e</span><span class="p">))</span> <span class="o">*</span> <span class="mi">2</span>    <span class="c"># coef. p-values</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">R2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="o">.</span><span class="n">var</span><span class="p">()</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">var</span><span class="p">()</span>         <span class="c"># model R-squared</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">R2adj</span> <span class="o">=</span> <span class="mi">1</span><span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">R2</span><span class="p">)</span><span class="o">*</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nobs</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nobs</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">ncoef</span><span class="p">))</span>   <span class="c"># adjusted R-square</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">F</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">R2</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">df_r</span><span class="p">)</span> <span class="o">/</span> <span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">R2</span><span class="p">)</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">df_e</span><span class="p">)</span>  <span class="c"># model F-statistic</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Fpv</span> <span class="o">=</span> <span class="mi">1</span><span class="o">-</span><span class="n">stats</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">F</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_e</span><span class="p">)</span>  <span class="c"># F-statistic p-value</span>
+
+</div>
+<div class="viewcode-block" id="OLS.dw"><a class="viewcode-back" href="../../../qikify.controllers.html#qikify.controllers.OLS.OLS.dw">[docs]</a>    <span class="k">def</span> <span class="nf">dw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculates the Durbin-Waston statistic</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">de</span> <span class="o">=</span> <span class="n">diff</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">dw</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">de</span><span class="p">,</span><span class="n">de</span><span class="p">)</span> <span class="o">/</span> <span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">dw</span>
+</div>
+<div class="viewcode-block" id="OLS.omni"><a class="viewcode-back" href="../../../qikify.controllers.html#qikify.controllers.OLS.OLS.omni">[docs]</a>    <span class="k">def</span> <span class="nf">omni</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Omnibus test for normality</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="n">normaltest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">)</span> 
+    </div>
+<div class="viewcode-block" id="OLS.JB"><a class="viewcode-back" href="../../../qikify.controllers.html#qikify.controllers.OLS.OLS.JB">[docs]</a>    <span class="k">def</span> <span class="nf">JB</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate residual skewness, kurtosis, and do the JB test for normality</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c"># Calculate residual skewness and kurtosis</span>
+        <span class="n">skew</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">skew</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">)</span> 
+        <span class="n">kurtosis</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">+</span> <span class="n">stats</span><span class="o">.</span><span class="n">kurtosis</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">)</span> 
+        
+        <span class="c"># Calculate the Jarque-Bera test for normality</span>
+        <span class="n">JB</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nobs</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">square</span><span class="p">(</span><span class="n">skew</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">square</span><span class="p">(</span><span class="n">kurtosis</span><span class="o">-</span><span class="mi">3</span><span class="p">))</span>
+        <span class="n">JBpv</span> <span class="o">=</span> <span class="mi">1</span><span class="o">-</span><span class="n">stats</span><span class="o">.</span><span class="n">chi2</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">JB</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="n">JB</span><span class="p">,</span> <span class="n">JBpv</span><span class="p">,</span> <span class="n">skew</span><span class="p">,</span> <span class="n">kurtosis</span>
+</div>
+<div class="viewcode-block" id="OLS.ll"><a class="viewcode-back" href="../../../qikify.controllers.html#qikify.controllers.OLS.OLS.ll">[docs]</a>    <span class="k">def</span> <span class="nf">ll</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate model log-likelihood and two information criteria</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># Model log-likelihood, AIC, and BIC criterion values </span>
+        <span class="n">ll</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nobs</span><span class="o">*</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">))</span> <span class="o">-</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nobs</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">log</span><span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">)</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">nobs</span><span class="p">)</span>
+        <span class="n">aic</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">ll</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">nobs</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">ncoef</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">nobs</span><span class="p">)</span>
+        <span class="n">bic</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">ll</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">nobs</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ncoef</span><span class="o">*</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nobs</span><span class="p">))</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">nobs</span>
+        <span class="k">return</span> <span class="n">ll</span><span class="p">,</span> <span class="n">aic</span><span class="p">,</span> <span class="n">bic</span>
+    </div>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># extra stats</span>
+        <span class="n">ll</span><span class="p">,</span> <span class="n">aic</span><span class="p">,</span> <span class="n">bic</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ll</span><span class="p">()</span>
+        <span class="n">JB</span><span class="p">,</span> <span class="n">JBpv</span><span class="p">,</span> <span class="n">skew</span><span class="p">,</span> <span class="n">kurtosis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">JB</span><span class="p">()</span>
+        <span class="n">omni</span><span class="p">,</span> <span class="n">omnipv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">omni</span><span class="p">()</span>
+
+        <span class="n">output</span> <span class="o">=</span> <span class="n">GREEN</span> <span class="o">+</span> \
+               <span class="s">&#39;==============================================================================</span><span class="se">\n</span><span class="s">&#39;</span>                           <span class="o">+</span> \
+               <span class="s">&#39;OLS Fit                                                                       </span><span class="se">\n</span><span class="s">&#39;</span>                           <span class="o">+</span> \
+               <span class="s">&#39;Dependent Variable: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_varnm</span>  <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">N: </span><span class="si">%5.0f</span><span class="s"> </span><span class="se">\n</span><span class="s">p: </span><span class="si">%5.0f</span><span class="s">                </span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nobs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncoef</span><span class="p">)</span> <span class="o">+</span> \
+               <span class="s">&#39;Models stats                         Residual stats                           </span><span class="se">\n</span><span class="s">&#39;</span>                           <span class="o">+</span> \
+               <span class="s">&#39;==============================================================================</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">+</span> <span class="n">ENDCOLOR</span>                <span class="o">+</span> \
+               <span class="s">&#39;R-squared            </span><span class="si">% -5.6f</span><span class="s">         Durbin-Watson stat  </span><span class="si">% -5.6f</span><span class="s">              </span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">R2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dw</span><span class="p">())</span>    <span class="o">+</span> \
+               <span class="s">&#39;Adjusted R-squared   </span><span class="si">% -5.6f</span><span class="s">         Omnibus stat        </span><span class="si">% -5.6f</span><span class="s">              </span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">R2adj</span><span class="p">,</span> <span class="n">omni</span><span class="p">)</span>      <span class="o">+</span> \
+               <span class="s">&#39;F-statistic          </span><span class="si">% -5.3f</span><span class="s">         Prob(Omnibus stat)  </span><span class="si">% -5.6f</span><span class="s">              </span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">F</span><span class="p">,</span> <span class="n">omnipv</span><span class="p">)</span>        <span class="o">+</span> \
+               <span class="s">&#39;Prob (F-statistic)   </span><span class="si">% -5.6f</span><span class="s">		 JB stat             </span><span class="si">% -5.6f</span><span class="s">              </span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Fpv</span><span class="p">,</span> <span class="n">JB</span><span class="p">)</span>          <span class="o">+</span> \
+               <span class="s">&#39;Log likelihood       </span><span class="si">% -5.3f</span><span class="s">		 Prob(JB)            </span><span class="si">% -5.6f</span><span class="s">              </span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ll</span><span class="p">,</span> <span class="n">JBpv</span><span class="p">)</span>              <span class="o">+</span> \
+               <span class="s">&#39;AIC criterion        </span><span class="si">% -5.6f</span><span class="s">         Skew                </span><span class="si">% -5.6f</span><span class="s">              </span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">aic</span><span class="p">,</span> <span class="n">skew</span><span class="p">)</span>             <span class="o">+</span> \
+               <span class="s">&#39;BIC criterion        </span><span class="si">% -5.6f</span><span class="s">         Kurtosis            </span><span class="si">% -5.6f</span><span class="s">              </span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">bic</span><span class="p">,</span> <span class="n">kurtosis</span><span class="p">)</span><span class="o">+</span><span class="n">GREEN</span>   <span class="o">+</span> \
+               <span class="s">&#39;==============================================================================</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">+</span> \
+               <span class="s">&#39;variable            coefficient     std. Error      t-statistic     prob      </span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">+</span> \
+               <span class="s">&#39;==============================================================================</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">+</span> <span class="n">ENDCOLOR</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="s">&#39;Intercept</span><span class="se">\t</span><span class="s">          </span><span class="si">% -5.6f</span><span class="s">     </span><span class="si">% -5.6f</span><span class="s">     </span><span class="si">% -5.6f</span><span class="s">     </span><span class="si">% -5.6f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">se</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> 
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_columns</span><span class="p">)):</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="si">% -5s</span><span class="s">          </span><span class="si">% -5.6f</span><span class="s">     </span><span class="si">% -5.6f</span><span class="s">     </span><span class="si">% -5.6f</span><span class="s">     </span><span class="si">% -5.6f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_columns</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">se</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span> 
+        <span class="k">return</span> <span class="n">output</span>
+        </div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../../np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">qikify  documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Author.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

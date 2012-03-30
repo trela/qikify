@@ -1,6 +1,0 @@
-qikify.views.charts.pairs
-=========================
-
-.. currentmodule:: qikify.views.charts
-
-.. autodata:: pairs

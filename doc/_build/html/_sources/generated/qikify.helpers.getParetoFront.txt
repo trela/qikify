@@ -1,6 +1,0 @@
-qikify.helpers.getParetoFront
-=============================
-
-.. currentmodule:: qikify.helpers
-
-.. autodata:: getParetoFront

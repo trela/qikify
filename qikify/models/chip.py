@@ -1,8 +1,8 @@
+import pandas
 
 class Chip(object):
-    """Encapsulates chip-level data.
+    """This class encapsulates chip-level data.
     """
-    import pandas
     def __init__(self, chip_dict, LCT_prefix = ''):
         """Expects a dictionary of chip data. A prefix indicating which 
         parameters are low-cost test data is also expected."""

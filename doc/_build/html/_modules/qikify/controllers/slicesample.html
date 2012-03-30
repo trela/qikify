@@ -1,0 +1,162 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>qikify.controllers.slicesample &mdash; qikify  documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="qikify  documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../../np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">qikify  documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for qikify.controllers.slicesample</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<div class="viewcode-block" id="slicesample"><a class="viewcode-back" href="../../../qikify.controllers.html#qikify.controllers.slicesample.slicesample">[docs]</a><span class="k">def</span> <span class="nf">slicesample</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">nsamples</span><span class="p">,</span> <span class="n">pdf</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">maxiter</span> <span class="o">=</span> <span class="mi">200</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Loosely based on slicesample() from MATLAB.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
+    <span class="n">rnd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nsamples</span><span class="p">,</span><span class="n">dim</span><span class="p">))</span>
+    <span class="n">e</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">exponential</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">nsamples</span><span class="p">)</span> <span class="c"># needed for the vertical position of the slice.</span>
+    <span class="n">RW</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">nsamples</span><span class="p">,</span><span class="n">dim</span><span class="p">)</span> <span class="c"># factors of randomizing the width</span>
+    <span class="n">RD</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">nsamples</span><span class="p">,</span><span class="n">dim</span><span class="p">)</span> <span class="c"># uniformly draw the point within the slice</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">nsamples</span><span class="p">):</span>
+        <span class="c"># A vertical level is drawn uniformly from (0,f(x0)) and used to define</span>
+        <span class="c"># the horizontal &quot;slice&quot;.</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">logpdf</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">pdf</span><span class="p">)</span> <span class="o">-</span> <span class="n">e</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        
+        <span class="c"># An interval [xl, xr] of width w is randomly position around x0 and then</span>
+        <span class="c"># expanded in steps of size w until both size are outside the slice.   </span>
+        <span class="n">r</span>  <span class="o">=</span> <span class="n">width</span> <span class="o">*</span> <span class="n">RW</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span>
+        <span class="n">xl</span> <span class="o">=</span> <span class="n">x0</span> <span class="o">-</span> <span class="n">r</span> 
+        <span class="n">xr</span> <span class="o">=</span> <span class="n">xl</span> <span class="o">+</span> <span class="n">width</span> 
+        
+        <span class="n">iteration</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c"># step out procedure is performed only when univariate samples are drawn.</span>
+        <span class="k">if</span> <span class="n">dim</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+            <span class="c"># step out to the left.</span>
+            <span class="k">while</span> <span class="n">inside</span><span class="p">(</span><span class="n">xl</span><span class="p">,</span><span class="n">z</span><span class="p">,</span> <span class="n">pdf</span><span class="p">)</span> <span class="ow">and</span> <span class="n">iteration</span> <span class="o">&lt;</span> <span class="n">maxiter</span><span class="p">:</span>
+                <span class="n">xl</span> <span class="o">-=</span> <span class="n">width</span>
+                <span class="n">iteration</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="c"># step out to the right</span>
+            <span class="n">iteration</span> <span class="o">=</span> <span class="mi">0</span>  
+            <span class="k">while</span> <span class="n">inside</span><span class="p">(</span><span class="n">xr</span><span class="p">,</span><span class="n">z</span><span class="p">,</span> <span class="n">pdf</span><span class="p">)</span> <span class="ow">and</span> <span class="n">iteration</span> <span class="o">&lt;</span> <span class="n">maxiter</span><span class="p">:</span>
+                <span class="n">xr</span> <span class="o">+=</span> <span class="n">width</span>
+                <span class="n">iteration</span> <span class="o">+=</span> <span class="mi">1</span>        
+
+        <span class="c"># A new point is found by picking uniformly from the interval [xl, xr].</span>
+        <span class="n">xp</span> <span class="o">=</span> <span class="n">RD</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span><span class="o">*</span><span class="p">(</span><span class="n">xr</span><span class="o">-</span><span class="n">xl</span><span class="p">)</span> <span class="o">+</span> <span class="n">xl</span>
+    
+        <span class="c"># shrink the interval (or hyper-rectangle) if a point outside the</span>
+        <span class="c"># density is drawn.</span>
+        <span class="n">iteration</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">outside</span><span class="p">(</span><span class="n">xp</span><span class="p">,</span><span class="n">z</span><span class="p">,</span> <span class="n">pdf</span><span class="p">)</span> <span class="ow">and</span> <span class="n">iteration</span> <span class="o">&lt;</span> <span class="n">maxiter</span><span class="p">:</span>
+            <span class="n">rshrink</span> <span class="o">=</span> <span class="p">(</span><span class="n">xp</span> <span class="o">&gt;</span> <span class="n">x0</span><span class="p">)</span>
+            <span class="n">lshrink</span> <span class="o">=</span> <span class="o">~</span><span class="n">rshrink</span>
+            <span class="n">xr</span><span class="p">[</span><span class="n">rshrink</span><span class="p">]</span> <span class="o">=</span> <span class="n">xp</span><span class="p">[</span><span class="n">rshrink</span><span class="p">]</span>
+            <span class="n">xl</span><span class="p">[</span><span class="n">lshrink</span><span class="p">]</span> <span class="o">=</span> <span class="n">xp</span><span class="p">[</span><span class="n">lshrink</span><span class="p">]</span>
+            <span class="n">xp</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">dim</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">xr</span><span class="o">-</span><span class="n">xl</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">xl</span> <span class="c"># draw again</span>
+            <span class="n">iteration</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">rnd</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">x0</span> <span class="o">=</span> <span class="n">xp</span> <span class="c"># update the current value </span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">rnd</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span> <span class="k">if</span> <span class="n">nsamples</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">rnd</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="logpdf"><a class="viewcode-back" href="../../../qikify.controllers.html#qikify.controllers.slicesample.logpdf">[docs]</a><span class="k">def</span> <span class="nf">logpdf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">pdf</span><span class="p">):</span>
+    <span class="n">fx</span> <span class="o">=</span> <span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">fx</span><span class="p">)</span> <span class="k">if</span> <span class="n">fx</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+</div>
+<div class="viewcode-block" id="inside"><a class="viewcode-back" href="../../../qikify.controllers.html#qikify.controllers.slicesample.inside">[docs]</a><span class="k">def</span> <span class="nf">inside</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">th</span><span class="p">,</span> <span class="n">pdf</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">logpdf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">pdf</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">th</span>
+</div>
+<div class="viewcode-block" id="outside"><a class="viewcode-back" href="../../../qikify.controllers.html#qikify.controllers.slicesample.outside">[docs]</a><span class="k">def</span> <span class="nf">outside</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">th</span><span class="p">,</span> <span class="n">pdf</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">logpdf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">pdf</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">th</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../../np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">qikify  documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Author.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

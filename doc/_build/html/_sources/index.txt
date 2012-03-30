@@ -1,31 +1,23 @@
-.. Qikify documentation master file, created by
+.. qikify documentation master file, created by
+   sphinx-quickstart on Tue Mar 27 16:23:11 2012.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
 
-*********************************************
-Qikify: Machine learning 
-*********************************************
+Welcome to qikify's documentation!
+==================================
 
-`PDF Version <qikify.pdf>`__
-
-.. module:: qikify
-
-**Date**: |today| **Version**: |version|
-
-**Source Repository:** http://github.com/trela/qikify
-
-**qikify** is a `Python <http://www.python.org>`__ package providing data 
-structures and algorithms for semiconductor manufacturing data analysis.
-
-.. note::
-
-   This documentation assumes general familiarity with NumPy. If you haven't
-   used NumPy much or at all, do invest some time in `learning about NumPy
-   <http://docs.scipy.org>`__ first.
-
-See the package overview for more detail about what's in the library.
+Contents:
 
 .. toctree::
-    :maxdepth: 2
-    
-    api
+   :maxdepth: 4
 
+   qikify
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
 

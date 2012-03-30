@@ -1,43 +1,32 @@
-#!/usr/bin/python
-'''
-Copyright (c) 2011 Nathan Kupp, Yale University.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-'''
-from numpy import *
-from scipy.spatial.distance import pdist, squareform
-from qikify.helpers import *
+import numpy as np
 import pandas
+from scipy.spatial.distance import pdist, squareform
+from qikify.helpers import standardize
 
 # Laplacian score feature selection
 class LSFS(object):
     def run(self, Xin, gnd):
-        """Run LSFS. Arguments are `dataset`, a DataStruct object, and gnd, a 
-        pass/fail vector of the same size. Based on definition from paper:
+        """Run Laplacian Score Feature Selection. 
+         
+        .. note:: Eventually, it'd be nice to maintain col names with Xin so that we can add a plot method to plot scores vs. column names.
         
-         \sum_{ij} (f_r^i - f_r^j) * S_{ij}
-         ----------------------------------
-                      sigma_2
+        Notes
+        -----
+        This code is based on the definition from the paper [1]_:
+
+        .. \\frac{\sum_{ij} (f_r^i - f_r^j) * S_{ij}}{sigma_2}
+
+        .. [1] He, X. and Cai, D. and Niyogi, P., "Laplacian Score for Feature Selection", NIPS 2005.
+
+        Parameters
+        ----------
+        Xin : array_like
+            A numpy.ndarray or pandas.DataFrame, with rows corresponding to observations and columns to features.
+            
+        gnd : array_like
+            A numpy.ndarray or pandas.DataFrame pass/fail vector of the same dimension as Xin
         
-        Now, with newfangled (albeit hacky) support for pandas DataFrames!
-        TODO: Eventually, it'd be nice to maintain col names w/ Xin so we
-        can add plot method to plot scores vs. column names.
+        
         """
         if isinstance(Xin, pandas.DataFrame):
             X = Xin.as_matrix()
@@ -54,18 +43,19 @@ class LSFS(object):
         # t = ncol(X) to be a suitable choice; anything on that order should 
         # work just fine.
         S          = self.constructS(X, gnd, t=X.shape[1]) 
-                   
         D          = sum(S,1)
-        z          = dot(D,X) * dot(D,X) / sum(diag(D))        
-        LPrime     = sum((dot(X.T,S).T * X).T,1) - z
-        DPrime     = sum(dot(X.T,diag(D)).T * X,0) - z
+        z          = (np.dot(D,X) * np.dot(D,X)) / sum(D)  
+        
+        DPrime     = sum(np.dot(X.T,np.diag(D)).T * X,0) - z      
+        LPrime     = sum((np.dot(X.T,S).T * X),1) - z
+        
         
         # Remove trivial solutions
-        DPrime[DPrime < 1e-12] = inf
+        DPrime[DPrime < 1e-12] = np.inf
         
         # Compute and retain Laplacian scores and rankings
         self.Scores    = (LPrime/DPrime).T
-        self.Ranking   = argsort(-self.Scores)
+        self.Ranking   = np.argsort(-self.Scores)
         
         del S  # Clean up to save memory
         return self
@@ -78,8 +68,8 @@ class LSFS(object):
 
     # Construct the W matrix used in LSFS
     def constructS(self, X, gnd, k = 0, t = 1, bLDA=False, bSelfConnected=True):
-        label = unique(gnd)
-        G     = zeros((len(gnd),len(gnd)))
+        label = np.unique(gnd)
+        G     = np.zeros((len(gnd),len(gnd)))
         if bLDA:
             for i in xrange(len(label)):
                 ind = (gnd==label[i])
@@ -87,9 +77,9 @@ class LSFS(object):
             return G
         else:
             for i in xrange(len(label)):
-                ind = nonzero(gnd==label[i])[0]
+                ind = np.nonzero(gnd==label[i])[0]
                 D   = squareform(pdist(X[ind,:], 'sqeuclidean'))  # D_ij = ||x_i - x_j||^2
-                S   = exp(-D/t)                                   # Per LSFS paper, exp(-||x_i - x_j||^2 / t)
+                S   = np.exp(-D/t)                                   # Per LSFS paper, exp(-||x_i - x_j||^2 / t)
                 self._setSubMat(G, S, ind)                         
             if not bSelfConnected:
                 G = zeroMatrixDiagonal(G)

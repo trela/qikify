@@ -13,4 +13,14 @@ setup(name='qikify',
       license='MIT',
       scripts=['qikify/bin/qikify'],
       packages = find_packages(),
+      install_requires=[
+          'setuptools',
+          'numpy', 
+          'scipy', 
+          'matplotlib',
+          'pandas',
+          'sklearn',
+          'zmq', 
+          'msgpack'
+      ]
      )

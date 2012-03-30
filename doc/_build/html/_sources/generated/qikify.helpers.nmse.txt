@@ -1,6 +1,0 @@
-qikify.helpers.nmse
-===================
-
-.. currentmodule:: qikify.helpers
-
-.. autodata:: nmse

@@ -1,6 +1,0 @@
-qikify.views.charts.syntheticAndReal
-====================================
-
-.. currentmodule:: qikify.views.charts
-
-.. autodata:: syntheticAndReal

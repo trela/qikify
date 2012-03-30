@@ -1,6 +1,0 @@
-qikify.controllers.KDE.KDE
-==========================
-
-.. currentmodule:: qikify.controllers.KDE
-
-.. autodata:: KDE
