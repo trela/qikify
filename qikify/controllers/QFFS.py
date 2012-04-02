@@ -1,8 +1,12 @@
+"""Qikify feature selection.
+"""
+
 import numpy as np
+from qikify.helpers import compute_corr_coefs
 
 class QFFS(object):
-    """Qikify feature selection library. Doesn't do much yet; right now only implements
-    correlation coefficient-based feature selection.
+    """Qikify feature selection library. Doesn't do much yet; right now only
+    implements correlation coefficient-based feature selection. 
     """
     
     def __init__(self):
@@ -39,24 +43,14 @@ class QFFS(object):
         all-constant column.
         """
         
-        if method=='corrcoef':
+        if method == 'corrcoef':
             if intercept:
-                cc, cs = self.computeCorrCoefs(X[:,1:],y)
-                return np.concatenate(([0],cs[0:n_features] + 1))
+                _, cc_sorted = compute_corr_coefs(X[:, 1:], y)
+                return np.concatenate(([0], cc_sorted[0:n_features] + 1))
             else:
-                cc, cs = self.computeCorrCoefs(X,y)
-                return cs[0:n_features]
-        else:
-            raise 'Method Error: specified feature selection method does not exist.'
-           
+                _, cc_sorted = compute_corr_coefs(X, y)
+                return cc_sorted[0:n_features]
 
-    def computeCorrCoefs(self, X,y):
-        """Returns the correlation coefficients between X and y, 
-        along with the arg-sorted indices of ranked most-correlated X-to-y vars.
-        """
-        cc = np.array([np.corrcoef(X[:,i], y)[0,1] for i in xrange(X.shape[1])])
-        return cc, np.argsort(-abs(cc))
-                
-                
-                
-                
+
+
+

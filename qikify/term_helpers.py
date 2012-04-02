@@ -1,4 +1,5 @@
 import curses 
+import numpy as np
 
 class colors(object):
     def __init__(self):
@@ -21,5 +22,7 @@ class colors(object):
         self.ENDC = ''
 
 
-def outputPassFail(gnd):
-    return 'Pass: '+GREEN+str(np.sum(gnd==1))+ENDCOLOR + ' Fail: '+RED+str(np.sum(gnd==0))+ENDCOLOR
+def output_pass_fail(gnd):
+    c = colors()
+    return 'Pass: ' + c.GREEN   + str(np.sum(gnd==1)) + c.ENDC + \
+          ' Fail: ' + c.WARNING + str(np.sum(gnd==0)) + c.ENDC

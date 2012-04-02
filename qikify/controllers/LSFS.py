@@ -1,14 +1,31 @@
+"""Laplacian score feature selection.
+"""
+
 import numpy as np
 import pandas
+import matplotlib.pyplot as plt
 from scipy.spatial.distance import pdist, squareform
-from qikify.helpers import standardize
+from qikify.helpers import standardize, zero_diag, set_submat, gen_max_mat
+from qikify.term_helpers import colors
 
 # Laplacian score feature selection
 class LSFS(object):
+    """Laplacian score feature selection.
+    """
+    
+    def __init__(self):
+        self.col = colors()
+        self.ranking = None
+        self.scores = None
+        self.subset = None
+        self.n_retained = None
+        
+        
     def run(self, Xin, gnd):
         """Run Laplacian Score Feature Selection. 
          
-        .. note:: Eventually, it'd be nice to maintain col names with Xin so that we can add a plot method to plot scores vs. column names.
+        .. note:: Eventually, it'd be nice to maintain col names with Xin so
+        that we can add a plot method to plot scores vs. column names.
         
         Notes
         -----
@@ -16,93 +33,104 @@ class LSFS(object):
 
         .. \\frac{\sum_{ij} (f_r^i - f_r^j) * S_{ij}}{sigma_2}
 
-        .. [1] He, X. and Cai, D. and Niyogi, P., "Laplacian Score for Feature Selection", NIPS 2005.
+        .. [1] He, X. and Cai, D. and Niyogi, P., "Laplacian Score for Feature
+        Selection", NIPS 2005.
 
         Parameters
         ----------
         Xin : array_like
-            A numpy.ndarray or pandas.DataFrame, with rows corresponding to observations and columns to features.
+            A numpy.ndarray or pandas.DataFrame, with rows corresponding to
+            observations and columns to features.
             
         gnd : array_like
-            A numpy.ndarray or pandas.DataFrame pass/fail vector of the same dimension as Xin
-        
-        
+            A numpy.ndarray or pandas.DataFrame pass/fail vector of the same
+            dimension as Xin.
+            
         """
-        if isinstance(Xin, pandas.DataFrame):
-            X = Xin.as_matrix()
-        else:
-            X = Xin
+        X = Xin.as_matrix() if isinstance(Xin, pandas.DataFrame) \
+                            else Xin
         
-        nSmp = X.shape[0]
-        if nSmp != len(gnd): 
-            raise Exception("Data and gnd do not have matching sizes")
+        assert X.shape[0] == len(gnd), \
+            "Data and gnd do not have matching sizes"
         
         _, X = standardize(X)
         
         # Per LSFS paper, S_ij = exp(-||x_i - x_j||^2 / t). I've found that
         # t = ncol(X) to be a suitable choice; anything on that order should 
         # work just fine.
-        S          = self.constructS(X, gnd, t=X.shape[1]) 
-        D          = sum(S,1)
-        z          = (np.dot(D,X) * np.dot(D,X)) / sum(D)  
+        S          = self.construct_w(X, gnd, t=X.shape[1]) 
+        D          = sum(S, 1)
+        dot_d_x    = np.dot(D, X)
+        z          = (dot_d_x * dot_d_x) / sum(D)  
         
-        DPrime     = sum(np.dot(X.T,np.diag(D)).T * X,0) - z      
-        LPrime     = sum((np.dot(X.T,S).T * X),1) - z
+        dprime = sum(np.dot(X.T, np.diag(D)).T * X, 0) - z      
+        lprime = sum(np.dot(X.T, S).T * X, 1) - z
         
         
         # Remove trivial solutions
-        DPrime[DPrime < 1e-12] = np.inf
+        dprime[dprime < 1e-12] = np.inf
         
         # Compute and retain Laplacian scores and rankings
-        self.Scores    = (LPrime/DPrime).T
-        self.Ranking   = np.argsort(-self.Scores)
+        self.scores  = (lprime/dprime).T
+        self.ranking = np.argsort(-self.scores)
         
         del S  # Clean up to save memory
         return self
         
-    def threshold(self, T_L):
-        self.subset    = self.Scores > T_L
-        self.nRetained = int(sum(self.subset))
-        print 'LSFS: retained', GREEN+str(self.nRetained)+ENDCOLOR, 'parameters.'
+    def threshold(self, thresh):
+        """Threshold Laplacian scores, and return subset of features with 
+        Laplacian scores above threshold."""
+        self.subset    = self.scores > thresh
+        self.n_retained = int(sum(self.subset))
+        print 'LSFS: retained %s %d %s parameters.' % \
+              (self.col.GREEN, self.n_retained, self.col.ENDC)
         return self.subset
 
-    # Construct the W matrix used in LSFS
-    def constructS(self, X, gnd, k = 0, t = 1, bLDA=False, bSelfConnected=True):
+    def construct_w(self, 
+                    X, 
+                    gnd, 
+                    t = 1, 
+                    bLDA=False, 
+                    self_connected=True):
+        """Construct the w matrix used in LSFS.
+        """
         label = np.unique(gnd)
-        G     = np.zeros((len(gnd),len(gnd)))
+        G     = np.zeros((len(gnd), len(gnd)))
+        
         if bLDA:
             for i in xrange(len(label)):
                 ind = (gnd==label[i])
-                G[ix_(ind,ind)] = 1.0/sum(ind)
+                G[np.ix_(ind, ind)] = 1.0 / sum(ind)
             return G
+            
         else:
             for i in xrange(len(label)):
                 ind = np.nonzero(gnd==label[i])[0]
-                D   = squareform(pdist(X[ind,:], 'sqeuclidean'))  # D_ij = ||x_i - x_j||^2
-                S   = np.exp(-D/t)                                   # Per LSFS paper, exp(-||x_i - x_j||^2 / t)
-                self._setSubMat(G, S, ind)                         
-            if not bSelfConnected:
-                G = zeroMatrixDiagonal(G)
-            return self._genMaxMatrix(G)
+
+                # D_ij = ||x_i - x_j||^2
+                D   = squareform(pdist(X[ind, :], 'sqeuclidean'))  
+                
+                # Per LSFS paper, exp(-||x_i - x_j||^2 / t)
+                S   = np.exp(-D / t)                         
+                
+                set_submat(G, S, ind)                         
+            if not self_connected:
+                G = zero_diag(G)
+            return gen_max_mat(G)
         print 'LSFS: Construction of W matrix complete.'
 
-    def _setSubMat(self, X, D, ind):
-        """Set a submatrix of X defined by the index ind to values in D. 
-        That is:
-                 [0, 0, 0]
-             X = [0, 0, 0]   D = [1 2] ind = [0 1]
-                 [0, 0, 0]       [3 4]
-        Gives:
-                 [1, 2, 0]
-             X = [3, 4, 0]
-                 [0, 0, 0]
-        """
-        for i, row in enumerate(ind):
-            X[row,ind] = D[i,:]
 
-    def _genMaxMatrix(self, A):
-        """Takes a square matrix A and computes max(A, A')"""
-        ind = (A.T - A) > 0
-        A[ind] = A.T[ind]
-        return A
+    def plot(self, filename):
+        """Plot laplacian scores.
+        """
+        plt.plot(self.scores[self.ranking], 'k-')
+        plt.grid(True)
+        plt.xlabel('Features Retained')
+        plt.ylabel('Laplacian Score')
+        if filename is None:
+            plt.show()
+        else:
+            plt.savefig(filename, dpi=150, format='pdf')
+        plt.close()
+
 

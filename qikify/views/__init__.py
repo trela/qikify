@@ -1,1 +1,2 @@
-from viewserver import ViewServer
+"""Qikify MVC Framework: views
+"""

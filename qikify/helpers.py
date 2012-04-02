@@ -1,11 +1,15 @@
-import numpy as np
-import scipy, csv, pandas
-from qikify.models.dotdict import dotdict
-import logging, os
+"""Qikify helpers.
+"""
 
+import numpy as np
+import scipy, pandas, logging, os
 
 def create_logger(logmodule):
-    # create logger with 'spam_application'
+    """Creates a logger for 'logmodule', enabling qikify controllers/recipes to
+    log to text output files. Useful for generating data that later is used in
+    views.
+    """
+    
     logger = logging.getLogger(logmodule)
     logger.setLevel(logging.INFO)
 
@@ -15,7 +19,7 @@ def create_logger(logmodule):
         config = ConfigParser.RawConfigParser()
         config.read(os.path.expanduser('~/.qikifyrc'))
         logdir = config.get('Logging', 'logdir')
-    except:
+    except IOError:
         logdir = '/tmp/qikify/test'
 
     if not os.path.exists(logdir):
@@ -31,7 +35,8 @@ def create_logger(logmodule):
     ch.setLevel(logging.INFO)
     
     # create formatter and add it to the handlers
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = \
+       logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     fh.setFormatter(formatter)
     ch.setFormatter(formatter)
     
@@ -46,10 +51,10 @@ def create_logger(logmodule):
 def bool2symmetric(data):
     """Changes True/False data to +1/-1 symmetric.
     """
-    return np.array((data-0.5)*2.0,dtype = int)
+    return np.array(( data - 0.5 ) * 2.0, dtype = int)
 
 
-def standardize(X, scaleDict = None, reverse = False):
+def standardize(X, scale_dict = None, reverse = False):
     """Facilitates standardizing data by subtracting the mean and dividing by
     the standard deviation. Set reverse to True to perform the inverse 
     operation.
@@ -58,7 +63,7 @@ def standardize(X, scaleDict = None, reverse = False):
     ----------
     X : numpy ndarray, or pandas.DataFrame
         Data for which we want pareto-optimal front.
-    scaleDict: dict, default None
+    scale_dict: dict, default None
         Dictionary with elements mean/std to control standardization.
     reverse: boolean, default False
         If this flag is set, the standardization will be reversed; e.g.,
@@ -67,19 +72,44 @@ def standardize(X, scaleDict = None, reverse = False):
     
     Examples
     --------
-    TODO
+    >>> Xstd, scale_dict = standardize(X)
         
     """
     if reverse:
-        return (X * scaleDict.std) + scaleDict.mean
-    elif scaleDict is None:
-        scaleDict = dotdict({'mean': X.mean(0).tolist(), 'std': X.std(0).tolist()})
-        return scaleDict, (X - scaleDict.mean) / scaleDict.std
+        return (X * scale_dict['std']) + scale_dict['mean']
+    elif scale_dict is None:
+        scale_dict = {'mean': X.mean(0).tolist(), \
+                       'std': X.std(0).tolist()}
+        return scale_dict, (X - scale_dict['mean']) / scale_dict['std']
     else:
-        return (X - scaleDict.mean) / scaleDict.std
+        return (X - scale_dict['mean']) / scale_dict['std']
 
 
-def zeroMatrixDiagonal(X):
+
+def set_submat(X, D, ind):
+    """Set a submatrix of X defined by the index ind to values in D. 
+    That is:
+             [0, 0, 0]
+         X = [0, 0, 0]   D = [1 2] ind = [0 1]
+             [0, 0, 0]       [3 4]
+    Gives:
+             [1, 2, 0]
+         X = [3, 4, 0]
+             [0, 0, 0]
+    """
+    for i, row in enumerate(ind):
+        X[row, ind] = D[i, :]
+
+
+def gen_max_mat(A):
+    """Takes a square matrix A and computes max(A, A').
+    """
+    ind = (A.T - A) > 0
+    A[ind] = A.T[ind]
+    return A
+    
+
+def zero_diag(X):
     """Set the diagonal of a matrix to all zeros.
     
     Parameters
@@ -89,13 +119,13 @@ def zeroMatrixDiagonal(X):
         
     Examples
     --------
-    Xp = zeroMatrixDiagonal(X)
+    Xp = zero_diag(X)
     
     """
     return X - np.diag(np.diag(X))
 
 
-def getParetoFront(data):
+def get_pareto_front(data):
     """Extracts the 2D Pareto-optimal front from a 2D numpy array.
     
     Parameters
@@ -105,18 +135,18 @@ def getParetoFront(data):
     
     Examples
     --------
-    p = getParetoFront(data)
+    p = get_pareto_front(data)
     
     """
-    dflags  = np.ones(data.shape[0], dtype=bool)
+    dflags = np.ones(data.shape[0], dtype=bool)
     for i in xrange(data.shape[0]):
-        point = data[i,:]
+        point = data[i, :]
         for j in xrange(data.shape[0]):
             if i == j:
                 continue
-            if np.all(point > data[j,:]):
+            if np.all(point > data[j, :]):
                 dflags[i] = False
-    return np.array(data[dflags,:])
+    return np.array(data[dflags, :])
 
 
 def is1D(data):
@@ -139,7 +169,7 @@ def partition(data, threshold=0.5, verbose = False):
         
     Examples
     --------
-    TODO
+    >>> xtrain, ytrain, xtest, ytest = partition(data)
         
     """
     
@@ -154,15 +184,15 @@ def partition(data, threshold=0.5, verbose = False):
     test_index = index >= threshold
     
     if isinstance(data, pandas.DataFrame):        
-        xtrain = data.ix[train_index,:ncol-1]
-        ytrain = data.ix[train_index,ncol-1]
-        xtest  = data.ix[test_index,:ncol-1]
-        ytest  = data.ix[test_index,ncol-1]
+        xtrain = data.ix[train_index, :ncol-1]
+        ytrain = data.ix[train_index, ncol-1]
+        xtest  = data.ix[test_index, :ncol-1]
+        ytest  = data.ix[test_index, ncol-1]
     elif isinstance(data, np.ndarray):
-        xtrain = data[train_index,:-1]
-        ytrain = data[train_index,-1]
-        xtest  = data[test_index,:-1]
-        ytest  = data[test_index,-1]
+        xtrain = data[train_index, :-1]
+        ytrain = data[train_index, -1]
+        xtest  = data[test_index, :-1]
+        ytest  = data[test_index, -1]
     else:
         raise Exception, 'data must be numpy.ndarray or pandas.DataFrame'
     
@@ -186,8 +216,9 @@ def nmse(yhat, y, min_y=None, max_y=None):
     y : 1d array or list of floats
         true values
     min_y, max_y : float, float
-      roughly the min and max; they do not have to be the perfect values of min and max, because
-      they're just here to scale the output into a roughly [0,1] range
+      roughly the min and max; they do not have to be the perfect values of min
+      and max, because they're just here to scale the output into a roughly
+      [0,1] range
 
     Examples
     --------
@@ -231,13 +262,29 @@ def computeR2(yhat, y):
     r2 = computeR2(yhat, y)
     
     """
-    #e    = y - yhat              # residuals
-    #return 1 - e.var()/y.var() # model R-squared
-    #y_bar = np.mean(y)
-    #SSReg = sum((yhat - y_bar)**2)
-    #SST   = sum((y    - y_bar)**2)
-    #return SSReg/SST
-    return np.corrcoef(yhat, y)[0,1]**2
+    return np.corrcoef(yhat, y)[0, 1]**2
     
+
+def compute_corr_coefs(X, y):
+    """Returns the correlation coefficients between X and y, along with the
+    arg-sorted indices of ranked most-correlated X-to-y vars. 
+    """
+    corr_coef = np.array([np.corrcoef(X[:, i], y)[0, 1] \
+                      for i in xrange(X.shape[1])])
+                                            
+    return corr_coef, np.argsort(-abs(corr_coef))
+
+                
+            
+def compute_te_yl(gnd, predicted):
+    """Report test escapes / yield loss test metrics due to using the 
+    trained classifier.
+    """
+    test_escapes = \
+        sum(np.logical_and((gnd < 0), (predicted > 0))) * 100.0 / len(gnd)
+    yield_loss = \
+        sum(np.logical_and((gnd > 0), (predicted < 0))) * 100.0 / len(gnd)
+    return [test_escapes, yield_loss]
     
+
 

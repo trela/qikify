@@ -1,23 +1,22 @@
-import os
-import time
-import zmq
-import csv
-import pandas
-import msgpack
-import fnmatch
-import fileinput
+"""Qikify ATE Simulator."""
+
+import os, time, zmq, msgpack, fnmatch, fileinput
 from qikify.models.chip import Chip
-from qikify.models.helpers import gz_csv_read
 from qikify.helpers import create_logger
 
 
 class ChipDataIterator(object):
+    """Chip data iterator, abstracts file i/o from csv files of data.
+    """
+    
     def __init__(self, data_dir):
         self.data_dir = data_dir
+        self.header   = None
+        
         file_list    = os.listdir(self.data_dir)
         csv_files    = fnmatch.filter(file_list, '*.csv') 
         csv_gz_files = fnmatch.filter(file_list, '*.csv.gz') 
-
+        
         assert len(csv_files) > 0 or len(csv_gz_files) > 0, \
                'Error: no data found in filesystem path'
 
@@ -32,10 +31,8 @@ class ChipDataIterator(object):
         self.chip_iter = fileinput.input(self.data) 
         self.n_files_read = 0
 
-
     def __iter__(self):
         return self
-
 
     def next(self):
         """The call to self.chip_iter.next() will raise StopIteration when done, 
@@ -57,8 +54,9 @@ class ChipDataIterator(object):
 
 class ATESimulator(object):    
     def __init__(self, data_src='filesystem'):
-        """This class is for simulating ATE. It loads data from a data source specified
-        by the argument data_src, and emits Chip() model tuples of data.
+        """This class is for simulating ATE. It loads data from a data source
+        specified by the argument data_src, and emits Chip() model tuples of
+        data. 
         """
         self.data_src = data_src
 
@@ -70,8 +68,8 @@ class ATESimulator(object):
         self.logger = create_logger('qikify.recipes.ATESimulator')
         
     def run(self, port=5570):
-        """This function runs the ATE simulator using CSV files in the current directory.
-        Currently, we only support loading .csv or .csv.gz files.
+        """This function runs the ATE simulator using CSV files in the current
+        directory. Currently, we only support loading .csv or .csv.gz files.
         """
 
         print 'Running ATE Simulator on port %d ...' % port

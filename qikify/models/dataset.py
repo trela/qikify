@@ -2,14 +2,13 @@
 .. warning:: Deprecated in version 0.2.
 
 """
-import numpy as np
-import gzip, StringIO, sys, os, csv, pandas
+import gzip, StringIO, pandas
 
 from qikify.helpers import is1D
 from qikify.term_helpers import colors
-from .dotdict import dotdict
+from qikify.models.dotdict import DotDict
 
-class Dataset(dotdict): 
+class Dataset(DotDict): 
     """This class is the fundamental data structure of the Qikify framework.
     """
     def __init__(self, filename=None, files=None, dataset=None):
@@ -35,27 +34,32 @@ class Dataset(dotdict):
             self.raw = None
 
     def _loadfile(self, filename):
+        """Load a .csv or .csv.gz file.
+        """
         filetype = filename.split('.')[-1]
         if filetype == 'csv':
             data = pandas.read_csv(filename)
         elif filetype == 'gz':
-            with gzip.open(filename, 'r') as f:
-                data = pandas.read_csv(StringIO.StringIO(f.read())) 
+            with gzip.open(filename, 'r') as in_file:
+                data = pandas.read_csv(StringIO.StringIO(in_file.read())) 
         else:
             raise Exception("Wrong file type, expected .csv or .csv.gz.")
         return data
         
     def __repr__(self):
-        """Print a summary of the dataset."""
+        """Print a summary of the dataset.
+        """
         output = colors().GREEN + \
                '===============================================\n' + \
                'Dataset                         #Rows #Cols    \n' + \
-               '===============================================\n' + colors().ENDC
+               '===============================================\n' + \
+               colors().ENDC
         for key in self.keys():
             if is1D(self[key]):
                 output += '%-30s %5d %5d\n' % (key, self[key].shape[0], 1)
             else:
-                output += '%-30s %5d %5d\n' % (key, self[key].shape[0], self[key].shape[1])
+                output += '%-30s %5d %5d\n' % (key, self[key].shape[0], \
+                                                    self[key].shape[1])
         return output
 
 

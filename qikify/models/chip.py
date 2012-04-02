@@ -1,10 +1,11 @@
-import pandas
+"""Qikify: Chip model.
+"""
 
 class Chip(object):
     """This class encapsulates chip-level data.
     """
     def __init__(self, chip_dict, LCT_prefix = ''):
-        """Expects a dictionary of chip data. A prefix indicating which 
+        """Expects a dictionary of chip data. A prefix indicating which
         parameters are low-cost test data is also expected."""
 
         self.LCT = {}

@@ -64,7 +64,7 @@ def views(argv):
         print VIEW_USAGE
         return
     if argv[0] == 'run':
-        from qikify.views import ViewServer
+        from qikify.views.viewserver import ViewServer
         ViewServer().run()
 
 

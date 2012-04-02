@@ -4,8 +4,7 @@ import scipy.linalg
 from numpy import log, pi, sqrt, square, diagonal
 
 class OLS(object):
-    """
-    Ordinary least squares multivariate regression.
+    """Ordinary least squares multivariate regression.
     """
 
     def __init__(self):
@@ -80,7 +79,8 @@ class OLS(object):
         return stats.normaltest(self.e) 
     
     def JB(self):
-        """Calculate residual skewness, kurtosis, and do the JB test for normality
+        """Calculate residual skewness, kurtosis, and do the JB test for 
+        normality.
         """
 
         # Calculate residual skewness and kurtosis
@@ -89,7 +89,7 @@ class OLS(object):
         
         # Calculate the Jarque-Bera test for normality
         JB = (self.nobs/6) * (square(skew) + (1/4)*square(kurtosis-3))
-        JBpv = 1-stats.chi2.cdf(JB,2);
+        JBpv = 1-stats.chi2.cdf(JB,2)
 
         return JB, JBpv, skew, kurtosis
 
