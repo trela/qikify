@@ -1,33 +1,40 @@
-var io = require('socket.io').listen(8001);
-
-
-// Generate datasets
-var x = []
-  , y = []
-  , i = 0;
-for (var i = 0; i < 1e3; i++) {
+(function() {
+  var datasets, fs, http, i, io, x, y;
+  console.log('Qikify View Server');
+  io = require('socket.io').listen(8001);
+  fs = require('fs');
+  http = require('http');
+  x = [];
+  y = [];
+  i = 0;
+  while (i < 1e3) {
     x[i] = i * 10;
-    y[i] = (y[i - 1] || 0) + (Math.random() * 7) - 3;    
-}
-datasets = ["raw tester data", "another tester dataset"];
-
-data = {"barData" : {"x": [55, 20, 13, 32, 5, 1, 2, 10, 55, 20, 13, 32, 5, 1, 2, 10, 55, 20, 13, 32, 5, 1, 2, 10]},                                                                                     // y
-            "lineData": {"x": x,
-                         "y": y}};
-
-io.sockets.on('connection', function (socket) {
+    y[i] = (y[i - 1] || 0) + (Math.random() * 7) - 3;
+    i++;
+  }
+  datasets = ["raw tester data", "another tester dataset"];
+  io.sockets.on('connection', function(socket) {
+    var logFile;
     socket.emit('message', 'Connected to web socket server.');
-    
-    // Log other messages
     socket.on('message', function(msg) {
-        console.log('*** Message received from client: ' + msg);
-        //if (msg == 'list') {
-        //    socket.emit('message', JSON.stringify(datasets));
-        //}
+      return console.log('*** Message received from client: ' + msg);
     });
     socket.on('list', function(fn) {
-        console.log(fn);
-        fn(datasets);
+      console.log(fn);
+      return fn(datasets);
     });
-});
-
+    console.log("Watching qikify logs");
+    logFile = '/tmp/qikify/qikify.recipes.ATESimulator.log';
+    return fs.watch(logFile, function(event, filename) {
+      return fs.readFile(logFile, function(err, data) {
+        var lines;
+        if (err) console.log(err);
+        lines = data.toString().split("\n");
+        console.log("Found %d lines", lines.length);
+        return socket.emit('atesim', {
+          statistic: lines.length
+        });
+      });
+    });
+  });
+}).call(this);

@@ -155,7 +155,8 @@ def wafermap(x, y, val, filename=None):
     """
     x = np.array(x, dtype=int)
     y = np.array(y, dtype=int)
-
+    val = np.array(val, dtype=float)
+    
     xmax, ymax = max(x), max(y)
     wafer_map = np.ones((xmax, ymax)) * np.nan
     for i in range(len(x)):
@@ -164,7 +165,7 @@ def wafermap(x, y, val, filename=None):
 
     fig  = plt.figure()
     ax1  = fig.add_subplot(111)
-    cax  = ax1.imshow(wafer_map, cm.RdYlGn, vmin=val.min(), vmax=val.max(), interpolation='nearest')
+    cax  = ax1.imshow(wafer_map.T, cm.RdYlGn, vmin=val.min(), vmax=val.max(), interpolation='nearest')
     cbar = fig.colorbar(cax)
 
     if filename==None:

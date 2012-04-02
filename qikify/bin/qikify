@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import sys
+import sys, os
 
 HELP_STR = """usage: qikify [subcommand]
 
@@ -9,8 +9,10 @@ Qikify: MVC for Adaptive Test
 available subcommands:
   help    show this help message and exit
   atesim  run the ATE simulator
-  basic   run a simple machine learning-based testing system.
-  tttest  run 2 tier test. ATE simulator should already be running.
+  view    run the view server
+  basic   run a simple machine learning-based testing system
+  tttest  run 2 tier test. ATE simulator should already be running
+
 """
 
 
@@ -28,7 +30,13 @@ available parameters:
   run     run 2 tier test. ATE simulator should already be running.
 """
 
+VIEW_USAGE = """usage: qikify view [parameters]
 
+available parameters:
+  help    show this help message and exit
+  run     run the view server. Current working directory should have app.js and index.html.
+
+"""
 
 def atesim(argv):
     if argv is None or argv[0] == 'help':
@@ -52,7 +60,12 @@ def tttest(argv):
         TwoTierTest().run()
 
 def views(argv):
-    print 'Launching View Server...'
+    if argv is None or argv[0] == 'help':
+        print VIEW_USAGE
+        return
+    if argv[0] == 'run':
+        from qikify.views import ViewServer
+        ViewServer().run()
 
 
 if __name__ == '__main__':
@@ -64,7 +77,7 @@ if __name__ == '__main__':
 
     # pass along subcommand args
     argv = sys.argv[2:] if len(sys.argv) >= 3 else None
-
+    
     if subcommand == 'atesim':
         atesim(argv)
     elif subcommand == 'basic':

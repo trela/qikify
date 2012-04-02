@@ -8,6 +8,7 @@ import fnmatch
 import fileinput
 from qikify.models.chip import Chip
 from qikify.models.helpers import gz_csv_read
+from qikify.helpers import create_logger
 
 
 class ChipDataIterator(object):
@@ -64,7 +65,10 @@ class ATESimulator(object):
         # ZeroMQ socket stuff
         self.context = zmq.Context()
         self.socket  = self.context.socket(zmq.REP)
-
+        
+        # Set up logger
+        self.logger = create_logger('qikify.recipes.ATESimulator')
+        
     def run(self, port=5570):
         """This function runs the ATE simulator using CSV files in the current directory.
         Currently, we only support loading .csv or .csv.gz files.
@@ -104,7 +108,10 @@ class ATESimulator(object):
                         print 'invalid message---continuing to next chip.'
                         break
                     print '\n           ',
-
+                
+                # record that we've tested a chip.
+                self.logger.info('chip tested.')
+                
         except KeyboardInterrupt:
             print '\nterminating ATE simulator.'
 

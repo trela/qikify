@@ -10,8 +10,8 @@ class DOMInteractions
     remove: =>
         if @id?
             $("#" + @parentID).children(@id).remove()
-        
-
+            
+    
 class Chart extends DOMInteractions
     # This creates the HTML for a chart in the page.
     constructor: (@name, description) ->

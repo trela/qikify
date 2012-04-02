@@ -1,4 +1,4 @@
-var BarChart, Chart, ChartCollection, DOMInteractions, LineChart, init;
+var BarChart, Chart, ChartCollection, DOMInteractions, LineChart;
 var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
   for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
   function ctor() { this.constructor = child; }
@@ -7,63 +7,6 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
   child.__super__ = parent.prototype;
   return child;
 };
-init = function() {
-  var d;
-  d = new Date();
-  window.today = d.toString().split(' GMT')[0];
-  console.log(today + " *** Qikify debug");
-  window.socket = io.connect('http://localhost:8001');
-  window.socket.on('connect', function() {
-    window.socket.emit('message', 'Client connected.');
-    return console.log('Client requests list of data.');
-  });
-  $("#data-getter-modal").modal({
-    keyboard: true,
-    backdrop: true
-  });
-  return $('#data-getter-modal').bind('show', function() {
-    console.log('Requesting data');
-    window.socket.emit('message', 'Client requests list of data.');
-    return socket.emit('list', function(data) {
-      var d, datasets, _i, _len;
-      if (data != null) {
-        for (_i = 0, _len = data.length; _i < _len; _i++) {
-          d = data[_i];
-          datasets = " " + d + " ";
-        }
-        console.log(data);
-        return $('p#lists').text(datasets);
-      } else {
-        return console.log('No datasets found.');
-      }
-    });
-  });
-};
-$(function() {
-  var barData, barchart, i, lineData, linechart, x, y;
-  init();
-  barData = {
-    "x": [55, 20, 13, 32, 5, 1, 2, 10, 55, 20, 13, 32, 5, 1, 2, 10, 55, 20, 13, 32, 5, 1, 2, 10]
-  };
-  x = [];
-  y = [];
-  i = 0;
-  while (i !== 1e3) {
-    x[i] = i * 10;
-    y[i] = (y[i - 1] || 0) + (Math.random() * 7) - 3;
-    i += 1;
-  }
-  lineData = {
-    x: x,
-    y: y
-  };
-  barchart = new BarChart('Histogram', 'Here, we present a histogram of all the data we have acquired thus far.');
-  barchart.inject('#data-acquisition');
-  barchart.plot(barData);
-  linechart = new LineChart('Line Chart', 'Trending upwards.');
-  linechart.inject('#data-acquisition');
-  return linechart.plot(lineData);
-});
 DOMInteractions = (function() {
   function DOMInteractions(name) {
     this.name = name;

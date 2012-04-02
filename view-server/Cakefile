@@ -1,97 +1,62 @@
-# Based on Cakefile on https://github.com/krismolendyke/InstantJasmineCoffee
+# Adapted from https://github.com/benhowes/coffee-less-cake-starter/blob/master/Cakefile
 
 fs     = require 'fs'
 {exec} = require 'child_process'
 util   = require 'util'
-uglify = require 'uglify-js'
-growl  = require 'growl'
 
-prodSrcCoffeeDir     = 'scripts/coffee'
-prodTargetJsDir      = 'scripts/js'
+coffeedir = 'scripts/coffee'
+jsdir = 'scripts/js'
 
-prodTargetFileName   = 'app'
-prodTargetCoffeeFile = "#{prodSrcCoffeeDir}/#{prodTargetFileName}.coffee"
-prodTargetJsFile     = "#{prodTargetJsDir}/#{prodTargetFileName}.js"
-prodTargetJsMinFile  = "#{prodTargetJsDir}/#{prodTargetFileName}.min.js"
+lessdir = 'stylesheets/less'
+cssdir = 'stylesheets/css'
 
-prodCoffeeOpts = "--bare --output #{prodTargetJsDir} --compile #{prodTargetCoffeeFile}"
+coffeeOptions = "--bare --output #{jsdir} "
+lesscOptions = "--compress"
 
-prodCoffeeFiles = [
-    'main'
-    'graphics'
-]
+task 'watch', 'Watch for coffeescript and less changes', ->
+  util.log "Watching for code changes to:"
+  
+  cFiles = fs.readdir("#{coffeedir}", (err, files)->
+    for file in files
+      fn = (file) -> 
+        parts = file.split('.', 1)
+        if(/(.*)\.(coffee)/i.test(file))
+          compileCoffee(parts[0])
+          fileRef = file
+          util.log " -> #{coffeedir}/#{file}"
+          fs.watchFile "#{coffeedir}/#{file}", (curr, prev) ->
+              if +curr.mtime isnt +prev.mtime
+                  util.log "Saw change in #{coffeedir}/#{fileRef}"
+                  compileCoffee(parts[0])
+      fn(file)
+  )
+  
+  lFiles = fs.readdir("#{lessdir}", (err, files)->
+    for file in files
+      fn = (file) ->
+        parts = file.split('.', 1)
+        if(/(.*)\.(less)/i.test(file))
+          util.log " -> #{lessdir}/#{file}"
+          compileLess(parts[0])
+          fileRef = file
+          fs.watchFile "#{lessdir}/#{file}", (curr, prev) ->
+              if +curr.mtime isnt +prev.mtime
+                  util.log "Saw change in #{lessdir}/#{fileRef}"
+                  compileLess(parts[0])
+      fn(file)
+  )
+  
+  util.log "-----------------------------------"
+  
+  util.log "Performed initial compile. Ready and waiting for changes"
 
-task 'watch', 'Watch prod source files and build changes', ->
-    invoke 'build'
-    util.log "Watching for changes in #{prodSrcCoffeeDir}"
-
-    for file in prodCoffeeFiles then do (file) ->
-        fs.watchFile "#{prodSrcCoffeeDir}/#{file}.coffee", (curr, prev) ->
-            if +curr.mtime isnt +prev.mtime
-                util.log "Saw change in #{prodSrcCoffeeDir}/#{file}.coffee"
-                invoke 'build'
-
-task 'build', 'Build a single JavaScript file from prod files', ->
-    util.log "Building #{prodTargetJsFile}"
-    appContents = new Array remaining = prodCoffeeFiles.length
-    util.log "Appending #{prodCoffeeFiles.length} files to #{prodTargetCoffeeFile}"
-    
-    for file, index in prodCoffeeFiles then do (file, index) ->
-        fs.readFile "#{prodSrcCoffeeDir}/#{file}.coffee"
-                  , 'utf8'
-                  , (err, fileContents) ->
-            handleError(err) if err
-            
-            appContents[index] = fileContents
-            util.log "[#{index + 1}] #{file}.coffee"
-            process() if --remaining is 0
-
-    process = ->
-        fs.writeFile prodTargetCoffeeFile
-                   , appContents.join('\n\n')
-                   , 'utf8'
-                   , (err) ->
-            handleError(err) if err
-            
-            exec "coffee #{prodCoffeeOpts}", (err, stdout, stderr) ->
-                handleError(err) if err
-                message = "Compiled #{prodTargetJsFile}"
-                util.log message
-                displayNotification message
-                # fs.unlink prodTargetCoffeeFile, (err) -> handleError(err) if err
-                invoke 'uglify'                
-
-task 'uglify', 'Minify and obfuscate', ->
-    jsp = uglify.parser
-    pro = uglify.uglify
-
-    fs.readFile prodTargetJsFile, 'utf8', (err, fileContents) ->
-        ast = jsp.parse fileContents  # parse code and get the initial AST
-        ast = pro.ast_mangle ast # get a new AST with mangled names
-        ast = pro.ast_squeeze ast # get an AST with compression optimizations
-        final_code = pro.gen_code ast # compressed code here
-    
-        fs.writeFile prodTargetJsMinFile, final_code
-        # fs.unlink prodTargetJsFile, (err) -> handleError(err) if err
-        
-        message = "Uglified #{prodTargetJsMinFile}"
-        util.log message
-        displayNotification message
-    
-coffee = (options = "", file) ->
-    util.log "Compiling #{file}"
-    exec "coffee #{options} --compile #{file}", (err, stdout, stderr) -> 
-        handleError(err) if err
-        displayNotification "Compiled #{file}"
-
-handleError = (error) -> 
-    util.log error
-    displayNotification error
-        
-displayNotification = (message = '') -> 
-    options = {
-        title: 'CoffeeScript'
-    }
-    try growl.notify message, options
-
-    
+# if you wanted to run these alone then you might as well do it from the command line
+compileCoffee = (file) ->
+  exec "coffee #{coffeeOptions} #{coffeedir}/#{file}.coffee", (error, stdout, stderr) ->
+    util.log(stdout) if stdout
+    util.log(stderr) if stderr
+  
+compileLess = (file) ->
+  exec "lessc #{lesscOptions} #{lessdir}/#{file}.less #{cssdir}/#{file}.css", (error, stdout, stderr) ->
+    util.log(stdout) if stdout
+    util.log(stderr) if stderr

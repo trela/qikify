@@ -1,3 +1,31 @@
+class Statistic
+    # This creates the HTML for a chart in the page.
+    constructor: (@name) ->
+        @isRendered  = false
+        @id       = Raphael.createUUID()
+        console.log window.today + " *** Statistic() - #{@name} #{@id}"
+            
+    inject: (parentID, selfID) =>
+        console.log window.today + " *** Statistic.inject"
+        statHTML = """
+        <p class="statistic">
+            #{ @name }: 
+            <span class="statistic-value" id=#{ @id }>
+            </span>
+        </p>
+        """
+        if not @isRendered
+            @isRendered = true
+            @parentID   = parentID
+            @selfID     = selfID
+            $(parentID).append(statHTML)
+            
+    update: (statistic) =>
+        $('#' + @id).text(statistic)
+              
+    
+
+
 init = () ->
     # Set up date
     d = new Date()
@@ -8,9 +36,8 @@ init = () ->
     window.socket = io.connect('http://localhost:8001')
     window.socket.on('connect', () ->
         window.socket.emit('message', 'Client connected.')
-        console.log 'Client requests list of data.'
-        )
-        
+    )
+    
     # Set up modal dialog
     $("#data-getter-modal").modal({
         keyboard: true, 
@@ -29,13 +56,12 @@ init = () ->
                 $('p#lists').text(datasets) #[" " + data for data in datasets])
             else
                 console.log 'No datasets found.'
-            )
+        )
     )
 
 
 $ ->
     init()
-    
     
     # Bar chart
     barData = {"x": [55, 20, 13, 32, 5, 1, 2, 10, 55, 20, 13, 32, 5, 1, 2, 10, 55, 20, 13, 32, 5, 1, 2, 10]};
@@ -50,13 +76,20 @@ $ ->
         i += 1
     lineData = {x: x, y: y}
     
-    
-    barchart = new BarChart('Histogram', 'Here, we present a histogram of all the data we have acquired thus far.')
-    barchart.inject('#data-acquisition')
-    barchart.plot(barData)
+    #barchart = new BarChart('Histogram', 'Here, we present a histogram of all the data we have acquired thus far.')
+    #barchart.inject('#data-acquisition')
+    #barchart.plot(barData)
     
     linechart = new LineChart('Line Chart', 'Trending upwards.')
-    linechart.inject('#data-acquisition')
+    linechart.inject('#ate-sim')
     linechart.plot(lineData)
+    
+    atestat = new Statistic('Number of chips tested')
+    atestat.inject('#statistics > div')    
+    window.socket.on('atesim', (v) =>
+        atestat.update(v.statistic)
+    )
+    window.atestat = atestat
+    
     
     
