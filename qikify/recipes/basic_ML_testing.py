@@ -2,14 +2,14 @@
 import zmq
 import msgpack
 import time
-from qikify.models.KNNImplementation import KNNImplementation
+from qikify.controllers.KNN import KNN
 from qikify.models import Chip
 
 class BasicMLTesting(object):
     def __init__(self):
         self.chip_buffer = []
         self.recv_count = 0
-        self.knn = KNNImplementation()
+        self.knn = KNN()
 
     def run(self, port = 5570):
         self.port = port
