@@ -12,7 +12,7 @@ class SVM(object):
         self.model = None
         self.scale_dict = None
         
-    def train(self, X, gnd, grid_search = False):
+    def fit(self, X, gnd, grid_search = False):
         """Train a support vector machine model.
         """
         if grid_search:

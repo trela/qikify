@@ -3,7 +3,7 @@ import numpy as np
 from scipy.stats.stats import kurtosis
 from scipy import c_, r_
 
-from qikify.controllers.identify_outliers import \
+from qikify.helpers.identify_outliers import \
     identify_outliers, identify_outliers_specs
 
 from qikify.controllers.KNN import KNN

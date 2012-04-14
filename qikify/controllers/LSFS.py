@@ -5,8 +5,8 @@ import numpy as np
 import pandas
 import matplotlib.pyplot as plt
 from scipy.spatial.distance import pdist, squareform
-from qikify.helpers import standardize, zero_diag, set_submat, gen_max_mat
-from qikify.term_helpers import colors
+from qikify.helpers.helpers import standardize, zero_diag, set_submat, gen_max_mat
+from qikify.helpers.term_helpers import colors
 
 # Laplacian score feature selection
 class LSFS(object):
@@ -14,10 +14,10 @@ class LSFS(object):
     """
     
     def __init__(self):
-        self.col = colors()
-        self.ranking = None
-        self.scores = None
-        self.subset = None
+        self.col        = colors()
+        self.ranking    = None
+        self.scores     = None
+        self.subset     = None
         self.n_retained = None
         
         

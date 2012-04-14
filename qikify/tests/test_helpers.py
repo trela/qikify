@@ -1,4 +1,4 @@
-from qikify.helpers import computeR2
+from qikify.helpers.helpers import computeR2
 import numpy as np
 
 def test_stats():
@@ -9,6 +9,6 @@ def test_stats():
                    6.0, 4.0, 12.0, 7.0, 5.0])
     y = np.array([8.04, 6.95, 7.58, 8.81, 8.33, 9.96, \
                   7.24, 4.26, 10.84, 4.82, 5.68])
-
-    assert computeR2(x, y) < eps
+                  
+    assert (computeR2(x, y) - 0.666542459) < eps
 

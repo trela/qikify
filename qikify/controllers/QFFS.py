@@ -12,7 +12,7 @@ class QFFS(object):
     def __init__(self):
         pass
         
-    def run(self, X, y, n_features=10, intercept=True, method='corrcoef'):
+    def fit(self, X, y, n_features=10, intercept=True, method='corrcoef'):
         """Do feature selection on the basis of correlation coefficients.
         
         Parameters

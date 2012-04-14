@@ -3,7 +3,7 @@
 
 import numpy as np
 import pandas
-from qikify.term_helpers import colors
+from qikify.helpers.term_helpers import colors
 
 class Specs(object):   
     """Qikify specs model.

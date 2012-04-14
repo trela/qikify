@@ -4,8 +4,8 @@
 import pandas
 import numpy as np
 from scipy.special import gamma
-from qikify.helpers import standardize
-from qikify.controllers.slicesample import slicesample
+from qikify.helpers.helpers import standardize
+from qikify.helpers.slicesample import slicesample
 
 class KDE(object):
     """This class implements non-parametric kernel density estimation.
@@ -77,7 +77,7 @@ class KDE(object):
         else:
             print 'KDE: Running on dataset of size n: %d d: %d and \
                 generating %d samples.' % (self.n, self.d, sum(counts.values()))
-            self._gen_spec_limits(X, specs)
+            self._gen_spec_limits(X)
             return self._gen_partitioned_samples(counts)
         
     def _gen_spec_limits(self, X):
@@ -108,22 +108,22 @@ class KDE(object):
         """
 
         # Initialize arrays for speed
-        Sg, Sc, Sf = np.zeros((counts.nGood, self.d)), \
-                     np.zeros((counts.nCritical, self.d)), \
-                     np.zeros((counts.nFail, self.d))
+        Sg, Sc, Sf = np.zeros((counts['nGood'], self.d)), \
+                     np.zeros((counts['nCritical'], self.d)), \
+                     np.zeros((counts['nFail'], self.d))
         ng, nc, nf = 0, 0, 0
         
         thresh = 0.02
         while ( ng+nc+nf < sum(counts.values()) ):
             sample = standardize(self._gen_sample(), \
                                  self.scale_factors, reverse = True)
-            if self._is_good(sample) and ng < counts.nGood:
+            if self._is_good(sample) and ng < counts['nGood']:
                 Sg[ng, :] = sample
                 ng += 1
-            if self._is_failing(sample) and nf < counts.nFail:
+            if self._is_failing(sample) and nf < counts['nFail']:
                 Sf[nf, :] = sample
                 nf += 1
-            if self._is_critical(sample) and nc < counts.nCritical:
+            if self._is_critical(sample) and nc < counts['nCritical']:
                 Sc[nc, :] = sample
                 nc += 1      
             
@@ -131,9 +131,9 @@ class KDE(object):
             # since this can take a while :)
             if float(ng+nc+nf) / sum(counts.values()) > thresh:
                 print 'Ng:%i/%i Nc:%i/%i Nf:%i/%i' % \
-                      (ng, counts.nGood, \
-                       nc, counts.nCritical, \
-                       nf, counts.nFail)
+                      (ng, counts['nGood'], \
+                       nc, counts['nCritical'], \
+                       nf, counts['nFail'])
                 thresh += 0.02
         print 'Non-parametric density estimation sampling complete.'
         return pandas.DataFrame(np.vstack((Sc, Sg, Sf)), columns=self.columns)
