@@ -48,7 +48,7 @@ class ChipDataIterator(object):
         else:
             print '[ %7d ]' % (self.chip_iter.lineno() - self.n_files_read),
             chip_dict = {k : v for k, v in zip(self.header, line) if v.strip() != ''}
-            return Chip(chip_dict, LCT_prefix = 'ORB_')
+            return Chip(chip_dict=chip_dict, LCT_prefix = 'ORB_')
 
                         
 
@@ -88,15 +88,21 @@ class ATESimulator(object):
                     print '->', chip.id, msg, 
                     if msg == 'REQ:send_LCT':
                         # send chip low-cost test data
-                        print 'LCT', 
-                        time.sleep(1)
+                        print 'lct', 
+                        #time.sleep(1)
                         chip_serialized = packer.pack(chip.LCT)
                         self.socket.send( chip_serialized )
                     elif msg == 'REQ:send_HCT':
                         # send chip high-cost test data
                         print 'LCT', 
-                        time.sleep(1)
+                        #time.sleep(1)
                         chip_serialized = packer.pack(chip.HCT)
+                        self.socket.send( chip_serialized )
+                    elif msg == 'REQ:send_gnd':
+                        #send chip gnd test values
+                        print 'gnd'
+                        #time.sleep(1)
+                        chip_serialized=packer.pack(chip.gnd)
                         self.socket.send( chip_serialized )
                     elif msg == 'REQ:done':
                         print 'done.'

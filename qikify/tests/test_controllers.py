@@ -1,14 +1,16 @@
+import pandas
 import numpy as np
 from scipy.stats.stats import kurtosis
 from scipy import c_, r_
 
 from qikify.controllers.identify_outliers import \
     identify_outliers, identify_outliers_specs
-    
+
+from qikify.controllers.KNN import KNN
 from qikify.controllers.KDE import KDE
 from qikify.controllers.LSFS import LSFS
+from qikify.models.chip import Chip
 from qikify.models.specs import Specs
-import pandas
 
 
 def test_identify_outliers():
@@ -67,6 +69,21 @@ def test_lsfs():
     lsfs.run(X, y)
     assert abs(sum(lsfs.scores[0:2]) - 2.0) < 0.2
     assert np.mean(lsfs.scores[2:]) < 0.25
+
+
+
+def test_knn():
+    knn=KNN(n_neighbors=1)
+    chip_data1 = {'ORB_a':1,'ORB_b':1,'gnd':1}
+    chip_data2 = {'ORB_a':-1,'ORB_b':-1,'gnd':-1}
+    chip1 = Chip(chip_data1,LCT_prefix='ORB')
+    chip2 = Chip(chip_data2,LCT_prefix='ORB')
+    chips = [chip1, chip2]
+
+    knn.fit(chips)
+
+    chip3 = Chip({'ORB_a':0.9,'ORB_b':0.9,'gnd':1}, LCT_prefix='ORB')
+    assert knn.predict(chip3) == 1, 'fail: prediction not correct.'
 
 
 

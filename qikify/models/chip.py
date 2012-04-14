@@ -4,20 +4,34 @@
 class Chip(object):
     """This class encapsulates chip-level data.
     """
-    def __init__(self, chip_dict, LCT_prefix = ''):
-        """Expects a dictionary of chip data. A prefix indicating which
-        parameters are low-cost test data is also expected."""
+    
+    def __init__(self, chip_dict=None, LCT=None, HCT=None, gnd=None, LCT_prefix=''):
+        """Expects a dictionary of chip data. A prefix indicating which 
+        parameters are low-cost test data is also expected.
+        
+        Alternatively, the LCT/HCT/gnd values can be provided directly.
+        """
 
-        self.LCT = {}
-        self.HCT = {}
-        try:
-            self.id = chip_dict['WAFER_ID'] + ':' + chip_dict['XY']
-        except:
-            self.id = 'unknown_chip_id'
+        if chip_dict is None:
+            self.LCT = LCT
+            self.HCT = HCT
+            self.gnd = gnd
 
-        for k in chip_dict:
-            if k.startswith(LCT_prefix):
-                self.LCT[k] = chip_dict[k]
-            else:
-                self.HCT[k] = chip_dict[k]
+        else:
+            self.LCT = {}
+            self.HCT = {}
+            self.gnd=0
+            try:
+                self.id = chip_dict['WAFER_ID'] + ':' + chip_dict['XY']
+            except:
+                self.id = 'unknown_chip_id'
+
+
+            for k in chip_dict:
+                if k=="gnd":
+                    self.gnd=chip_dict[k]
+                elif k.startswith(LCT_prefix):
+                    self.LCT[k] = chip_dict[k]
+                else:
+                    self.HCT[k] = chip_dict[k]
 
