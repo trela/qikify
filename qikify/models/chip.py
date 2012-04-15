@@ -22,7 +22,7 @@ class Chip(object):
             self.HCT = {}
             self.gnd=0
             try:
-                self.id = chip_dict['WAFER_ID'] + ':' + chip_dict['XY']
+                self.id = str(chip_dict['WAFER_ID']) + ':' + str(chip_dict['XY'])
             except:
                 self.id = 'unknown_chip_id'
 

@@ -8,6 +8,7 @@ def sigint_replace():
     """
     signal.signal(signal.SIGINT, signal.SIG_IGN)
 
+
 class ViewServer(object):
     """Run a view server.
     """
@@ -48,7 +49,8 @@ class ViewServer(object):
                 pass
                 
         except KeyboardInterrupt:
-            print '\nshutting down view server'
+            print '\nterminating view server'
             self.p_http.terminate()
             self.p_node.terminate()
-          
+
+

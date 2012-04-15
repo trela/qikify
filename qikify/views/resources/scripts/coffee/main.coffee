@@ -84,10 +84,10 @@ $ ->
     linechart.inject('#ate-sim')
     linechart.plot(lineData)
     
-    atestat = new Statistic('Number of chips tested')
+    atestat = new Statistic()
     atestat.inject('#statistics > div')    
     window.socket.on('atesim', (v) =>
-        atestat.update(v.statistic)
+        atestat.update(v)
     )
     window.atestat = atestat
     

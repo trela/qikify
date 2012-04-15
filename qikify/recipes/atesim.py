@@ -1,7 +1,8 @@
 """Qikify ATE Simulator."""
 
-import os, time, zmq, msgpack, fnmatch, fileinput
+import os, sys, time, zmq, json, fnmatch, fileinput, datetime
 from qikify.models.chip import Chip
+from qikify.views.viewserver_mixin import ViewServerMixin
 
 class ChipDataIterator(object):
     """Chip data iterator, abstracts file i/o from csv files of data.
@@ -44,72 +45,90 @@ class ChipDataIterator(object):
             self.n_files_read += 1
             return self.next()
         else:
-            print '[ %7d ]' % (self.chip_iter.lineno() - self.n_files_read),
+            print '[ %7d ]' % (self.chip_iter.lineno() - self.n_files_read)
             chip_dict = {k : v for k, v in zip(self.header, line) if v.strip() != ''}
+            if 'WAFER_ID' not in chip_dict:
+                chip_dict['WAFER_ID'] = self.chip_iter.filename().strip('.csv')
+            if 'XY' not in chip_dict:
+                chip_dict['XY'] = self.chip_iter.filelineno() - 1
+                
             return Chip(chip_dict=chip_dict, LCT_prefix = 'ORB_')
-
+            
                         
 
-class ATESimulator(object):    
-    def __init__(self, data_src='filesystem'):
-        """This class is for simulating ATE. It loads data from a data source
-        specified by the argument data_src, and emits Chip() model tuples of
-        data. 
+class ATESimulator(ViewServerMixin):    
+    def __init__(self, port = 5000):
+        """This class is for simulating ATE. It loads data from a csv files,
+        and emits Chip() model instances of data. 
         """
-        self.data_src = data_src
-
+        self.port = port
+        
         # ZeroMQ socket stuff
         self.context = zmq.Context()
         self.socket  = self.context.socket(zmq.REP)
-                
-    def run(self, port=5570):
+        self.socket.bind('tcp://127.0.0.1:%d' % port)
+        
+        # hand off the ZeroMQ context and port number to the ViewServerMixin
+        # superclass, for logging to view server.
+        super(ATESimulator, self).__init__('atesim', self.port+1, self.context)
+        
+        
+    def run(self):
         """This function runs the ATE simulator using CSV files in the current
         directory. Currently, we only support loading .csv or .csv.gz files.
         """
-
-        print 'Running ATE Simulator on port %d ...' % port
-
-        if self.data_src != 'filesystem':
-            print 'non-filesystem data backends are currently not supported.'
-            return
-        
-        # Run ZeroMQ server
-        self.socket.bind('tcp://127.0.0.1:%d' % port)
-        packer = msgpack.Packer()
+        print 'Running ATE Simulator on port %d ...' % self.port
         try:
-            for chip in ChipDataIterator(os.getcwd()):
-                while True:
-                    msg  = self.socket.recv()
-                    print '->', chip.id, msg, 
-                    if msg == 'REQ:send_LCT':
-                        # send chip low-cost test data
-                        print 'lct', 
-                        #time.sleep(1)
-                        chip_serialized = packer.pack(chip.LCT)
-                        self.socket.send( chip_serialized )
-                    elif msg == 'REQ:send_HCT':
-                        # send chip high-cost test data
-                        print 'LCT', 
-                        #time.sleep(1)
-                        chip_serialized = packer.pack(chip.HCT)
-                        self.socket.send( chip_serialized )
-                    elif msg == 'REQ:send_gnd':
-                        #send chip gnd test values
-                        print 'gnd'
-                        #time.sleep(1)
-                        chip_serialized=packer.pack(chip.gnd)
-                        self.socket.send( chip_serialized )
-                    elif msg == 'REQ:done':
-                        print 'done.'
-                        self.socket.send('RES:ack')
-                        break
-                    else:
-                        print 'invalid message---continuing to next chip.'
-                        break
-                    print '\n           ',
-
+            for i, chip in enumerate(ChipDataIterator(os.getcwd())):
+                self.send_chip(chip)
+                self.update_viewserver(self.stats(i))
         except KeyboardInterrupt:
             print '\nterminating ATE simulator.'
+
+
+    def send_chip(self, chip):
+        """Send a chip along to the test regime over ZeroMQ socket.
+        """
+        while True:
+            msg  = self.socket.recv()
+            print '\t->', chip.id, msg
+            
+            if msg == 'REQ:done':
+                self.socket.send('RES:ack')
+                break
+            
+            time.sleep(1)
+            
+            if msg == 'REQ:LCT':
+                data = chip.LCT
+            elif msg == 'REQ:HCT':
+                data = chip.HCT
+            elif msg == 'REQ:gnd':
+                data = chip.gnd
+            else:
+                break
+                
+            self.socket.send( json.dumps(data) )
+        sys.stdout.flush()
+        return None
+
+
+    def stats(self, i):
+        """The self.update_viewserver() method from the ViewServerMixin class
+        expects a Python object that can be JSONified. This function returns 
+        such an object.
+        """
+        return {
+                    'name' : 'atesim',
+                    'datetime' : datetime.datetime.utcnow().isoformat(),
+                    'parms' :   [
+                                    {
+                                        'name' : 'chips_tested',
+                                        'desc' : 'Number of chips tested.',
+                                        'value': i
+                                    }  
+                                ]
+                }
 
 
 

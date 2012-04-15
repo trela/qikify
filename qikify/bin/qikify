@@ -48,8 +48,8 @@ def atesim(argv):
 
 def basic(argv):
     if argv[0] == 'run':
-        from qikify.recipes.basic_ML_testing import BasicMLTesting
-        BasicMLTesting().run()
+        from qikify.recipes.basic_testing import BasicTesting
+        BasicTesting().run()
 
 def tttest(argv):
     if argv is None or argv[0] == 'help':
