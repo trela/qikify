@@ -1,31 +1,3 @@
-class Statistic
-    # This creates the HTML for a chart in the page.
-    constructor: (@name) ->
-        @isRendered  = false
-        @id       = Raphael.createUUID()
-        console.log window.today + " *** Statistic() - #{@name} #{@id}"
-            
-    inject: (parentID, selfID) =>
-        console.log window.today + " *** Statistic.inject"
-        statHTML = """
-        <p class="statistic">
-            #{ @name }: 
-            <span class="statistic-value" id=#{ @id }>
-            </span>
-        </p>
-        """
-        if not @isRendered
-            @isRendered = true
-            @parentID   = parentID
-            @selfID     = selfID
-            $(parentID).append(statHTML)
-            
-    update: (statistic) =>
-        $('#' + @id).text(statistic)
-              
-    
-
-
 init = () ->
     # Set up date
     d = new Date()
@@ -59,37 +31,13 @@ init = () ->
         )
     )
 
-
 $ ->
     init()
-    
-    # Bar chart
-    barData = {"x": [55, 20, 13, 32, 5, 1, 2, 10, 55, 20, 13, 32, 5, 1, 2, 10, 55, 20, 13, 32, 5, 1, 2, 10]};
-    
-    # Line chart
-    x = []
-    y = []
-    i = 0
-    until i == 1e3
-        x[i] = i * 10;
-        y[i] = (y[i - 1] || 0) + (Math.random() * 7) - 3;
-        i += 1
-    lineData = {x: x, y: y}
-    
-    #barchart = new BarChart('Histogram', 'Here, we present a histogram of all the data we have acquired thus far.')
-    #barchart.inject('#data-acquisition')
-    #barchart.plot(barData)
-    
-    linechart = new LineChart('Line Chart', 'Trending upwards.')
-    linechart.inject('#ate-sim')
-    linechart.plot(lineData)
-    
-    atestat = new Statistic()
-    atestat.inject('#statistics > div')    
-    window.socket.on('atesim', (v) =>
-        atestat.update(v)
-    )
-    window.atestat = atestat
-    
-    
-    
+    ateSection = new Section('atesim', 
+                             'ATE Simulator', 
+                             'updates from the ATE simulator',
+                             true)
+    testSection = new Section('basic', 
+                              'Basic Tester', 
+                              'updates from the test plan',
+                              false)

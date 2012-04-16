@@ -3,6 +3,7 @@
 import os, sys, time, zmq, json, fnmatch, fileinput, datetime
 from qikify.models.chip import Chip
 from qikify.views.viewserver_mixin import ViewServerMixin
+from qikify.helpers.term_helpers import Colors
 
 class ChipDataIterator(object):
     """Chip data iterator, abstracts file i/o from csv files of data.
@@ -11,6 +12,7 @@ class ChipDataIterator(object):
     def __init__(self, data_dir):
         self.data_dir = data_dir
         self.header   = None
+        self.c        = Colors()
         
         file_list    = os.listdir(self.data_dir)
         csv_files    = fnmatch.filter(file_list, '*.csv') 
@@ -45,14 +47,19 @@ class ChipDataIterator(object):
             self.n_files_read += 1
             return self.next()
         else:
-            print '[ %7d ]' % (self.chip_iter.lineno() - self.n_files_read)
             chip_dict = {k : v for k, v in zip(self.header, line) if v.strip() != ''}
             if 'WAFER_ID' not in chip_dict:
                 chip_dict['WAFER_ID'] = self.chip_iter.filename().strip('.csv')
             if 'XY' not in chip_dict:
                 chip_dict['XY'] = self.chip_iter.filelineno() - 1
                 
-            return Chip(chip_dict=chip_dict, LCT_prefix = 'ORB_')
+            chip = Chip(chip_dict=chip_dict, LCT_prefix = 'ORB_')
+            print '[ %7d ] :%s %s %s' \
+                % (self.chip_iter.lineno() - self.n_files_read, 
+                   self.c.GREEN, 
+                   chip.id,
+                   self.c.ENDC)
+            return chip
             
                         
 
@@ -62,11 +69,18 @@ class ATESimulator(ViewServerMixin):
         and emits Chip() model instances of data. 
         """
         self.port = port
+        self.c    = Colors()
         
         # ZeroMQ socket stuff
         self.context = zmq.Context()
         self.socket  = self.context.socket(zmq.REP)
         self.socket.bind('tcp://127.0.0.1:%d' % port)
+        
+        # Internal statistics to track
+        self.num_chips_tested = 0
+        self.num_lct = 0
+        self.num_hct = 0
+        self.num_gnd = 0
         
         # hand off the ZeroMQ context and port number to the ViewServerMixin
         # superclass, for logging to view server.
@@ -80,18 +94,20 @@ class ATESimulator(ViewServerMixin):
         print 'Running ATE Simulator on port %d ...' % self.port
         try:
             for i, chip in enumerate(ChipDataIterator(os.getcwd())):
-                self.send_chip(chip)
-                self.update_viewserver(self.stats(i))
+                self.num_chips_tested = i + 1
+                self.send(chip)
+                self.update_view(self.stats)
+                
         except KeyboardInterrupt:
             print '\nterminating ATE simulator.'
 
 
-    def send_chip(self, chip):
+    def send(self, chip):
         """Send a chip along to the test regime over ZeroMQ socket.
         """
         while True:
             msg  = self.socket.recv()
-            print '\t->', chip.id, msg
+            print '\t->', self.c.RED, msg, self.c.ENDC
             
             if msg == 'REQ:done':
                 self.socket.send('RES:ack')
@@ -101,33 +117,47 @@ class ATESimulator(ViewServerMixin):
             
             if msg == 'REQ:LCT':
                 data = chip.LCT
+                self.num_lct += 1
+                
             elif msg == 'REQ:HCT':
                 data = chip.HCT
+                self.num_hct += 1
+                
             elif msg == 'REQ:gnd':
                 data = chip.gnd
+                self.num_gnd += 1
+                
             else:
                 break
-                
+                                
             self.socket.send( json.dumps(data) )
         sys.stdout.flush()
         return None
 
-
-    def stats(self, i):
-        """The self.update_viewserver() method from the ViewServerMixin class
+    @property
+    def stats(self):
+        """The self.update_view() method from the ViewServerMixin class
         expects a Python object that can be JSONified. This function returns 
         such an object.
         """
         return {
-                    'name' : 'atesim',
-                    'datetime' : datetime.datetime.utcnow().isoformat(),
-                    'parms' :   [
-                                    {
-                                        'name' : 'chips_tested',
-                                        'desc' : 'Number of chips tested.',
-                                        'value': i
-                                    }  
-                                ]
+                'name' : 'atesim',
+                'datetime' : datetime.datetime.utcnow().isoformat(),
+                'parms' :   
+                    {
+                    'chips_tested' : {
+                            'desc' : 'Number of chips tested',
+                            'value': str(self.num_chips_tested)
+                    },
+                    'perc_lct' : {
+                            'desc' : 'Percent of chips tested with LCT',
+                            'value': str(float(100.0 * self.num_lct) / self.num_chips_tested) + '%'
+                    },
+                    'perc_hct' : {
+                            'desc' : 'Percent of chips tested with HCT',
+                            'value': str(float(100.0 * self.num_hct) / self.num_chips_tested) + '%'
+                    }      
+                    }
                 }
 
 

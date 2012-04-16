@@ -8,10 +8,33 @@ body {
     background: url('../../images/wafer.png');
 }
 
-.statistic { 
-    
+
+.statistics {
+    min-height: 150px; 
 }
-.statistic-value { 
-    font-size: 20px;
+
+.stat {
+    position: relative;
+    float: left;
+    width: 291px;
+    padding: 5px;
+    margin: 5px; 
+    
+    #gradient > .vertical-three-colors(#777,#666,.45,#444);
+
+    border: 1px solid #555;
+    .border-radius(4px);
+    
+    color: #fff;
+    text-shadow: 0 1px 0 #000;
+}
+
+.stat-value { 
+    font-size: 19px;
     font-weight: bold;
+}
+
+.stat-label {
+    position: relative;
+    top: -2px;
 }

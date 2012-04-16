@@ -10,7 +10,7 @@ class ViewServerMixin(object):
         self.socket_viewserver = self.context.socket(zmq.PUB)
         self.socket_viewserver.bind('tcp://127.0.0.1:%d' % port)
         
-    def update_viewserver(self, msg):
+    def update_view(self, msg):
         self.socket_viewserver.send(json.dumps(msg))
 
         

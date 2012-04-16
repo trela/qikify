@@ -16,8 +16,8 @@ class Forwarder
             # message is prefixed by source ID, suffixed by JSON data.
             @data = JSON.parse(msg.toString())
             console.log('Recv msg from ' + @data.name)
-            console.log(@data)
-            @client_socket.emit(@data.name, @data)
+            console.log(JSON.stringify(@data))
+            @client_socket.emit('message', @data)
         )
     
 
@@ -27,7 +27,7 @@ io.on('connection', (client_socket) ->
     console.log('Qikify: client has connected')
     client_socket.on('message', (msg) -> console.log('*** Message received from client: ' + msg))
     ateSimForwarder = new Forwarder('atesim', 5001, client_socket)
-    ateSimListener.run()
+    ateSimForwarder.run()
 )
 
 

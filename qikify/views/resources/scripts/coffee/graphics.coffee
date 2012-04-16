@@ -1,21 +1,8 @@
-class DOMInteractions
-    constructor: (@name) ->
-        @isRendered = false
-        @id         = null
-    inject: (parentID, content) =>
-        if not @isRendered
-            @isRendered = true
-            @parentID   = parentID
-            $(parentID).append(content)
-    remove: =>
-        if @id?
-            $("#" + @parentID).children(@id).remove()
-            
-    
+   
 class Chart extends DOMInteractions
     # This creates the HTML for a chart in the page.
     constructor: (@name, description) ->
-        @id       = Raphael.createUUID()
+        super
         @chart_id = Raphael.createUUID()
         console.log window.today + " *** Chart() - #{@name} #{@id}"
         @chartHTML = """
@@ -48,6 +35,27 @@ class ChartCollection
         # something like "chart_array.push_back(new_chart) for i in range(10)" here
         # Will create a <section> with charts in page.
         
+        # Bar chart
+        barData = {"x": [55, 20, 13, 32, 5, 1, 2, 10, 55, 20, 13, 32, 5, 1, 2, 10, 55, 20, 13, 32, 5, 1, 2, 10]};
+
+        # Line chart
+        x = []
+        y = []
+        i = 0
+        until i == 1e3
+            x[i] = i * 10;
+            y[i] = (y[i - 1] || 0) + (Math.random() * 7) - 3;
+            i += 1
+        lineData = {x: x, y: y}
+
+        #barchart = new BarChart('Histogram', 'Here, we present a histogram of all the data we have acquired thus far.')
+        #barchart.inject('#data-acquisition')
+        #barchart.plot(barData)
+
+        # linechart = new LineChart('Line Chart', 'Trending upwards.')
+        # linechart.inject('#ate-sim')
+        # linechart.plot(lineData)
+
     add: (name) ->
         console.log 'add' #add a chart here
         

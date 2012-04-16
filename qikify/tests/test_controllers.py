@@ -3,8 +3,7 @@ import numpy as np
 from scipy.stats.stats import kurtosis
 from scipy import c_, r_
 
-from qikify.helpers.identify_outliers import \
-    identify_outliers, identify_outliers_specs
+from qikify.helpers.identify_outliers import identify_outliers
 
 from qikify.controllers.KNN import KNN
 from qikify.controllers.KDE import KDE
@@ -73,16 +72,16 @@ def test_lsfs():
 
 
 def test_knn():
-    knn=KNN(n_neighbors=1)
-    chip_data1 = {'ORB_a':1,'ORB_b':1,'gnd':1}
-    chip_data2 = {'ORB_a':-1,'ORB_b':-1,'gnd':-1}
-    chip1 = Chip(chip_data1,LCT_prefix='ORB')
-    chip2 = Chip(chip_data2,LCT_prefix='ORB')
+    knn = KNN(n_neighbors=1)
+    chip_data1 = {'ORB_a':1, 'ORB_b':1, 'gnd':1}
+    chip_data2 = {'ORB_a':-1, 'ORB_b':-1, 'gnd':-1}
+    chip1 = Chip(chip_data1, LCT_prefix='ORB')
+    chip2 = Chip(chip_data2, LCT_prefix='ORB')
     chips = [chip1, chip2]
 
     knn.fit(chips)
 
-    chip3 = Chip({'ORB_a':0.9,'ORB_b':0.9,'gnd':1}, LCT_prefix='ORB')
+    chip3 = Chip({'ORB_a':0.9, 'ORB_b':0.9, 'gnd':1}, LCT_prefix='ORB')
     assert knn.predict(chip3) == 1, 'fail: prediction not correct.'
 
 

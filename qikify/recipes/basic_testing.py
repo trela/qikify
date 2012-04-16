@@ -1,12 +1,15 @@
 import zmq, json, time
 from qikify.controllers.KNN import KNN
 from qikify.models.chip import Chip
+from qikify.helpers.term_helpers import Colors
 
 class BasicTesting(object):
     def __init__(self, port = 5000):
         self.port = port
         self.knn = KNN()
         self.chips = []
+        self.num_predicted = 0
+        self.c = Colors()
         
         # ZeroMQ stuff
         self.context = zmq.Context()
@@ -18,7 +21,10 @@ class BasicTesting(object):
         self.socket.connect("tcp://127.0.0.1:%d" % self.port)
         try:
             while True:
-                print '[ %7d ]' % (self.recv_count + 1)
+                print '[ Train:     %s %7d %s ] ' \
+                    % (self.c.GREEN, self.num_train_chips, self.c.ENDC),
+                print '[ Predicted: %s %7d %s ]' \
+                    % (self.c.GREEN, self.num_predicted, self.c.ENDC)
                 self.get_chip()
                 self.update_model()
         except KeyboardInterrupt:
@@ -49,23 +55,24 @@ class BasicTesting(object):
         1,000 chips, then we go ahead and train the model.
         """
         
-        if self.recv_count <= 1000:
+        if self.num_train_chips <= 1000:
             self.chips.append(self.current_chip)
                  
-        if self.recv_count == 1000:
+        if self.num_train_chips == 1000:
             print "Training KNN on 1000 chips"
             self.knn.fit(self.chips)
             
-        if self.recv_count > 1000:
-            self.knn.predict(chip)
+        if self.num_train_chips > 1000:
+            self.num_predicted += 1
+            self.knn.predict(self.current_chip)
 
     
     def log(self, msg):
         # might expand this later
-        print '\t->', msg
+        print '\t-> %s %s %s' % ( self.c.RED, msg, self.c.ENDC )
 
 
     @property
-    def recv_count(self):
+    def num_train_chips(self):
         return len(self.chips)
         
