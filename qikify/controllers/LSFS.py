@@ -6,7 +6,7 @@ import pandas
 import matplotlib.pyplot as plt
 from scipy.spatial.distance import pdist, squareform
 from qikify.helpers.helpers import standardize, zero_diag, set_submat, gen_max_mat
-from qikify.helpers.term_helpers import colors
+from qikify.helpers.term_helpers import Colors
 
 # Laplacian score feature selection
 class LSFS(object):

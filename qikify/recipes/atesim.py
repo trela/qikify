@@ -145,18 +145,22 @@ class ATESimulator(ViewServerMixin):
                 'datetime' : datetime.datetime.utcnow().isoformat(),
                 'parms' :   
                     {
-                    'chips_tested' : {
-                            'desc' : 'Number of chips tested',
-                            'value': str(self.num_chips_tested)
-                    },
-                    'perc_lct' : {
-                            'desc' : 'Percent of chips tested with LCT',
-                            'value': str(float(100.0 * self.num_lct) / self.num_chips_tested) + '%'
-                    },
-                    'perc_hct' : {
-                            'desc' : 'Percent of chips tested with HCT',
-                            'value': str(float(100.0 * self.num_hct) / self.num_chips_tested) + '%'
-                    }      
+                        'chips_tested' : {
+                                'desc' : 'Number of chips tested',
+                                'value': str(self.num_chips_tested)
+                        },
+                        'perc_lct' : {
+                                'desc' : 'Percent of chips tested with LCT',
+                                'value': str(float(100.0 * self.num_lct) / self.num_chips_tested) + '%'
+                        },
+                        'perc_hct' : {
+                                'desc' : 'Percent of chips tested with HCT',
+                                'value': str(float(100.0 * self.num_hct) / self.num_chips_tested) + '%'
+                        },
+                        'perc_gnd' : {
+                                'desc' : 'Percent of chips tested completely',
+                                'value': str(float(100.0 * self.num_gnd) / self.num_chips_tested) + '%'
+                        }
                     }
                 }
 

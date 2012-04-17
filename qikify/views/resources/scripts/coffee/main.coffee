@@ -40,4 +40,4 @@ $ ->
     testSection = new Section('basic', 
                               'Basic Tester', 
                               'updates from the test plan',
-                              false)
+                              true)

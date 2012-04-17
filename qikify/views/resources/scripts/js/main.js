@@ -37,5 +37,5 @@ $(function() {
   var ateSection, testSection;
   init();
   ateSection = new Section('atesim', 'ATE Simulator', 'updates from the ATE simulator', true);
-  return testSection = new Section('basic', 'Basic Tester', 'updates from the test plan', false);
+  return testSection = new Section('basic', 'Basic Tester', 'updates from the test plan', true);
 });

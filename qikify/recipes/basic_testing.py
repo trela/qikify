@@ -1,19 +1,29 @@
-import zmq, json, time
+import zmq, json, datetime
 from qikify.controllers.KNN import KNN
 from qikify.models.chip import Chip
 from qikify.helpers.term_helpers import Colors
+from qikify.views.viewserver_mixin import ViewServerMixin
 
-class BasicTesting(object):
+
+class BasicTesting(ViewServerMixin):
     def __init__(self, port = 5000):
-        self.port = port
-        self.knn = KNN()
-        self.chips = []
+        self.port          = port
+        self.chips         = []
+        
         self.num_predicted = 0
-        self.c = Colors()
+        self.is_trained    = False
+        
+        self.knn           = KNN()
+        self.c             = Colors()
         
         # ZeroMQ stuff
         self.context = zmq.Context()
         self.socket  = self.context.socket(zmq.REQ)
+        
+        # hand off the ZeroMQ context and port number to the ViewServerMixin
+        # superclass, for logging to view server.
+        super(BasicTesting, self).__init__('atesim', self.port+2, self.context)
+        
         
     def run(self):
         print 'Running Basic Machine learning-based testing,' + \
@@ -25,8 +35,11 @@ class BasicTesting(object):
                     % (self.c.GREEN, self.num_train_chips, self.c.ENDC),
                 print '[ Predicted: %s %7d %s ]' \
                     % (self.c.GREEN, self.num_predicted, self.c.ENDC)
+                    
                 self.get_chip()
                 self.update_model()
+                self.update_view(self.stats)
+                
         except KeyboardInterrupt:
             print '\nterminating basic ML testing.'
 
@@ -60,6 +73,7 @@ class BasicTesting(object):
                  
         if self.num_train_chips == 1000:
             print "Training KNN on 1000 chips"
+            self.is_trained = True
             self.knn.fit(self.chips)
             
         if self.num_train_chips > 1000:
@@ -75,4 +89,29 @@ class BasicTesting(object):
     @property
     def num_train_chips(self):
         return len(self.chips)
-        
+
+    
+    @property
+    def stats(self):
+        """The self.update_view() method from the ViewServerMixin class
+        expects a Python object that can be JSONified. This function returns 
+        such an object.
+        """
+        return {
+                'name' : 'basic',
+                'datetime' : datetime.datetime.utcnow().isoformat(),
+                'parms' :   
+                    {
+                        'num_train_chips' : 
+                        {
+                            'desc' : 'Number of chips in training set',
+                            'value': str(self.num_train_chips)
+                        },
+                        'is_trained' : 
+                        {
+                            'desc' : 'Model trained',
+                            'value': self.is_trained
+                        }
+                    }
+                }
+                
