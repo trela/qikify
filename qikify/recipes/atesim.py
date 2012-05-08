@@ -47,7 +47,14 @@ class ChipDataIterator(object):
             self.n_files_read += 1
             return self.next()
         else:
-            chip_dict = {k : v for k, v in zip(self.header, line) if v.strip() != ''}
+            # No dict comprehension in python 2.6
+            chip_dict = {}
+            for k, v in zip(self.header, line):
+                if v.strip() != '':
+                    chip_dict[k] = v
+            # not available in python 2.6
+            #chip_dict = {k : v for k, v in zip(self.header, line) if v.strip() != ''}
+            
             if 'WAFER_ID' not in chip_dict:
                 chip_dict['WAFER_ID'] = self.chip_iter.filename().strip('.csv')
             if 'XY' not in chip_dict:
