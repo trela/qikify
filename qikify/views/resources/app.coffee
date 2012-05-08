@@ -2,6 +2,7 @@ io   = require('socket.io').listen(8001)
 fs   = require('fs')                                                                     
 http = require('http')
 zmq  = require('zmq')
+connect = require('connect')
 colors = require('./termcolors.js').colors
 
 
@@ -36,7 +37,5 @@ io.on('connection', (client_socket) ->
     basicForwarder.run()
 )
 
-
-
-
+app = connect().use(connect.static(__dirname)).listen(8000)
 

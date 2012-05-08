@@ -10,32 +10,16 @@ init = function() {
   window.socket.on('connect', function() {
     return window.socket.emit('message', 'Client connected.');
   });
-  $("#data-getter-modal").modal({
-    keyboard: true,
-    backdrop: true
-  });
-  return $('#data-getter-modal').bind('show', function() {
-    console.log('Requesting data');
-    window.socket.emit('message', 'Client requests list of data.');
-    return socket.emit('list', function(data) {
-      var d, datasets, _i, _len;
-      if (data != null) {
-        for (_i = 0, _len = data.length; _i < _len; _i++) {
-          d = data[_i];
-          datasets = " " + d + " ";
-        }
-        console.log(data);
-        return $('p#lists').text(datasets);
-      } else {
-        return console.log('No datasets found.');
-      }
-    });
+  return Highcharts.setOptions({
+    global: {
+      useUTC: false
+    }
   });
 };
 
 $(function() {
-  var ateSection, testSection;
+  var testSection;
   init();
-  ateSection = new Section('atesim', 'ATE Simulator', 'updates from the ATE simulator', true);
-  return testSection = new Section('basic', 'Basic Tester', 'updates from the test plan', true);
+  window.ateSection = new Section('atesim', 'ATE Simulator', 'updates from the ATE simulator');
+  return testSection = new Section('basic', 'Basic Tester', 'updates from the test plan');
 });

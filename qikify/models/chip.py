@@ -21,17 +21,16 @@ class Chip(object):
         else:
             self.LCT = {}
             self.HCT = {}
-            self.gnd=0
+            self.gnd = 0
             try:
                 self.id = str(chip_dict['WAFER_ID']) + ':' + \
                           str(chip_dict['XY'])
             except:
                 self.id = 'unknown_chip_id'
-
-
+            
             for k in chip_dict:
                 if k == "gnd":
-                    self.gnd = chip_dict[k]
+                    self.gnd = int(float(chip_dict[k]))
                 elif k.startswith(LCT_prefix):
                     self.LCT[k] = chip_dict[k]
                 else:

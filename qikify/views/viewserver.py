@@ -1,6 +1,6 @@
 """View server implementation.
 """
-import subprocess, signal, sys, os
+import subprocess, signal, sys, os, time
 
 def sigint_replace():
     """Ignore the SIGINT signal by setting the handler to the standard signal
@@ -30,13 +30,6 @@ class ViewServer(object):
         sys.stdout.flush()
         
         try:
-            # start http server
-            self.p_http = subprocess.Popen(
-                ["python", "-m", "SimpleHTTPServer"],
-                preexec_fn = sigint_replace,
-                cwd = self.resource_dir
-            )
-            
             # start node.js server
             self.p_node = subprocess.Popen(
                 ["node", "app.js"],
@@ -46,11 +39,10 @@ class ViewServer(object):
             
             # Run forever, and wait for Ctrl+C
             while True:
-                pass
-                
+                time.sleep(1)
+
         except KeyboardInterrupt:
             print '\nterminating view server'
-            self.p_http.terminate()
             self.p_node.terminate()
 
 

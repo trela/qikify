@@ -39,7 +39,7 @@ class ChipDataIterator(object):
         """The call to self.chip_iter.next() will raise StopIteration when done, 
         propagating through to the caller of ChipDataIterator().next().
         """
-        line = self.chip_iter.next().split(',')
+        line = self.chip_iter.next().strip().split(',')
         if self.chip_iter.filelineno() <= 1:
             # read header line
             self.header = line
@@ -52,7 +52,7 @@ class ChipDataIterator(object):
                 chip_dict['WAFER_ID'] = self.chip_iter.filename().strip('.csv')
             if 'XY' not in chip_dict:
                 chip_dict['XY'] = self.chip_iter.filelineno() - 1
-                
+
             chip = Chip(chip_dict=chip_dict, LCT_prefix = 'ORB_')
             print '[ %7d ] :%s %s %s' \
                 % (self.chip_iter.lineno() - self.n_files_read, 
@@ -113,7 +113,7 @@ class ATESimulator(ViewServerMixin):
                 self.socket.send('RES:ack')
                 break
             
-            time.sleep(1)
+            #time.sleep(0.1)
             
             if msg == 'REQ:LCT':
                 data = chip.LCT
@@ -151,15 +151,13 @@ class ATESimulator(ViewServerMixin):
                         },
                         'perc_lct' : {
                                 'desc' : 'Percent of chips tested with LCT',
-                                'value': str(float(100.0 * self.num_lct) / self.num_chips_tested) + '%'
-                        },
-                        'perc_hct' : {
-                                'desc' : 'Percent of chips tested with HCT',
-                                'value': str(float(100.0 * self.num_hct) / self.num_chips_tested) + '%'
+                                #'value': '%3.1f%%' % (self.num_lct * 100.0 / self.num_chips_tested)
+                                'value' : (self.num_lct * 100.0 / self.num_chips_tested)
                         },
                         'perc_gnd' : {
                                 'desc' : 'Percent of chips tested completely',
-                                'value': str(float(100.0 * self.num_gnd) / self.num_chips_tested) + '%'
+                                #'value': '%3.1f%%' % (self.num_gnd * 100.0 / self.num_chips_tested)
+                                'value' : (self.num_gnd * 100.0 / self.num_chips_tested)
                         }
                     }
                 }

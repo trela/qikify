@@ -356,7 +356,3 @@ button.btn::-moz-focus-inner,input[type=submit].btn::-moz-focus-inner{padding:0;
 .media-grid a:hover{border-color:#0069d6;-webkit-box-shadow:0 1px 4px rgba(0, 105, 214, 0.25);-moz-box-shadow:0 1px 4px rgba(0, 105, 214, 0.25);box-shadow:0 1px 4px rgba(0, 105, 214, 0.25);}
 body{padding-top:60px;}
 .hero-unit{background:url('../../images/wafer.png');}
-.statistics{min-height:150px;}
-.stat{position:relative;float:left;width:291px;padding:5px;margin:5px;background-color:#444444;background-repeat:no-repeat;background-image:-webkit-gradient(linear, 0 0, 0 100%, from(#777777), color-stop(0.45, #666666), to(#444444));background-image:-webkit-linear-gradient(#777777, #666666 0.45, #444444);background-image:-moz-linear-gradient(top, #777777, #666666 0.45, #444444);background-image:-ms-linear-gradient(#777777, #666666 0.45, #444444);background-image:-o-linear-gradient(#777777, #666666 0.45, #444444);background-image:linear-gradient(#777777, #666666 0.45, #444444);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#777777', endColorstr='#444444', GradientType=0);border:1px solid #555;-webkit-border-radius:4px;-moz-border-radius:4px;border-radius:4px;color:#fff;text-shadow:0 1px 0 #000;}
-.stat-value{font-size:19px;font-weight:bold;}
-.stat-label{position:relative;top:-2px;}

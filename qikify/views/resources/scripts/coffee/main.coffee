@@ -9,35 +9,15 @@ init = () ->
     window.socket.on('connect', () ->
         window.socket.emit('message', 'Client connected.')
     )
-    
-    # Set up modal dialog
-    $("#data-getter-modal").modal({
-        keyboard: true, 
-        backdrop: true
+    Highcharts.setOptions({
+            global: { useUTC: false }
     })
-    
-    # When the "Get data" dialog is clicked, we query the server async for
-    # a list of datasets.
-    $('#data-getter-modal').bind('show', () ->
-        console.log('Requesting data')
-        window.socket.emit('message', 'Client requests list of data.')
-        socket.emit('list', (data) ->
-            if data?
-                datasets = " "+d+" " for d in data
-                console.log data
-                $('p#lists').text(datasets) #[" " + data for data in datasets])
-            else
-                console.log 'No datasets found.'
-        )
-    )
-
+        
 $ ->
     init()
-    ateSection = new Section('atesim', 
+    window.ateSection = new Section('atesim', 
                              'ATE Simulator', 
-                             'updates from the ATE simulator',
-                             true)
+                             'updates from the ATE simulator')
     testSection = new Section('basic', 
                               'Basic Tester', 
-                              'updates from the test plan',
-                              true)
+                              'updates from the test plan')
