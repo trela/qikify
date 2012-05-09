@@ -21,7 +21,7 @@ class LSFS(object):
         self.n_retained = None
         
         
-    def run(self, Xin, gnd):
+    def fit(self, chips):
         """Run Laplacian Score Feature Selection. 
          
         .. note:: Eventually, it'd be nice to maintain col names with Xin so
@@ -38,17 +38,12 @@ class LSFS(object):
 
         Parameters
         ----------
-        Xin : array_like
-            A numpy.ndarray or pandas.DataFrame, with rows corresponding to
-            observations and columns to features.
-            
-        gnd : array_like
-            A numpy.ndarray or pandas.DataFrame pass/fail vector of the same
-            dimension as Xin.
-            
+        chips : list
+            A list of chip objects            
         """
-        X = Xin.as_matrix() if isinstance(Xin, pandas.DataFrame) \
-                            else Xin
+        
+        X   = np.array([chip.LCT.values() for chip in chips])
+        gnd = np.array([chip.gnd for chip in chips])
         
         assert X.shape[0] == len(gnd), \
             "Data and gnd do not have matching sizes"
@@ -58,7 +53,7 @@ class LSFS(object):
         # Per LSFS paper, S_ij = exp(-||x_i - x_j||^2 / t). I've found that
         # t = ncol(X) to be a suitable choice; anything on that order should 
         # work just fine.
-        S          = self.construct_w(X, gnd, t=X.shape[1]) 
+        S          = self._construct_w(X, gnd, t=X.shape[1]) 
         D          = sum(S, 1)
         dot_d_x    = np.dot(D, X)
         z          = (dot_d_x * dot_d_x) / sum(D)  
@@ -86,7 +81,7 @@ class LSFS(object):
               (self.col.GREEN, self.n_retained, self.col.ENDC)
         return self.subset
 
-    def construct_w(self, 
+    def _construct_w(self, 
                     X, 
                     gnd, 
                     t = 1, 

@@ -12,7 +12,7 @@ class OLS(object):
         """
         pass
         
-    def fit(self,X,y,useQR = True, addConstant = True):    
+    def fit(self, X, y, useQR = True, addConstant = True):    
         '''Solve y = Xb.
         
         Parameters

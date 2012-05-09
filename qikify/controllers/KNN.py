@@ -13,8 +13,8 @@ class KNN(object):
 
             Parameters
             ----------
-            chip_list: array_like
-                       Contains a stored array of Chip objects 
+            chip_list: list
+                Contains a stored array of Chip objects 
         """
         X = [chip.LCT.values() for chip in chips]
         y = [chip.gnd for chip in chips]    
@@ -22,14 +22,14 @@ class KNN(object):
         
         
     def predict(self, chip):
-        """This function is another primary point of execution. Here each chip is tested 
-            on the basis of the trained model and predict the outcome of the chip using 
-            KNN implementation predict method.
+        """Here each chip is tested on the basis of the trained model and 
+        predicts the outcome of the chip using KNN implementation predict 
+        method.
 
             Parameters:
             ----------
-            chip_params:array-like
-                        Contains a chip's test parameters
+            chip: chip model object
+                Contains a chip's test parameters
         """
         return self.knnmodel.predict(chip.LCT.values())
 

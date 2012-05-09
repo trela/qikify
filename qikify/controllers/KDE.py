@@ -11,34 +11,35 @@ class KDE(object):
     """This class implements non-parametric kernel density estimation.
     """
     def __init__(self):
-        self.bandwidth = None
-        self.Xn = None
-        self.n = None
-        self.d = None
-        self.h = None
-        self.bounds = None
-        self.inner = None
-        self.outer = None
-        self.scale_factors = None
-        self.lambdas = None
-        self.specs = None
-        self.columns = None
-        self.c_d = None
+        self.bandwidth      = None
+        self.Xn             = None
+        self.n              = None
+        self.d              = None
+        self.h              = None
+        self.bounds         = None
+        self.inner          = None
+        self.outer          = None
+        self.scale_factors  = None
+        self.lambdas        = None
+        self.specs          = None
+        self.columns        = None
+        self.c_d            = None
         
-    def run(self, X, 
-            specs    = None,
+    def fit(self, 
+            chips, 
+            specs     = None,
             n_samples = 0, 
-            counts   = None, 
-            a        = 0, 
-            bounds   = None):
+            counts    = None, 
+            a         = 0, 
+            bounds    = None):
         """Primary execution point. Run either standard KDE or class-membership
         based KDE. If any of the class-membership based KDE arguments are set,
         it will be run instead of standard KDE.
                 
         Parameters
         ----------
-        X : array_like
-            Contains data stored in a pandas.DataFrame.
+        chips : list
+            A list of chip model objects.
         
         n_samples : int
             The number of samples to generate.
@@ -52,6 +53,8 @@ class KDE(object):
             with three keys: nGood, nCritical, nFail.
                  
         """
+        X = pandas.DataFrame([chip.LCT for chip in chips])
+        
         self.n, self.d = X.shape
         self.specs     = specs
         self.columns   = getattr(X, 'columns', None)
