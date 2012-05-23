@@ -23,14 +23,14 @@ The atomic model used in our framework is the `Chip` model, encapsulating chip-l
 A large number of controllers are provided with the Qikify framework. These controllers aim to provide simple APIs, usually defining a standard `controller.run()` method.
 
 ## Views
-The view implementation in our framework is in flux. Currently, views in our framework consist of a collection of scripts to generate common charts in matplotlib; however, a web-based interface is under development to enable users to quickly view real-time statistical data on running machine learning algorithms. 
+In Qikify, a view server recipe is provided. The view server listens for JSON from recipes and controllers, and then forwards that on to any connected web clients. Some client-side javascript parses the JSON and turns it into graphical representations.
 
 
 # Installation
 
   This project is built on and requires the following software:  
   
-  * [python 2.7.2+](http://www.python.org/)
+  * [python 2.6.6+](http://www.python.org/)
   * [numpy 1.6.1+](http://numpy.scipy.org/)
   * [scipy 0.9.0+](http://www.scipy.org/)
   * [sklearn 0.10+](http://scikit-learn.org/stable/)
@@ -42,7 +42,7 @@ Depending on your platform, installing these dependencies is usually straightfor
 
 Once the above are installed, install qikify with:
 
-    git clone git://github.com/natekupp/qikify.git
+    git clone git://github.com/trela/qikify.git
     cd qikify
     python setup.py install
 
@@ -55,6 +55,7 @@ The following are the major project contributors.
 
   * Nate Kupp ([natekupp](https://github.com/natekupp))
   * Abhishek Basu ([abhishekingithub](https://github.com/abhishekingithub))
+  * Ke Huang ([hkhk](https://github.com/hkhk))
 
 ## License 
 

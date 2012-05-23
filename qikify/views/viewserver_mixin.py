@@ -13,7 +13,7 @@ class ViewServerMixin(object):
         
     def update_view(self, msg):
         """We cull most updates to rate limit the view"""
-        if time.time() - self.last_sent > 5:
+        if time.time() - self.last_sent > 2:
             self.last_sent = time.time()
             self.socket_viewserver.send(json.dumps(msg))
 

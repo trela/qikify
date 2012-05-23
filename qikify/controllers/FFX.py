@@ -4,14 +4,14 @@ from helpers import partition
 class FFX(object):
     def __init__(self):
         pass
-    
+
     def fit(self, chips):
         """Fit an FFX model.
 
         Parameters
         ----------
         chips : list
-            A list of chip model objects.        
+            A list of chip model objects.
         """
         data = [chip.LCT.values() + [chip.gnd] for chip in chips]
         

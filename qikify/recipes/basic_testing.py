@@ -11,7 +11,7 @@ class BasicTesting(ViewServerMixin):
         self.chips         = []
         
         self.num_predicted    = 0
-        self.num_tested_chips = 0
+        self.num_chips_tested = 0
         self.test_escapes     = 0
         self.yield_loss       = 0
         
@@ -65,7 +65,7 @@ class BasicTesting(ViewServerMixin):
             'Error: invalid ack from ATE simulator'
         self.log('REQ:done')
         self.current_chip = Chip(LCT=chip_lct, gnd=chip_gnd)
-        self.num_tested_chips += 1
+        self.num_chips_tested += 1
 
 
     def update_model(self):
@@ -73,15 +73,15 @@ class BasicTesting(ViewServerMixin):
         1,000 chips, then we go ahead and train the model.
         """
         
-        if self.num_tested_chips <= 1000:
+        if self.num_chips_tested <= 1000:
             self.chips.append(self.current_chip)
                  
-        if self.num_tested_chips == 1000:
+        if self.num_chips_tested == 1000:
             print "Training KNN on 1000 chips"
             self.is_trained = True
             self.knn.fit(self.chips)
             
-        if self.num_tested_chips >= 1000:
+        if self.num_chips_tested >= 1000:
             time.sleep(0.1)
             self.num_predicted += 1
             chip_gnd_predicted = self.knn.predict(self.current_chip)
@@ -120,17 +120,22 @@ class BasicTesting(ViewServerMixin):
                             'desc' : 'Number of chips in training set',
                             'value': str(self.num_train_chips)
                         },
+                        'num_predicted' : 
+                        {
+                            'desc' : 'Number of chips predicted with k-NN',
+                            'value': str(self.num_predicted)
+                        },
                         'test_escape' : 
                         {
                             'desc' : 'Test escape rate',
-                            #'value': '%1.3f%%' % (self.test_escapes * 100.0 / self.num_tested_chips)
-                            'value': (self.test_escapes * 100.0 / self.num_tested_chips)
+                            #'value': '%1.3f%%' % (self.test_escapes * 100.0 / self.num_chips_tested)
+                            'value': (self.test_escapes * 100.0 / self.num_chips_tested)
                         },
                         'yield_loss' : 
                         {
                             'desc' : 'Yield loss rate',
-                            #'value': '%1.3f%%' % (self.yield_loss * 100.0 / self.num_tested_chips)
-                            'value': (self.yield_loss * 100.0 / self.num_tested_chips)
+                            #'value': '%1.3f%%' % (self.yield_loss * 100.0 / self.num_chips_tested)
+                            'value': (self.yield_loss * 100.0 / self.num_chips_tested)
                         },
                         'is_trained' : 
                         {

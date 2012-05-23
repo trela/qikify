@@ -19,7 +19,7 @@ class ChipDataIterator(object):
         csv_gz_files = fnmatch.filter(file_list, '*.csv.gz') 
         
         assert len(csv_files) > 0 or len(csv_gz_files) > 0, \
-               'Error: no data found in filesystem path'
+               'Error: no data found in current filesystem path'
 
         if len(csv_files) > len(csv_gz_files):
             print 'data source: reading %d csv files...' % len(csv_files)
@@ -72,7 +72,7 @@ class ChipDataIterator(object):
 
 class ATESimulator(ViewServerMixin):    
     def __init__(self, port = 5000):
-        """This class is for simulating ATE. It loads data from a csv files,
+        """This class is for simulating an ATE. It loads data from a csv files,
         and emits Chip() model instances of data. 
         """
         self.port = port
