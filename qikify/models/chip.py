@@ -5,10 +5,14 @@ class Chip(object):
     """This class encapsulates chip-level data.
     """
     
-    def __init__(self, chip_dict=None, LCT=None,
-                 HCT=None, gnd=None, LCT_prefix=''):
-        """Expects a dictionary of chip data. A prefix indicating which 
-        parameters are low-cost test data is also expected.
+    def __init__(self, 
+                 chip_dict=None, 
+                 LCT=None,
+                 HCT=None, 
+                 gnd=None, 
+                 LCT_prefix=''):
+        """Expects a dictionary of chip data, chip_dict. A prefix, LCT_prefix,
+        is also expected, indicating which parameters are low-cost test data.
         
         Alternatively, the LCT/HCT/gnd values can be provided directly.
         """
@@ -23,6 +27,7 @@ class Chip(object):
             self.HCT = {}
             self.gnd = 0
             try:
+                # create an ID by concatenating wafer ID and XY coordinate.
                 self.id = str(chip_dict['WAFER_ID']) + ':' + \
                           str(chip_dict['XY'])
             except:
