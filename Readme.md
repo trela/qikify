@@ -42,7 +42,7 @@ TODO: Need example demonstrating usage.
 The following are the major project contributors.
 
   * Nate Kupp ([natekupp](https://github.com/natekupp))
-  * Abhishek Basu([abhishekingithub](https://github.com/abhishekingith))
+  * Abhishek Basu([abhishekingithub](https://github.com/abhishekingithub))
 
 ## License 
 
