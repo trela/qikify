@@ -1,0 +1,420 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta name="generator" content="jemdoc, see http://jemdoc.jaboc.net/" />
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<style type="text/css">
+/* Default css file for jemdoc. */
+
+table#tlayout {
+    border: none;
+    border-collapse: separate;
+    background: white;
+}
+
+body {
+	background: white;
+	font-family: Georgia, serif;
+	padding-bottom: 8px;
+	margin: 0;
+}
+
+#layout-menu {
+	background: #f6f6f6;
+	border: 1px solid #dddddd;
+	padding-top: 0.5em;
+	padding-left: 8px;
+	padding-right: 8px;
+	font-size: 1.0em;
+	width: auto;
+	white-space: nowrap;
+    text-align: left;
+    vertical-align: top;
+}
+
+#layout-menu td {
+	background: #f4f4f4;
+    vertical-align: top;
+}
+
+#layout-content {
+	padding-top: 0.0em;
+	padding-left: 1.0em;
+	padding-right: 1.0em;
+    border: none;
+    background: white;
+    text-align: left;
+    vertical-align: top;
+}
+
+#layout-menu a {
+	line-height: 1.5em;
+	margin-left: 0.5em;
+}
+
+tt {
+    background: #ffffdd;
+}
+
+pre, tt {
+	font-size: 90%;
+	font-family: monaco, monospace;
+}
+
+a, a > tt {
+	color: #224b8d;
+	text-decoration: none;
+}
+
+a:hover {
+	border-bottom: 1px gray dotted;
+}
+
+#layout-menu a.current:link, #layout-menu a.current:visited {
+	color: #022b6d;
+	border-bottom: 1px gray solid;
+}
+#layout-menu a:link, #layout-menu a:visited, #layout-menu a:hover {
+	color: #527bbd;
+	text-decoration: none;
+}
+#layout-menu a:hover {
+	text-decoration: none;
+}
+
+div.menu-category {
+	border-bottom: 1px solid gray;
+	margin-top: 0.8em;
+	padding-top: 0.2em;
+	padding-bottom: 0.1em;
+	font-weight: bold;
+}
+
+div.menu-item {
+	padding-left: 16px;
+	text-indent: -16px;
+}
+
+div#toptitle {
+	padding-bottom: 0.2em;
+	margin-bottom: 1.5em;
+	border-bottom: 3px double gray;
+}
+
+/* Reduce space if we begin the page with a title. */
+div#toptitle + h2, div#toptitle + h3 {
+	margin-top: -0.7em;
+}
+
+div#subtitle {
+	margin-top: 0.0em;
+	margin-bottom: 0.0em;
+	padding-top: 0em;
+	padding-bottom: 0.1em;
+}
+
+em {
+	font-style: italic;
+}
+
+strong {
+	font-weight: bold;
+}
+
+
+h1, h2, h3 {
+	color: #527bbd;
+	margin-top: 0.7em;
+	margin-bottom: 0.3em;
+	padding-bottom: 0.2em;
+	line-height: 1.0;
+	padding-top: 0.5em;
+	border-bottom: 1px solid #aaaaaa;
+}
+
+h1 {
+	font-size: 165%;
+}
+
+h2 {
+	padding-top: 0.8em;
+	font-size: 125%;
+}
+
+h2 + h3 {
+    padding-top: 0.2em;
+}
+
+h3 {
+	font-size: 110%;
+	border-bottom: none;
+}
+
+p {
+	margin-top: 0.0em;
+	margin-bottom: 0.8em;
+	padding: 0;
+	line-height: 1.3;
+}
+
+pre {
+	padding: 0;
+	margin: 0;
+}
+
+div#footer {
+	font-size: small;
+	border-top: 1px solid #c0c0c0;
+	padding-top: 0.1em;
+	margin-top: 4.0em;
+	color: #c0c0c0;
+}
+
+div#footer a {
+	color: #80a0b0;
+}
+
+div#footer-text {
+	float: left;
+	padding-bottom: 8px;
+}
+
+ul, ol, dl {
+	margin-top: 0.2em;
+	padding-top: 0;
+	margin-bottom: 0.8em;
+}
+
+dt {
+	margin-top: 0.5em;
+	margin-bottom: 0;
+}
+
+dl {
+	margin-left: 20px;
+}
+
+dd {
+	color: #222222;
+}
+
+dd > *:first-child {
+	margin-top: 0;
+}
+
+ul {
+	list-style-position: outside;
+	list-style-type: square;
+}
+
+p + ul, p + ol {
+	margin-top: -0.5em;
+}
+
+li ul, li ol {
+	margin-top: -0.3em;
+}
+
+ol {
+	list-style-position: outside;
+	list-style-type: decimal;
+}
+
+li p, dd p {
+	margin-bottom: 0.3em;
+}
+
+
+ol ol {
+	list-style-type: lower-alpha;
+}
+
+ol ol ol {
+	list-style-type: lower-roman;
+}
+
+p + div.codeblock {
+	margin-top: -0.6em;
+}
+
+div.codeblock, div.infoblock {
+	margin-right: 0%;
+	margin-top: 1.2em;
+	margin-bottom: 1.3em;
+}
+
+div.blocktitle {
+	font-weight: bold;
+	color: #cd7b62;
+	margin-top: 1.2em;
+	margin-bottom: 0.1em;
+}
+
+div.blockcontent {
+	border: 1px solid silver;
+	padding: 0.3em 0.5em;
+}
+
+div.infoblock > div.blockcontent {
+	background: #ffffee;
+}
+
+div.blockcontent p + ul, div.blockcontent p + ol {
+	margin-top: 0.4em;
+}
+
+div.infoblock p {
+	margin-bottom: 0em;
+}
+
+div.infoblock li p, div.infoblock dd p {
+	margin-bottom: 0.5em;
+}
+
+div.infoblock p + p {
+	margin-top: 0.8em;
+}
+
+div.codeblock > div.blockcontent {
+	background: #f6f6f6;
+}
+
+span.pycommand {
+	color: #000070;
+}
+
+span.statement {
+	color: #008800;
+}
+span.builtin {
+	color: #000088;
+}
+span.special {
+	color: #990000;
+}
+span.operator {
+	color: #880000;
+}
+span.error {
+	color: #aa0000;
+}
+span.comment, span.comment > *, span.string, span.string > * {
+	color: #606060;
+}
+
+@media print {
+	#layout-menu { display: none; }
+}
+
+#fwtitle {
+	margin: 2px;
+}
+
+#fwtitle #toptitle {
+	padding-left: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+#layout-content h1:first-child, #layout-content h2:first-child, #layout-content h3:first-child {
+	margin-top: -0.7em;
+}
+
+div#toptitle h1, #layout-content div#toptitle h1 {
+	margin-bottom: 0.0em;
+	padding-bottom: 0.1em;
+	padding-top: 0;
+	margin-top: 0.5em;
+	border-bottom: none;
+}
+
+img.eq {
+	padding: 0;
+	padding-left: 0.1em;
+	padding-right: 0.1em;
+	margin: 0;
+}
+
+img.eqwl {
+	padding-left: 2em;
+	padding-top: 0.6em;
+	padding-bottom: 0.2em;
+	margin: 0;
+}
+
+table {
+    border: 2px solid black;
+    border-collapse: collapse;
+}
+
+td {
+    padding: 2px;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    text-align: center;
+    border: 1px solid gray;
+}
+
+table + table {
+    margin-top: 1em;
+}
+
+tr.heading {
+    font-weight: bold;
+    border-bottom: 2px solid black;
+}
+
+img {
+    border: none;
+}
+
+table.imgtable, table.imgtable td {
+    border: none;
+    text-align: left;
+}
+
+
+</style>
+<title>MVC Architecture</title>
+</head>
+<body>
+<script type="text/javascript">
+
+</script>
+<table summary="Table for page layout" id="tlayout">
+<tr valign="top">
+<td id="layout-menu">
+<div class="menu-category">Home</div>
+<div class="menu-item"><a href="index.html">Motivation</div>
+<div class="menu-item"><a href="qikify.html">MVC:Qikify</div>
+<div class="menu-item"><a href="model.html">Model</div>
+<div class="menu-item"><a href="view.html">View</div>
+<div class="menu-item"><a href="controller.html" class="current">Controller</div>
+<div class="menu-category">Tutorials</div>
+<div class="menu-item"><a href="index.html"></div>
+<div class="menu-item"><a href="prereq.html">Prerequisites</div>
+<div class="menu-item"><a href="runmvc.html">Running MVC Architecture</div>
+<div class="menu-item"><a href=""></div>
+<div class="menu-item"><a href=""></div>
+<div class="menu-category">Projects</div>
+<div class="menu-category">Publications</div>
+<div class="menu-item"><a href="">Conferences</div>
+<div class="menu-item"><a href="">Journals</div>
+<div class="menu-category">Contributors</div>
+<div class="menu-item"><a href="contributors_student.html">Students</div>
+<div class="menu-item"><a href="advisor.html">Advisor</div>
+</td>
+<td id="layout-content">
+<div id="titleheader">
+<br>
+<h1>Controller</h1>
+<div id="author">presented by TRELA</div>
+</div>
+<br>
+<p>Lastly, the controller component of the MVC architecture combines models and input from the user (via the views), and uses these inputs to perform actions on the data encapsulated in the models. We expect that specific analysis tasks can live in the MVC system as applications; with sufficient development effort and attention from industry, we hope this could develop into a complete application ecosystem, with application-specific controller modules broadly available for use. Given this ecosystem of modular controller applications, custom analysis tasks can be realized with dramatically lower complexity by simply wiring together the appropriate controllers with custom code. At the same time, the test engineer’s full control over the analysis is not sacrificed: all controllers can act as super-classes for user code allowing for complete customizability and overriding of default behaviors, if required. For example, consider the support vector machine controller developed in the experimental demonstration. Because application-specific code is pushed into the models, the SVM controller is sufficiently abstracted to suit a broad range of applications. On the other hand, implementing a subclass is always possible if a particular application requires a unique SVM implementation.
+</p>
+<br>
+<p>A large number of controllers are provided with the Qikify framework. These controllers aim to provide simple APIs, usually defining a standard controller.run() method.
+</p>
+</td>
+</tr>
+</table>
+</body>
